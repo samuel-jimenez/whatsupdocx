@@ -3,8 +3,8 @@ package docx
 import (
 	"testing"
 
-	"github.com/gomutex/godocx/wml/ctypes"
-	"github.com/gomutex/godocx/wml/stypes"
+	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
+	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 	"github.com/stretchr/testify/assert"
 )
 

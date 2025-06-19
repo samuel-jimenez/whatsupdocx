@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gomutex/godocx/wml/stypes"
+	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
 func TestExpaComp_MarshalXML(t *testing.T) {

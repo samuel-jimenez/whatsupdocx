@@ -4,8 +4,8 @@ import (
 	"encoding/xml"
 	"testing"
 
-	"github.com/gomutex/godocx/dml/dmlst"
-	"github.com/gomutex/godocx/internal"
+	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
+	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
 
 func TestTile_MarshalXML(t *testing.T) {

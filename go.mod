@@ -1,4 +1,4 @@
-module github.com/gomutex/godocx
+module github.com/samuel-jimenez/whatsupdocx
 
 go 1.18
 

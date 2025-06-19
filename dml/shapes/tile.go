@@ -4,7 +4,7 @@ import (
 	"encoding/xml"
 	"strconv"
 
-	"github.com/gomutex/godocx/dml/dmlst"
+	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
 
 // Tile

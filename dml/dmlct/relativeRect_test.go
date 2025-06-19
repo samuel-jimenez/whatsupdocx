@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gomutex/godocx/internal"
+	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
 
 func TestRelativeRect_MarshalXML(t *testing.T) {

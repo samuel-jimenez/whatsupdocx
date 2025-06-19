@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gomutex/godocx/wml/ctypes"
+	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
 )
 
 // Return a heading paragraph newly added to the end of the document.
