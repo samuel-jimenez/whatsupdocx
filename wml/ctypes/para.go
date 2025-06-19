@@ -2,6 +2,7 @@ package ctypes
 
 import (
 	"encoding/xml"
+	"strings"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
@@ -34,6 +35,22 @@ type Hyperlink struct {
 	ID       string   `xml:"http://schemas.openxmlformats.org/officeDocument/2006/relationships id,attr"`
 	Run      *Run
 	Children []ParagraphChild
+}
+
+func (p Paragraph) String() string {
+	var builder strings.Builder
+	for _, cElem := range p.Children {
+		if cElem.Run != nil {
+			for _, child := range cElem.Run.Children {
+				switch {
+				case child.Text != nil:
+					t := child.Text
+					builder.WriteString(t.Text)
+				}
+			}
+		}
+	}
+	return builder.String()
 }
 
 func (p Paragraph) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
