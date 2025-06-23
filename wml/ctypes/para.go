@@ -8,20 +8,29 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+// CT_P
+// w_CT_P =
 type Paragraph struct {
 	id string
 
 	// Attributes
-	RsidRPr      *stypes.LongHexNum // Revision Identifier for Paragraph Glyph Formatting
-	RsidR        *stypes.LongHexNum // Revision Identifier for Paragraph
-	RsidDel      *stypes.LongHexNum // Revision Identifier for Paragraph Deletion
-	RsidP        *stypes.LongHexNum // Revision Identifier for Paragraph Properties
+	// attribute w:rsidRPr { w_ST_LongHexNumber }?,
+	RsidRPr *stypes.LongHexNum // Revision Identifier for Paragraph Glyph Formatting
+	// attribute w:rsidR { w_ST_LongHexNumber }?,
+	RsidR *stypes.LongHexNum // Revision Identifier for Paragraph
+	// attribute w:rsidDel { w_ST_LongHexNumber }?,
+	RsidDel *stypes.LongHexNum // Revision Identifier for Paragraph Deletion
+	// attribute w:rsidP { w_ST_LongHexNumber }?,
+	RsidP *stypes.LongHexNum // Revision Identifier for Paragraph Properties
+	// attribute w:rsidRDefault { w_ST_LongHexNumber }?,
 	RsidRDefault *stypes.LongHexNum // Default Revision Identifier for Runs
 
 	// 1. Paragraph Properties
+	// element pPr { w_CT_PPr }?,
 	Property *ParagraphProp
 
 	// 2. Choices (Slice of Child elements)
+	// w_EG_PContent*
 	Children []ParagraphChild
 }
 

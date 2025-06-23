@@ -8,7 +8,11 @@ import (
 )
 
 // This element specifies the set of table-wide properties applied to the current table. These properties affect the appearance of all rows and cells within the parent table, but may be overridden by individual table-level exception, row, and cell level properties as defined by each TableProp.
+// w_CT_TblPr =
+// w_CT_TblPrBase,
 type TableProp struct {
+	// 	w_CT_TblPrBase =
+	// element tblStyle { w_CT_String }?,
 
 	// 1. Referenced Table Style
 	// TableStyle represents the style of a table in a document.
@@ -54,48 +58,67 @@ type TableProp struct {
 	Style *CTString `xml:"tblStyle,omitempty"`
 
 	// 2. Floating Table Positioning
+	// element tblpPr { w_CT_TblPPr }?,
 	FloatPos *FloatPos `xml:"tblpPr,omitempty"`
 
 	// 3.Floating Table Allows Other Tables to Overlap
+	// element tblOverlap { w_CT_TblOverlap }?,
 	Overlap *GenSingleStrVal[stypes.TblOverlap] `xml:"tblOverlap,omitempty"`
 
 	// 4. Visually Right to Left Table
+	// element bidiVisual { w_CT_OnOff }?,
 	BidiVisual *OnOff `xml:"bidiVisual,omitempty"`
 
 	// 5. Number of Rows in Row Band
+	// element tblStyleRowBandSize { w_CT_DecimalNumber }?,
 	RowCountInRowBand *DecimalNum `xml:"tblStyleRowBandSize,omitempty"`
 
 	// 6. Number of Columns in Column Band
+	// element tblStyleColBandSize { w_CT_DecimalNumber }?,
 	RowCountInColBand *DecimalNum `xml:"tblStyleColBandSize,omitempty"`
 
 	// 7. Preferred Table Width
+	// element tblW { w_CT_TblWidth }?,
 	Width *TableWidth `xml:"tblW,omitempty"`
 
 	// 8.Table Alignment
+	// element jc { w_CT_JcTable }?,
 	Justification *GenSingleStrVal[stypes.Justification] `xml:"jc,omitempty"`
 
 	// 9.Table Cell Spacing Default
+	// element tblCellSpacing { w_CT_TblWidth }?,
 	CellSpacing *TableWidth `xml:"blCellSpacing,omitempty"`
 
 	// 10. Table Indent from Leading Margin
+	// element tblInd { w_CT_TblWidth }?,
 	Indent *TableWidth `xml:"tblInd,omitempty"`
 
 	// 11. Table Indent from Leading Margin
+	// element tblBorders { w_CT_TblBorders }?,
 	Borders *TableBorders `xml:"tblBorders,omitempty"`
 
 	// 12. Table Shading
+	// element shd { w_CT_Shd }?,
 	Shading *Shading `xml:"shd,omitempty"`
 
 	// 13. Table Layout
+	// element tblLayout { w_CT_TblLayoutType }?,
 	Layout *TableLayout `xml:"tblLayout,omitempty"`
 
 	// 14. Table Cell Margin Defaults
+	// element tblCellMar { w_CT_TblCellMar }?,
 	CellMargin *CellMargins `xml:"tblCellMar,omitempty"`
 
 	// 15. Table Style Conditional Formatting Settings
+	// element tblLook { w_CT_TblLook }?,
 	TableLook *CTString `xml:"tblLook,omitempty"`
 
+	//TODO
+	// element tblCaption { w_CT_String }?,
+	// element tblDescription { w_CT_String }?
+
 	//16. Revision Information for Table Properties
+	// element tblPrChange { w_CT_TblPrChange }?
 	PrChange *TblPrChange `xml:"tblPrChange,omitempty"`
 }
 

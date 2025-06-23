@@ -8,10 +8,14 @@ import (
 )
 
 // DocGrid represents the document grid settings.
+// w_CT_DocGrid =
 type DocGrid struct {
-	Type      stypes.DocGridType `xml:"type,attr,omitempty"`
-	LinePitch *int               `xml:"linePitch,attr,omitempty"`
-	CharSpace *int               `xml:"charSpace,attr,omitempty"`
+	// attribute w:type { w_ST_DocGrid }?,
+	Type stypes.DocGridType `xml:"type,attr,omitempty"`
+	// attribute w:linePitch { w_ST_DecimalNumber }?,
+	LinePitch *int `xml:"linePitch,attr,omitempty"`
+	// attribute w:charSpace { w_ST_DecimalNumber }?
+	CharSpace *int `xml:"charSpace,attr,omitempty"`
 }
 
 // MarshalXML implements the xml.Marshaler interface for the DocGrid type.

@@ -9,8 +9,11 @@ import (
 )
 
 // TableRowHeight represents the height of a table row in a document.
+// w_CT_Height =
 type TableRowHeight struct {
-	Val   *int               `xml:"val,attr,omitempty"`
+	// attribute w:val { s_ST_TwipsMeasure }?,
+	Val *int `xml:"val,attr,omitempty"`
+	// attribute w:hRule { w_ST_HeightRule }?
 	HRule *stypes.HeightRule `xml:"hRule,attr,omitempty"`
 }
 

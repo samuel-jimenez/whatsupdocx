@@ -7,16 +7,29 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+// Border Properties (CT_Border)
+// w_CT_Border =
 type Border struct {
-	Val        stypes.BorderStyle `xml:"val,attr"`
-	Color      *string            `xml:"color,attr,omitempty"`
+	// attribute w:val { w_ST_Border },
+	Val stypes.BorderStyle `xml:"val,attr"`
+	// attribute w:color { w_ST_HexColor }?,
+	// ## default value: auto
+	Color *string `xml:"color,attr,omitempty"`
+	// attribute w:themeColor { w_ST_ThemeColor }?,
 	ThemeColor *stypes.ThemeColor `xml:"themeColor,attr,omitempty"`
-	ThemeTint  *string            `xml:"themeTint,attr,omitempty"`
-	ThemeShade *string            `xml:"themeShade,attr,omitempty"`
-	Space      *string            `xml:"space,attr,omitempty"`
-	Shadow     *stypes.OnOff      `xml:"shadow,attr,omitempty"`
-	Frame      *stypes.OnOff      `xml:"frame,attr,omitempty"`
-	Size       *int               `xml:"sz,attr,omitempty"`
+	// attribute w:themeTint { w_ST_UcharHexNumber }?,
+	ThemeTint *string `xml:"themeTint,attr,omitempty"`
+	// attribute w:themeShade { w_ST_UcharHexNumber }?,
+	ThemeShade *string `xml:"themeShade,attr,omitempty"`
+	// attribute w:sz { w_ST_EighthPointMeasure }?,
+	Size *int `xml:"sz,attr,omitempty"`
+	// attribute w:space { w_ST_PointMeasure }?,
+	// ## default value: 0
+	Space *string `xml:"space,attr,omitempty"`
+	// attribute w:shadow { s_ST_OnOff }?,
+	Shadow *stypes.OnOff `xml:"shadow,attr,omitempty"`
+	// attribute w:frame { s_ST_OnOff }?
+	Frame *stypes.OnOff `xml:"frame,attr,omitempty"`
 }
 
 /*
@@ -53,20 +66,17 @@ func (t Border) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if t.ThemeShade != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeShade"}, Value: *t.ThemeShade})
 	}
+	if t.Size != nil {
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:sz"}, Value: strconv.Itoa(*t.Size)})
+	}
 	if t.Space != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:space"}, Value: *t.Space})
 	}
-
 	if t.Shadow != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:shadow"}, Value: string(*t.Shadow)})
 	}
-
 	if t.Frame != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:frame"}, Value: string(*t.Frame)})
-	}
-
-	if t.Size != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:sz"}, Value: strconv.Itoa(*t.Size)})
 	}
 
 	return e.EncodeElement("", start)

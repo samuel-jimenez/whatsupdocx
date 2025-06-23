@@ -6,6 +6,7 @@ import (
 )
 
 // Header or Footer Type
+// w_ST_HdrFtr = string "even" | string "default" | string "first"
 type HdrFtrType string
 
 const (

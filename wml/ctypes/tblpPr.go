@@ -7,28 +7,40 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+// CT_TblPPr
+// w_CT_TblPPr =
 type FloatPos struct {
-	LeftFromText   *uint64 `xml:"leftFromText,attr,omitempty"`
-	RightFromText  *uint64 `xml:"rightFromText,attr,omitempty"`
-	TopFromText    *uint64 `xml:"topFromText,attr,omitempty"`
+	// attribute w:leftFromText { s_ST_TwipsMeasure }?,
+	LeftFromText *uint64 `xml:"leftFromText,attr,omitempty"`
+	// attribute w:rightFromText { s_ST_TwipsMeasure }?,
+	RightFromText *uint64 `xml:"rightFromText,attr,omitempty"`
+	// attribute w:topFromText { s_ST_TwipsMeasure }?,
+	TopFromText *uint64 `xml:"topFromText,attr,omitempty"`
+	// attribute w:bottomFromText { s_ST_TwipsMeasure }?,
 	BottomFromText *uint64 `xml:"bottomFromText,attr,omitempty"`
 
-	//Frame Horizontal Positioning Base
-	HAnchor *stypes.Anchor `xml:"horzAnchor,attr,omitempty"`
-
 	//Frame Vertical Positioning Base
+	// attribute w:vertAnchor { w_ST_VAnchor }?,
 	VAnchor *stypes.Anchor `xml:"vertAnchor,attr,omitempty"`
 
+	//Frame Horizontal Positioning Base
+	// attribute w:horzAnchor { w_ST_HAnchor }?,
+	HAnchor *stypes.Anchor `xml:"horzAnchor,attr,omitempty"`
+
 	//Relative Horizontal Alignment From Anchor
+	// attribute w:tblpXSpec { s_ST_XAlign }?,
 	XAlign *stypes.XAlign `xml:"tblpXSpec,attr,omitempty"`
 
 	//Relative Vertical Alignment from Anchor
+	// attribute w:tblpYSpec { s_ST_YAlign }?,
 	YAlign *stypes.YAlign `xml:"tblpYSpec,attr,omitempty"`
 
 	//Absolute Horizontal Distance From Anchor
+	// attribute w:tblpX { w_ST_SignedTwipsMeasure }?,
 	AbsXDist *int `xml:"tblpX,attr,omitempty"`
 
 	// Absolute Vertical Distance From Anchor
+	// attribute w:tblpY { w_ST_SignedTwipsMeasure }?
 	AbsYDist *int `xml:"tblpY,attr,omitempty"`
 }
 
@@ -47,11 +59,11 @@ func (t FloatPos) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if t.BottomFromText != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:bottomFromText"}, Value: strconv.FormatUint(*t.BottomFromText, 10)})
 	}
-	if t.HAnchor != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:horzAnchor"}, Value: string(*t.HAnchor)})
-	}
 	if t.VAnchor != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:vertAnchor"}, Value: string(*t.VAnchor)})
+	}
+	if t.HAnchor != nil {
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:horzAnchor"}, Value: string(*t.HAnchor)})
 	}
 	if t.XAlign != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:tblpXSpec"}, Value: string(*t.XAlign)})

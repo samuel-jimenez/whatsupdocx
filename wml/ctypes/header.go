@@ -7,6 +7,14 @@ import (
 )
 
 // Header Reference
+// w_EG_HdrFtrReferences =
+// element headerReference { w_CT_HdrFtrRef }?
+// | element footerReference { w_CT_HdrFtrRef }?
+// w_CT_HdrFtrRef =
+// w_CT_Rel,
+// attribute w:type { w_ST_HdrFtr }
+// w_CT_Rel = r_id
+// r_id = attribute r:id { r_ST_RelationshipId }
 type HeaderReference struct {
 	Type stypes.HdrFtrType `xml:"type,attr"` //Header or Footer Type
 	ID   string            `xml:"id,attr"`   //Relationship to Part
