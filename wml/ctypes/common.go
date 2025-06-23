@@ -106,13 +106,6 @@ func (s Uint64Elem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // !--- Uint64Elem ends here---!
 
-type Empty struct {
-}
-
-func (s Empty) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	return e.EncodeElement("", start)
-}
-
 type Markup struct {
 	ID int `xml:"id,attr"`
 }

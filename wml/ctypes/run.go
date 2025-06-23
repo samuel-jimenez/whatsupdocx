@@ -3,12 +3,14 @@ package ctypes
 import (
 	"encoding/xml"
 
+	"github.com/samuel-jimenez/whatsupdocx/common"
 	"github.com/samuel-jimenez/whatsupdocx/dml"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
+	"github.com/samuel-jimenez/whatsupdocx/mc"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
-// A Run is part of a paragraph that has its own style. It could be
+// A Run is part of a paragraph that has its own style. It could be (CT_R)
 type Run struct {
 	// Attributes
 	RsidRPr *stypes.LongHexNum // Revision Identifier for Run Properties
@@ -41,55 +43,55 @@ type RunChild struct {
 	DelInstrText *Text `xml:"delInstrText,omitempty"`
 
 	//Non Breaking Hyphen Character
-	NoBreakHyphen *Empty `xml:"noBreakHyphen,omitempty"`
+	NoBreakHyphen *common.Empty `xml:"noBreakHyphen,omitempty"`
 
 	//Non Breaking Hyphen Character
-	SoftHyphen *Empty `xml:"softHyphen,omitempty"`
+	SoftHyphen *common.Empty `xml:"softHyphen,omitempty"`
 
 	//Date Block - Short Day Format
-	DayShort *Empty `xml:"dayShort,omitempty"`
+	DayShort *common.Empty `xml:"dayShort,omitempty"`
 
 	//Date Block - Short Month Format
-	MonthShort *Empty `xml:"monthShort,omitempty"`
+	MonthShort *common.Empty `xml:"monthShort,omitempty"`
 
 	//Date Block - Short Year Format
-	YearShort *Empty `xml:"yearShort,omitempty"`
+	YearShort *common.Empty `xml:"yearShort,omitempty"`
 
 	//Date Block - Long Day Format
-	DayLong *Empty `xml:"dayLong,omitempty"`
+	DayLong *common.Empty `xml:"dayLong,omitempty"`
 
 	//Date Block - Long Month Format
-	MonthLong *Empty `xml:"monthLong,omitempty"`
+	MonthLong *common.Empty `xml:"monthLong,omitempty"`
 
 	//Date Block - Long Year Format
-	YearLong *Empty `xml:"yearLong,omitempty"`
+	YearLong *common.Empty `xml:"yearLong,omitempty"`
 
 	//Comment Information Block
-	AnnotationRef *Empty `xml:"annotationRef,omitempty"`
+	AnnotationRef *common.Empty `xml:"annotationRef,omitempty"`
 
 	//Footnote Reference Mark
-	FootnoteRef *Empty `xml:"footnoteRef,omitempty"`
+	FootnoteRef *common.Empty `xml:"footnoteRef,omitempty"`
 
 	//Endnote Reference Mark
-	EndnoteRef *Empty `xml:"endnoteRef,omitempty"`
+	EndnoteRef *common.Empty `xml:"endnoteRef,omitempty"`
 
 	//Footnote/Endnote Separator Mark
-	Separator *Empty `xml:"separator,omitempty"`
+	Separator *common.Empty `xml:"separator,omitempty"`
 
 	//Continuation Separator Mark
-	ContSeparator *Empty `xml:"continuationSeparator,omitempty"`
+	ContSeparator *common.Empty `xml:"continuationSeparator,omitempty"`
 
 	//Symbol Character
 	Sym *Sym `xml:"sym,omitempty"`
 
 	//Page Number Block
-	PgNumBlock *Empty `xml:"pgNum,omitempty"`
+	PgNumBlock *common.Empty `xml:"pgNum,omitempty"`
 
 	//Carriage Return
-	CarrRtn *Empty `xml:"cr,omitempty"`
+	CarrRtn *common.Empty `xml:"cr,omitempty"`
 
 	//Tab Character
-	Tab *Empty `xml:"tab,omitempty"`
+	Tab *common.Empty `xml:"tab,omitempty"`
 
 	//TODO:
 	// 	w:object    Inline Embedded Object
@@ -110,7 +112,7 @@ type RunChild struct {
 	PTab *PTab `xml:"ptab,omitempty"`
 
 	//Position of Last Calculated Page Break
-	LastRenPgBrk *Empty `xml:"lastRenderedPageBreak,omitempty"`
+	LastRenPgBrk *common.Empty `xml:"lastRenderedPageBreak,omitempty"`
 }
 
 func NewRun() *Run {
@@ -187,7 +189,7 @@ loop:
 					return err
 				}
 			case "tab":
-				tabElem := &Empty{}
+				tabElem := &common.Empty{}
 				if err = d.DecodeElement(tabElem, &elem); err != nil {
 					return err
 				}
@@ -213,6 +215,21 @@ loop:
 				r.Children = append(r.Children, RunChild{
 					Drawing: drawingElem,
 				})
+				// <mc:AlternateContent>
+			case "AlternateContent":
+				alternateContent := &mc.AlternateContent{}
+
+				if err = d.DecodeElement(alternateContent, &elem); err != nil {
+					return err
+				}
+
+				if alternateContent.Drawing != nil {
+
+					r.Children = append(r.Children, RunChild{
+						Drawing: alternateContent.Drawing,
+					})
+				}
+
 			default:
 				if err = d.Skip(); err != nil {
 					return err

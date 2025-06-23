@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/whatsupdocx/common"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
 
@@ -291,12 +292,12 @@ func TestGenSingleStrVal_UnmarshalXML(t *testing.T) {
 func TestEmpty_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    Empty
+		input    common.Empty
 		expected string
 	}{
 		{
 			name:     "Empty element",
-			input:    Empty{},
+			input:    common.Empty{},
 			expected: `<w:tab></w:tab>`,
 		},
 	}
@@ -334,7 +335,7 @@ func TestEmpty_UnmarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result Empty
+			var result common.Empty
 
 			err := xml.Unmarshal([]byte(tt.inputXML), &result)
 			if err != nil {
@@ -344,7 +345,7 @@ func TestEmpty_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of Empty ends here ---!
+// !--- Tests of common.Empty ends here ---!
 
 func TestMarkup_MarshalXML(t *testing.T) {
 	tests := []struct {

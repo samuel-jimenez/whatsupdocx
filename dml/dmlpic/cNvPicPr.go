@@ -9,16 +9,21 @@ import (
 )
 
 // Non-Visual Picture Drawing Properties
+// CT_NonVisualPictureProperties
+// a_CT_NonVisualPictureProperties =
 type CNvPicPr struct {
 	//Relative Resize Preferred	- Default value is "true"(i.e when attr not specified).
+	// ## default value: true
+	// attribute preferRelativeResize { xsd:boolean }?,
 	PreferRelativeResize *bool `xml:"preferRelativeResize,attr,omitempty"`
 
 	//1. Picture Locks
+	// element picLocks { a_CT_PictureLocking }?,
 	PicLocks *dmlprops.PicLocks `xml:"picLocks,omitempty"`
 
 	//TODO:
 	// 2. Extension List
-
+	// element extLst { a_CT_OfficeArtExtensionList }?
 }
 
 func NewCNvPicPr() CNvPicPr {

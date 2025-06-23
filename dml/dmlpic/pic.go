@@ -84,9 +84,22 @@ func (p Pic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
+// a_CT_Transform2D =
 type TransformGroup struct {
+
+	// ## default value: 0
+	// attribute rot { a_ST_Angle }?,
+
+	// ## default value: false
+	// attribute flipH { xsd:boolean }?,
+
+	// ## default value: false
+	// attribute flipV { xsd:boolean }?,
+
+	// element off { a_CT_Point2D }?,
+	Offset *Offset `xml:"off,omitempty"`
+	// element ext { a_CT_PositiveSize2D }?
 	Extent *dmlct.PSize2D `xml:"ext,omitempty"`
-	Offset *Offset        `xml:"off,omitempty"`
 }
 
 type TFGroupOption func(*TransformGroup)
