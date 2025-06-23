@@ -11,12 +11,12 @@ import (
 func TestHeaderReference_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    HeaderReference
+		input    HeaderFooterReference
 		expected string
 	}{
 		{
 			name: "Marshal with ID and Type",
-			input: HeaderReference{
+			input: HeaderFooterReference{
 				ID:   "rId1",
 				Type: stypes.HdrFtrFirst,
 			},
@@ -24,21 +24,21 @@ func TestHeaderReference_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Marshal with Type only",
-			input: HeaderReference{
+			input: HeaderFooterReference{
 				Type: stypes.HdrFtrEven,
 			},
 			expected: `<w:headerReference w:type="even"></w:headerReference>`,
 		},
 		{
 			name: "Marshal with ID only",
-			input: HeaderReference{
+			input: HeaderFooterReference{
 				ID: "rId2",
 			},
 			expected: `<w:headerReference r:id="rId2"></w:headerReference>`,
 		},
 		{
 			name:     "Marshal with neither ID nor Type",
-			input:    HeaderReference{},
+			input:    HeaderFooterReference{},
 			expected: `<w:headerReference></w:headerReference>`,
 		},
 	}
@@ -65,12 +65,12 @@ func TestHeaderReference_UnmarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
 		inputXML string
-		expected HeaderReference
+		expected HeaderFooterReference
 	}{
 		{
 			name:     "Unmarshal with ID and Type",
 			inputXML: `<w:headerReference w:type="first" r:id="rId1"></w:headerReference>`,
-			expected: HeaderReference{
+			expected: HeaderFooterReference{
 				ID:   "rId1",
 				Type: stypes.HdrFtrFirst,
 			},
@@ -78,27 +78,27 @@ func TestHeaderReference_UnmarshalXML(t *testing.T) {
 		{
 			name:     "Unmarshal with Type only",
 			inputXML: `<w:headerReference w:type="even"></w:headerReference>`,
-			expected: HeaderReference{
+			expected: HeaderFooterReference{
 				Type: stypes.HdrFtrEven,
 			},
 		},
 		{
 			name:     "Unmarshal with ID only",
 			inputXML: `<w:headerReference r:id="rId2"></w:headerReference>`,
-			expected: HeaderReference{
+			expected: HeaderFooterReference{
 				ID: "rId2",
 			},
 		},
 		{
 			name:     "Unmarshal with neither ID nor Type",
 			inputXML: `<w:headerReference></w:headerReference>`,
-			expected: HeaderReference{},
+			expected: HeaderFooterReference{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result HeaderReference
+			var result HeaderFooterReference
 
 			err := xml.Unmarshal([]byte(tt.inputXML), &result)
 			if err != nil {

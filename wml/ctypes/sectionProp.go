@@ -46,8 +46,11 @@ type SectionProp struct {
 	// attribute w:rsidSect { w_ST_LongHexNumber }?
 
 	// w_EG_HdrFtrReferences*,
-	HeaderReference *HeaderReference `xml:"headerReference,omitempty"`
-	FooterReference *FooterReference `xml:"footerReference,omitempty"`
+	// w_EG_HdrFtrReferences =
+	// element headerReference { w_CT_HdrFtrRef }?
+	// | element footerReference { w_CT_HdrFtrRef }?
+	HeaderReference *HeaderFooterReference `xml:"headerReference,omitempty"`
+	FooterReference *HeaderFooterReference `xml:"footerReference,omitempty"`
 
 	// w_EG_SectPrContents?,
 	// w_EG_SectPrContents =
@@ -100,13 +103,15 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	if s.HeaderReference != nil {
-		if err := s.HeaderReference.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:headerReference"}}
+		if err = e.EncodeElement(s.HeaderReference, propsElement); err != nil {
 			return err
 		}
 	}
 
 	if s.FooterReference != nil {
-		if err := s.FooterReference.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:footerReference"}}
+		if err = e.EncodeElement(s.FooterReference, propsElement); err != nil {
 			return err
 		}
 	}

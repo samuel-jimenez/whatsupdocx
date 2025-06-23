@@ -18,8 +18,8 @@ func TestSectionProp_MarshalXML(t *testing.T) {
 		{
 			name: "All attributes",
 			input: SectionProp{
-				HeaderReference: &HeaderReference{Type: "default", ID: "rId1"},
-				FooterReference: &FooterReference{Type: "default", ID: "rId2"},
+				HeaderReference: &HeaderFooterReference{Type: "default", ID: "rId1"},
+				FooterReference: &HeaderFooterReference{Type: "default", ID: "rId2"},
 				PageSize: &PageSize{
 					Width:  uint64Ptr(12240),
 					Height: uint64Ptr(15840),
@@ -109,8 +109,8 @@ func TestSectionProp_UnmarshalXML(t *testing.T) {
 				<w:docGrid w:type="default" w:linePitch="360"></w:docGrid>
 			</w:sectPr>`,
 			expected: SectionProp{
-				HeaderReference: &HeaderReference{Type: "default", ID: "rId1"},
-				FooterReference: &FooterReference{Type: "default", ID: "rId2"},
+				HeaderReference: &HeaderFooterReference{Type: "default", ID: "rId1"},
+				FooterReference: &HeaderFooterReference{Type: "default", ID: "rId2"},
 				PageSize: &PageSize{
 					Width:  uint64Ptr(12240),
 					Height: uint64Ptr(15840),

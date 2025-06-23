@@ -11,12 +11,12 @@ import (
 func TestFooterReference_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    FooterReference
+		input    HeaderFooterReference
 		expected string
 	}{
 		{
 			name: "Marshal with ID and Type",
-			input: FooterReference{
+			input: HeaderFooterReference{
 				ID:   "rId1",
 				Type: stypes.HdrFtrFirst,
 			},
@@ -24,21 +24,21 @@ func TestFooterReference_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Marshal with Type only",
-			input: FooterReference{
+			input: HeaderFooterReference{
 				Type: stypes.HdrFtrEven,
 			},
 			expected: `<w:footerReference w:type="even"></w:footerReference>`,
 		},
 		{
 			name: "Marshal with ID only",
-			input: FooterReference{
+			input: HeaderFooterReference{
 				ID: "rId2",
 			},
 			expected: `<w:footerReference r:id="rId2"></w:footerReference>`,
 		},
 		{
 			name:     "Marshal with neither ID nor Type",
-			input:    FooterReference{},
+			input:    HeaderFooterReference{},
 			expected: `<w:footerReference></w:footerReference>`,
 		},
 	}
@@ -66,12 +66,12 @@ func TestFooterReference_UnmarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
 		inputXML string
-		expected FooterReference
+		expected HeaderFooterReference
 	}{
 		{
 			name:     "Unmarshal with ID and Type",
 			inputXML: `<w:footerReference w:type="first" r:id="rId1"></w:footerReference>`,
-			expected: FooterReference{
+			expected: HeaderFooterReference{
 				ID:   "rId1",
 				Type: stypes.HdrFtrFirst,
 			},
@@ -79,27 +79,27 @@ func TestFooterReference_UnmarshalXML(t *testing.T) {
 		{
 			name:     "Unmarshal with Type only",
 			inputXML: `<w:footerReference w:type="even"></w:footerReference>`,
-			expected: FooterReference{
+			expected: HeaderFooterReference{
 				Type: stypes.HdrFtrEven,
 			},
 		},
 		{
 			name:     "Unmarshal with ID only",
 			inputXML: `<w:footerReference r:id="rId2"></w:footerReference>`,
-			expected: FooterReference{
+			expected: HeaderFooterReference{
 				ID: "rId2",
 			},
 		},
 		{
 			name:     "Unmarshal with neither ID nor Type",
 			inputXML: `<w:footerReference></w:footerReference>`,
-			expected: FooterReference{},
+			expected: HeaderFooterReference{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result FooterReference
+			var result HeaderFooterReference
 
 			err := xml.Unmarshal([]byte(tt.inputXML), &result)
 			if err != nil {
