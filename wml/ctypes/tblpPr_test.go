@@ -30,7 +30,7 @@ func TestFloatPos_MarshalXML(t *testing.T) {
 				AbsXDist:       internal.ToPtr(int(100)),
 				AbsYDist:       internal.ToPtr(int(200)),
 			},
-			expected: `<w:tblpPr w:leftFromText="10" w:rightFromText="20" w:topFromText="30" w:bottomFromText="40" w:hAnchor="page" w:vAnchor="text" w:tblpXSpec="center" w:tblpYSpec="inside" w:tblpX="100" w:tblpY="200"></w:tblpPr>`,
+			expected: `<w:tblpPr w:leftFromText="10" w:rightFromText="20" w:topFromText="30" w:bottomFromText="40" w:horzAnchor="page" w:vertAnchor="text" w:tblpXSpec="center" w:tblpYSpec="inside" w:tblpX="100" w:tblpY="200"></w:tblpPr>`,
 		},
 		{
 			name: "Without optional attributes",
@@ -40,7 +40,7 @@ func TestFloatPos_MarshalXML(t *testing.T) {
 				XAlign:       internal.ToPtr(stypes.XAlignLeft),
 				AbsXDist:     internal.ToPtr(int(50)),
 			},
-			expected: `<w:tblpPr w:leftFromText="5" w:hAnchor="margin" w:tblpXSpec="left" w:tblpX="50"></w:tblpPr>`,
+			expected: `<w:tblpPr w:leftFromText="5" w:horzAnchor="margin" w:tblpXSpec="left" w:tblpX="50"></w:tblpPr>`,
 		},
 	}
 
@@ -74,7 +74,7 @@ func TestFloatPos_UnmarshalXML(t *testing.T) {
 		{
 			name: "With all attributes",
 			inputXML: `<w:tblpPr w:leftFromText="10" w:rightFromText="20" w:topFromText="30" w:bottomFromText="40" ` +
-				`w:hAnchor="margin" w:vAnchor="page" w:tblpXSpec="center" w:tblpYSpec="inside" w:tblpX="100" w:tblpY="200"></w:tblpPr>`,
+				`w:horzAnchor="margin" w:vertAnchor="page" w:tblpXSpec="center" w:tblpYSpec="inside" w:tblpX="100" w:tblpY="200"></w:tblpPr>`,
 			expected: FloatPos{
 				LeftFromText:   internal.ToPtr(uint64(10)),
 				RightFromText:  internal.ToPtr(uint64(20)),
@@ -90,7 +90,7 @@ func TestFloatPos_UnmarshalXML(t *testing.T) {
 		},
 		{
 			name:     "Without optional attributes",
-			inputXML: `<w:tblpPr w:leftFromText="5" w:hAnchor="margin" w:tblpXSpec="left" w:tblpX="50"></w:tblpPr>`,
+			inputXML: `<w:tblpPr w:leftFromText="5" w:horzAnchor="margin" w:tblpXSpec="left" w:tblpX="50"></w:tblpPr>`,
 			expected: FloatPos{
 				LeftFromText: internal.ToPtr(uint64(5)),
 				HAnchor:      internal.ToPtr(stypes.AnchorMargin),

@@ -14,10 +14,10 @@ type FloatPos struct {
 	BottomFromText *uint64 `xml:"bottomFromText,attr,omitempty"`
 
 	//Frame Horizontal Positioning Base
-	HAnchor *stypes.Anchor `xml:"hAnchor,attr,omitempty"`
+	HAnchor *stypes.Anchor `xml:"horzAnchor,attr,omitempty"`
 
 	//Frame Vertical Positioning Base
-	VAnchor *stypes.Anchor `xml:"vAnchor,attr,omitempty"`
+	VAnchor *stypes.Anchor `xml:"vertAnchor,attr,omitempty"`
 
 	//Relative Horizontal Alignment From Anchor
 	XAlign *stypes.XAlign `xml:"tblpXSpec,attr,omitempty"`
@@ -48,10 +48,10 @@ func (t FloatPos) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:bottomFromText"}, Value: strconv.FormatUint(*t.BottomFromText, 10)})
 	}
 	if t.HAnchor != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:hAnchor"}, Value: string(*t.HAnchor)})
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:horzAnchor"}, Value: string(*t.HAnchor)})
 	}
 	if t.VAnchor != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:vAnchor"}, Value: string(*t.VAnchor)})
+		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:vertAnchor"}, Value: string(*t.VAnchor)})
 	}
 	if t.XAlign != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:tblpXSpec"}, Value: string(*t.XAlign)})
