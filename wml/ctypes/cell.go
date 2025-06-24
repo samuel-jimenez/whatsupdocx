@@ -32,7 +32,9 @@ func (c Cell) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 
 	//1.Table Cell Properties
 	if c.Property != nil {
-		if err = c.Property.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tcPr"}}
+		if err := e.EncodeElement(c.Property, propsElement); err != nil {
+			// if err := c.Property.MarshalXML(e, propsElement); err != nil {
 			return err
 		}
 	}

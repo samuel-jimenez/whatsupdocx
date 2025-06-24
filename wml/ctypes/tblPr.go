@@ -1,8 +1,9 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
@@ -226,9 +227,9 @@ func (t TableProp) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error
 
 	// 11. tblBorders
 	if t.Borders != nil {
-		if err = t.Borders.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:tblBorders"},
-		}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblBorders"}}
+		if err := e.EncodeElement(t.Borders, propsElement); err != nil {
+			// if err := t.Borders.MarshalXML(e, propsElement); err != nil {
 			return err
 		}
 	}

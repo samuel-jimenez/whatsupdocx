@@ -1,9 +1,10 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"fmt"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
@@ -51,7 +52,7 @@ type ParagraphProp struct {
 
 	// 9. Paragraph Borders
 	// element pBdr { w_CT_PBdr }?,
-	Border *ParaBorder `xml:"pBdr,omitempty"`
+	Border *ParaBorder `xml:"w:pBdr,omitempty"`
 
 	// 10. This element specifies the shading applied to the contents of the paragraph.
 	// element shd { w_CT_Shd }?,
@@ -235,7 +236,9 @@ func (pp ParagraphProp) MarshalXML(e *xml.Encoder, start xml.StartElement) (err 
 
 	// 9.Border
 	if pp.Border != nil {
-		if err = pp.Border.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:pBdr"}}
+		if err := e.EncodeElement(pp.Border, propsElement); err != nil {
+			// if err := pp.Border.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("Border: %w", err)
 		}
 	}

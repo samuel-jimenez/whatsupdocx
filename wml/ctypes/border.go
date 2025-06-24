@@ -1,9 +1,6 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strconv"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
@@ -11,25 +8,25 @@ import (
 // w_CT_Border =
 type Border struct {
 	// attribute w:val { w_ST_Border },
-	Val stypes.BorderStyle `xml:"val,attr"`
+	Val stypes.BorderStyle `xml:"w:val,attr"`
 	// attribute w:color { w_ST_HexColor }?,
 	// ## default value: auto
-	Color *string `xml:"color,attr,omitempty"`
+	Color *string `xml:"w:color,attr,omitempty"`
 	// attribute w:themeColor { w_ST_ThemeColor }?,
-	ThemeColor *stypes.ThemeColor `xml:"themeColor,attr,omitempty"`
+	ThemeColor *stypes.ThemeColor `xml:"w:themeColor,attr,omitempty"`
 	// attribute w:themeTint { w_ST_UcharHexNumber }?,
-	ThemeTint *string `xml:"themeTint,attr,omitempty"`
+	ThemeTint *string `xml:"w:themeTint,attr,omitempty"`
 	// attribute w:themeShade { w_ST_UcharHexNumber }?,
-	ThemeShade *string `xml:"themeShade,attr,omitempty"`
+	ThemeShade *string `xml:"w:themeShade,attr,omitempty"`
 	// attribute w:sz { w_ST_EighthPointMeasure }?,
-	Size *int `xml:"sz,attr,omitempty"`
+	Size *int `xml:"w:sz,attr,omitempty"`
 	// attribute w:space { w_ST_PointMeasure }?,
 	// ## default value: 0
-	Space *string `xml:"space,attr,omitempty"`
+	Space *string `xml:"w:space,attr,omitempty"`
 	// attribute w:shadow { s_ST_OnOff }?,
-	Shadow *stypes.OnOff `xml:"shadow,attr,omitempty"`
+	Shadow *stypes.OnOff `xml:"w:shadow,attr,omitempty"`
 	// attribute w:frame { s_ST_OnOff }?
-	Frame *stypes.OnOff `xml:"frame,attr,omitempty"`
+	Frame *stypes.OnOff `xml:"w:frame,attr,omitempty"`
 }
 
 /*
@@ -51,6 +48,7 @@ func NewCellBorder(style stypes.BorderStyle, color string, space string, size in
 	}
 }
 
+/*
 func (t Border) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: string(t.Val)})
 
@@ -80,4 +78,4 @@ func (t Border) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	return e.EncodeElement("", start)
-}
+}*/

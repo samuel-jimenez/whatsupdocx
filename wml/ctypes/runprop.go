@@ -1,8 +1,9 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"fmt"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
@@ -67,13 +68,13 @@ type RunProperty struct {
 	Color *Color `xml:"color,omitempty"`
 
 	//20. Character Spacing Adjustment
-	Spacing *DecimalNum `xml:"spacing,omitempty"`
+	Spacing *DecimalNum `xml:"w:spacing,omitempty"`
 
 	//21.Expanded/Compressed Text
-	ExpaComp *ExpaComp `xml:"w,omitempty"`
+	ExpaComp *ExpaComp `xml:"w:w,omitempty"`
 
 	//22.Font Kerning
-	Kern *Uint64Elem `xml:"kern,omitempty"`
+	Kern *Uint64Elem `xml:"w:kern,omitempty"`
 
 	//23. Vertically Raised or Lowered Text
 	Position *DecimalNum `xml:"position,omitempty"`
@@ -94,7 +95,7 @@ type RunProperty struct {
 	Effect *Effect `xml:"effect,omitempty"`
 
 	//29.Text Border
-	Border *Border `xml:"bdr,omitempty"`
+	Border *Border `xml:"w:bdr,omitempty"`
 
 	//30.Run Shading
 	Shading *Shading `xml:"shd,omitempty"`
@@ -277,9 +278,9 @@ func (rp RunProperty) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	//29.Text Border
 	if rp.Border != nil {
-		if err = rp.Border.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:bdr"},
-		}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:bdr"}}
+		if err := e.EncodeElement(rp.Border, propsElement); err != nil {
+			// if err := rp.Border.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("border: %w", err)
 		}
 	}

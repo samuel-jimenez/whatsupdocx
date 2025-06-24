@@ -1,101 +1,32 @@
 package ctypes
 
-import (
-	"github.com/samuel-jimenez/xml"
-)
-
 // CT_TblBorders
 // w_CT_TblBorders =
 type TableBorders struct {
 	// 1. Table Top Border
 	// element top { w_CT_Border }?,
-	Top *Border `xml:"top,omitempty"`
+	Top *Border `xml:"w:top,omitempty"`
 
 	// 2. Table Left Border
 	// element start { w_CT_Border }?,
-	Left *Border `xml:"left,omitempty"`
+	Left *Border `xml:"w:left,omitempty"`
 
 	// 3. Table Bottom Border
 	// element bottom { w_CT_Border }?,
-	Bottom *Border `xml:"bottom,omitempty"`
+	Bottom *Border `xml:"w:bottom,omitempty"`
 
 	// 4. Table Right Border
 	// element end { w_CT_Border }?,
-	Right *Border `xml:"right,omitempty"`
+	Right *Border `xml:"w:right,omitempty"`
 
 	// 5. Table Inside Horizontal Edges Border
 	// element insideH { w_CT_Border }?,
-	InsideH *Border `xml:"insideH,omitempty"`
+	InsideH *Border `xml:"w:insideH,omitempty"`
 	// 6. Table Inside Vertical Edges Border
 	// element insideV { w_CT_Border }?
-	InsideV *Border `xml:"insideV,omitempty"`
+	InsideV *Border `xml:"w:insideV,omitempty"`
 }
 
 func DefaultTableBorders() *TableBorders {
 	return &TableBorders{}
-}
-
-func (t TableBorders) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:tblBorders"
-
-	if err := e.EncodeToken(start); err != nil {
-		return err
-	}
-
-	// 1. Top
-	if t.Top != nil {
-		if err := t.Top.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:top"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// 2. Left
-	if t.Left != nil {
-		if err := t.Left.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:left"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// 3. Bottom
-	if t.Bottom != nil {
-		if err := t.Bottom.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:bottom"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// 4. Right
-	if t.Right != nil {
-		if err := t.Right.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:right"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// 5. insideH
-	if t.InsideH != nil {
-		if err := t.InsideH.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:insideH"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// 6. InsideV
-	if t.InsideV != nil {
-		if err := t.InsideV.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:insideV"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-
 }

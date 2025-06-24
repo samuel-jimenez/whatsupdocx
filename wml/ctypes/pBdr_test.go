@@ -1,9 +1,10 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
@@ -47,7 +48,8 @@ func TestParaBorder_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:pBdr"}}
-			if err := tt.input.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.input, start); err != nil {
+				// if err := tt.input.MarshalXML(encoder, start); err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
