@@ -1,7 +1,7 @@
 package dml
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"testing"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"

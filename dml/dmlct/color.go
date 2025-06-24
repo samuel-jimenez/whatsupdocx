@@ -1,6 +1,6 @@
 package dmlct
 
-import "encoding/xml"
+import "github.com/samuel-jimenez/xml"
 
 // ColorChoice selects a color
 // a_EG_ColorChoice =

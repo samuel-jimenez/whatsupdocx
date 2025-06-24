@@ -1,6 +1,6 @@
 package common
 
-import "encoding/xml"
+import "github.com/samuel-jimenez/xml"
 
 type Empty struct {
 }

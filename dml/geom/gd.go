@@ -1,6 +1,6 @@
 package geom
 
-import "encoding/xml"
+import "github.com/samuel-jimenez/xml"
 
 type ShapeGuide struct {
 	Name    string `xml:"name,attr,omitempty"`

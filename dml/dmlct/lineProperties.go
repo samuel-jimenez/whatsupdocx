@@ -1,7 +1,7 @@
 package dmlct
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 )
 
 // LineProperties specifies the properties of a line.

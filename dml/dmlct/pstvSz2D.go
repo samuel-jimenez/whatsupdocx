@@ -1,7 +1,7 @@
 package dmlct
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"strconv"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/units"

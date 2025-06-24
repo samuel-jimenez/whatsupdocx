@@ -1,10 +1,11 @@
 package ctypes
 
 import (
-	"encoding/xml"
 	"fmt"
+	"log"
 
-	"github.com/samuel-jimenez/whatsupdocx/common/constants"
+	"github.com/samuel-jimenez/xml"
+
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
@@ -34,6 +35,10 @@ type Styles struct {
 
 func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name.Local = "w:styles"
+	log.Println("Styles MarshalXML s", s)
+	log.Println("Styles MarshalXML start", start)
+	log.Println("Styles MarshalXML s Attr", s.Attr)
+	log.Println("Styles MarshalXML len s Attr", len(s.Attr))
 
 	if len(s.Attr) == 0 {
 		for key, value := range defaultStyleNSAttrs {
@@ -42,6 +47,7 @@ func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	} else {
 		start.Attr = s.Attr
+		log.Println("MarshalXML", s, start)
 	}
 
 	if err := e.EncodeToken(start); err != nil {
@@ -70,70 +76,6 @@ func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	return e.EncodeToken(start.End())
-}
-
-func (s *Styles) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-	s.Attr = make([]xml.Attr, len(start.Attr))
-
-	for _, attr := range start.Attr {
-		// Broken Go xml - Handling the Docx namespace
-		//TODO: Centralize, generic function for document also
-		ns := attr.Name.Space
-		if ns != "xmlns" {
-			// Convert if it is namespace with http:// not the xmlns attribute
-			local, ok := constants.NSToLocal[ns]
-			ns = local
-			if !ok {
-				continue
-			}
-		}
-
-		s.Attr = append(s.Attr, xml.Attr{
-			Name: xml.Name{
-				Local: fmt.Sprintf("%s:%s", ns, attr.Name.Local),
-			},
-			Value: attr.Value,
-		})
-	}
-loop:
-	for {
-		currentToken, err := d.Token()
-		if err != nil {
-			return err
-		}
-
-		switch elem := currentToken.(type) {
-		case xml.StartElement:
-			switch elem.Name.Local {
-			case "docDefaults":
-				dd := DocDefault{}
-				if err = d.DecodeElement(&dd, &elem); err != nil {
-					return err
-				}
-				s.DocDefaults = &dd
-			case "latentStyles":
-				ls := LatentStyle{}
-				if err = d.DecodeElement(&ls, &elem); err != nil {
-					return err
-				}
-				s.LatentStyle = &ls
-			case "style":
-				style := Style{}
-				if err = d.DecodeElement(&style, &elem); err != nil {
-					return err
-				}
-				s.StyleList = append(s.StyleList, style)
-			default:
-				if err = d.Skip(); err != nil {
-					return err
-				}
-			}
-		case xml.EndElement:
-			break loop
-		}
-	}
-
-	return nil
 }
 
 type Style struct {

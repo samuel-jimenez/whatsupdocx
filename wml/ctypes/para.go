@@ -1,8 +1,9 @@
 package ctypes
 
 import (
-	"encoding/xml"
 	"strings"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
@@ -15,7 +16,7 @@ type Paragraph struct {
 
 	// Attributes
 	// attribute w:rsidRPr { w_ST_LongHexNumber }?,
-	RsidRPr *stypes.LongHexNum // Revision Identifier for Paragraph Glyph Formatting
+	RsidRPr *stypes.LongHexNum `xml:"w:rsidRPr,attr,omitempty"` // Revision Identifier for Paragraph Glyph Formatting
 	// attribute w:rsidR { w_ST_LongHexNumber }?,
 	RsidR *stypes.LongHexNum // Revision Identifier for Paragraph
 	// attribute w:rsidDel { w_ST_LongHexNumber }?,

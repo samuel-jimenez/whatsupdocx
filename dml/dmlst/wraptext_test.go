@@ -1,7 +1,7 @@
 package dmlst
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"testing"
 )
 

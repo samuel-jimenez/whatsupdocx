@@ -1,7 +1,7 @@
 package shapes
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"testing"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"

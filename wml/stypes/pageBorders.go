@@ -1,8 +1,9 @@
 package stypes
 
 import (
-	"encoding/xml"
 	"errors"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 // w_ST_PageBorderZOrder = string "front" | string "back"

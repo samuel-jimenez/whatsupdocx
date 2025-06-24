@@ -2,7 +2,7 @@ package ctypes
 
 import (
 	"bytes"
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
 

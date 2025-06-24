@@ -1,6 +1,6 @@
 package ctypes
 
-import "encoding/xml"
+import "github.com/samuel-jimenez/xml"
 
 // Range Markup elements
 type RngMarkupElem struct {

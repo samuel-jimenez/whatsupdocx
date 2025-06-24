@@ -1,8 +1,9 @@
 package wps
 
 import (
-	"encoding/xml"
 	"fmt"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlpic"
@@ -54,8 +55,6 @@ type NonVisualProps struct { /*
 }
 
 func (props NonVisualProps) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-
-	// log.Println("MarshalXML NonVisualProps", props)
 	if props.NonVisualDrawingShapeProps != nil {
 		return e.EncodeElement(props.NonVisualDrawingShapeProps, xml.StartElement{Name: xml.Name{Local: "wps:cNvSpPr"}})
 	}
@@ -63,31 +62,9 @@ func (props NonVisualProps) MarshalXML(e *xml.Encoder, start xml.StartElement) (
 
 }
 
-// github.com/golang/go/issues/9519
-// github.com/golang/go/issues/13400
-// TODO use https://github.com/nbio/xml
 // ShapeStyle specifies the style information for a shape.
 // CT_ShapeStyle
 // a_CT_ShapeStyle =
-type ShapeStyleIn struct {
-	// element lnRef { a_CT_StyleMatrixReference },
-	LnRef dmlct.StyleMatrixReference `xml:"lnRef"`
-	// element fillRef { a_CT_StyleMatrixReference },
-	FillRef dmlct.StyleMatrixReference `xml:"fillRef"`
-	// element effectRef { a_CT_StyleMatrixReference },
-	EffectRef dmlct.StyleMatrixReference `xml:"effectRef"`
-	// element fontRef { a_CT_FontReference }
-	FontRef dmlct.FontReference `xml:"fontRef"`
-}
-
-func (style ShapeStyleIn) Out() *ShapeStyle {
-	return &ShapeStyle{style.LnRef,
-		style.FillRef,
-		style.EffectRef,
-		style.FontRef,
-	}
-}
-
 type ShapeStyle struct {
 	// element lnRef { a_CT_StyleMatrixReference },
 	LnRef dmlct.StyleMatrixReference `xml:"a:lnRef"`
@@ -99,7 +76,7 @@ type ShapeStyle struct {
 	FontRef dmlct.FontReference `xml:"a:fontRef"`
 }
 
-//TODO use https://github.com/nbio/xml
+//TODO use https://github.com/samuel-jimenez/xml
 // func (props ShapeStyle) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 //
 // 	err = e.EncodeToken(start)
@@ -271,21 +248,18 @@ func (shape *Shape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err er
 			case "cNvPr": // element cNvPr { a_CT_NonVisualDrawingProps }?,
 				props := &dmlct.CNvPr{}
 				if err = d.DecodeElement(props, &elem); err != nil {
-					// if err := para.unmarshalXML(d, elem); err != nil {
 					return err
 				}
 
 			case "cNvSpPr": // (element cNvSpPr { a_CT_NonVisualDrawingShapeProps }
 				shape.NonVisualProps.NonVisualDrawingShapeProps = dmlct.NewNonVisualDrawingShapeProps()
 				if err = d.DecodeElement(shape.NonVisualProps.NonVisualDrawingShapeProps, &elem); err != nil {
-					// if err := shape.NonVisualProps.NonVisualDrawingShapeProps.UnmarshalXML(d, elem); err != nil {
 					return err
 				}
 
 			case "cNvCnPr": // | element cNvCnPr { a_CT_NonVisualConnectorProperties }),
 				shape.NonVisualProps.NonVisualConnectorProperties = dmlct.NewNonVisualConnectorProperties()
 				if err = d.DecodeElement(shape.NonVisualProps.NonVisualConnectorProperties, &elem); err != nil {
-					// if err := shape.NonVisualProps.NonVisualConnectorProperties.unmarshalXML(d, elem); err != nil {
 					return err
 				}
 
@@ -293,23 +267,15 @@ func (shape *Shape) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err er
 				shape.PicShapeProp = *dmlpic.NewPicShapeProp()
 				// PicShapeProp
 				if err = d.DecodeElement(&shape.PicShapeProp, &elem); err != nil {
-					// if err :=shape.PicShapeProp.UnmarshalXML(d, elem); err != nil {
 					return err
 				}
 
 			case "style": // element style { a_CT_ShapeStyle }?,
-				// TODO use https://github.com/nbio/xml
-				// github.com/golang/go/issues/9519
-				// github.com/golang/go/issues/13400
-				style := &ShapeStyleIn{}
-
-				if err = d.DecodeElement(&style, &elem); err != nil {
-					// if err :=shape.PicShapeProp.UnmarshalXML(d, elem); err != nil {
+				shape.Style = &ShapeStyle{}
+				if err = d.DecodeElement(&shape.Style, &elem); err != nil {
 					return err
 				}
-				shape.Style = style.Out()
 
-				// TODO
 			// element extLst { a_CT_OfficeArtExtensionList }?,
 			// ExtLst *OfficeArtExtensionList `xml:"extLst,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) to hold future extensions to the parent element of this extLst element.
 

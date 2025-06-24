@@ -1,7 +1,7 @@
 package dml
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"errors"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"

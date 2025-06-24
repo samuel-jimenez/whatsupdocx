@@ -1,7 +1,7 @@
 package packager
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/docx"

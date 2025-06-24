@@ -1,7 +1,7 @@
 package stypes
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"fmt"
 )
 

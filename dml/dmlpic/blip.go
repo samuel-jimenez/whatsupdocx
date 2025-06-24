@@ -1,6 +1,6 @@
 package dmlpic
 
-import "encoding/xml"
+import "github.com/samuel-jimenez/xml"
 
 // Binary large image or picture
 type Blip struct {

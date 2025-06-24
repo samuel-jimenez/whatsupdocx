@@ -1,7 +1,7 @@
 // Package constants provides constant values related to OpenXML namespaces, relationships, and other attributes.
 package constants
 
-import "encoding/xml"
+import "github.com/samuel-jimenez/xml"
 
 var XMLHeader = []byte(`<?xml version="1.0" encoding="UTF-8"?>` + "\n")
 

@@ -1,7 +1,7 @@
 package ctypes
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"errors"
 	"strconv"
 

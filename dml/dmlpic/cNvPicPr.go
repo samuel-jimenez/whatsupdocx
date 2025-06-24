@@ -1,7 +1,7 @@
 package dmlpic
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"fmt"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"

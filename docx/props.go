@@ -2,7 +2,7 @@ package docx
 
 import (
 	"bytes"
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 	"io"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"

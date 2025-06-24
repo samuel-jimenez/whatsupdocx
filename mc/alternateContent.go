@@ -1,7 +1,7 @@
 package mc
 
 import (
-	"encoding/xml"
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml"
 )
