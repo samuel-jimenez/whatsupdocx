@@ -150,7 +150,7 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	// element pgBorders { w_CT_PageBorders }?,
 	if s.PageBorders != nil {
 		propsElement := xml.StartElement{Name: xml.Name{Local: "w:pgBorders"}}
-		if err = s.PageBorders.MarshalXML(e, propsElement); err != nil {
+		if err = e.EncodeElement(s.FooterReference, propsElement); err != nil {
 			return err
 		}
 	}
