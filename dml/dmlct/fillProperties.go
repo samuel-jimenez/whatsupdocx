@@ -26,9 +26,9 @@ type LineFillProperties struct {
 
 	// element noFill { a_CT_NoFillProperties }
 	// a_CT_NoFillProperties = empty
-	NoFillProperties *common.Empty `xml:"noFill,omitempty"`
+	NoFillProperties *common.Empty `xml:"a:noFill,omitempty"`
 	// | element solidFill { a_CT_SolidColorFillProperties }
-	SolidColorFillProperties *SolidColorFillProperties `xml:"solidFill,omitempty"`
+	SolidColorFillProperties *SolidColorFillProperties `xml:"a:solidFill,omitempty"`
 
 	//TODO
 	// | element gradFill { a_CT_GradientFillProperties }
