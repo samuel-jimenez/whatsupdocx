@@ -65,6 +65,7 @@ type SectionProp struct {
 	PageMargin *PageMargin `xml:"pgMar,omitempty"`
 	// element paperSrc { w_CT_PaperSource }?,
 	// element pgBorders { w_CT_PageBorders }?,
+	PageBorders *PageBorders `xml:"pgBorders,omitempty"`
 	// element lnNumType { w_CT_LineNumber }?,
 	// element pgNumType { w_CT_PageNumber }?,
 	PageNum *PageNumbering `xml:"pgNumType,omitempty"`
@@ -102,6 +103,10 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		return err
 	}
 
+	// w_EG_HdrFtrReferences*,
+	// w_EG_HdrFtrReferences =
+	// element headerReference { w_CT_HdrFtrRef }?
+	// | element footerReference { w_CT_HdrFtrRef }?
 	if s.HeaderReference != nil {
 		propsElement := xml.StartElement{Name: xml.Name{Local: "w:headerReference"}}
 		if err = e.EncodeElement(s.HeaderReference, propsElement); err != nil {
@@ -116,6 +121,9 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	}
 
+	// element footnotePr { w_CT_FtnProps }?,
+	// element endnotePr { w_CT_EdnProps }?,
+	// element type { w_CT_SectType }?,
 	if s.Type != nil {
 		if err := s.Type.MarshalXML(e, xml.StartElement{
 			Name: xml.Name{Local: "w:type"},
@@ -124,32 +132,49 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	}
 
+	// element pgSz { w_CT_PageSz }?,
 	if s.PageSize != nil {
 		if err := s.PageSize.MarshalXML(e, xml.StartElement{}); err != nil {
 			return err
 		}
 	}
 
+	// element pgMar { w_CT_PageMar }?,
 	if s.PageMargin != nil {
 		if err = s.PageMargin.MarshalXML(e, xml.StartElement{}); err != nil {
 			return err
 		}
 	}
 
+	// element paperSrc { w_CT_PaperSource }?,
+	// element pgBorders { w_CT_PageBorders }?,
+	if s.PageBorders != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:pgBorders"}}
+		if err = s.PageBorders.MarshalXML(e, propsElement); err != nil {
+			return err
+		}
+	}
+
+	// element lnNumType { w_CT_LineNumber }?,
+	// element pgNumType { w_CT_PageNumber }?,
 	if s.PageNum != nil {
 		if err = s.PageNum.MarshalXML(e, xml.StartElement{}); err != nil {
 			return err
 		}
 	}
 
+	// element cols { w_CT_Columns }?,
+	// element formProt { w_CT_OnOff }?,
 	if s.FormProt != nil {
-		if err = s.FormProt.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:formProt"},
-		}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:formProt"}}
+		if err = s.FormProt.MarshalXML(e, propsElement); err != nil {
 			return err
 		}
 	}
 
+	// element vAlign { w_CT_VerticalJc }?,
+	// element noEndnote { w_CT_OnOff }?,
+	// element titlePg { w_CT_OnOff }?,
 	if s.TitlePg != nil {
 		if err = s.TitlePg.MarshalXML(e, xml.StartElement{
 			Name: xml.Name{Local: "w:titlePg"},
@@ -158,6 +183,7 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	}
 
+	// element textDirection { w_CT_TextDirection }?,
 	if s.TextDir != nil {
 		if s.TextDir.MarshalXML(e, xml.StartElement{
 			Name: xml.Name{Local: "w:textDirection"},
@@ -166,11 +192,16 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	}
 
+	// element bidi { w_CT_OnOff }?,
+	// element rtlGutter { w_CT_OnOff }?,
+	// element docGrid { w_CT_DocGrid }?,
 	if s.DocGrid != nil {
 		if s.DocGrid.MarshalXML(e, xml.StartElement{}); err != nil {
 			return err
 		}
 	}
+
+	// element printerSettings { w_CT_Rel }?
 
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
