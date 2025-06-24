@@ -98,11 +98,12 @@ This is screenshot of demo document generated from the godocx library.
 ## Feature addition request
 
 If you need a feature that's missing in WhatsupDOCX, feel free to raise an issue describing what you want to achieve, along with a sample DOCX. While I can't promise immediate implementation, I'll review your request and work on it if it's valid.
+Due to [underlying Golang implementation issues with XML namespaces](https://github.com/golang/go/issues/9519) and the [unwillingness to fix them](https://github.com/golang/go/issues/13400), resource optimization seems unlikely.
 
 
 ## Inspiration
 
-The WhatsupDOCX library is fotked from [Godocx](https://github.com/gomutex/godocx).
+The WhatsupDOCX library is forked from [Godocx](https://github.com/gomutex/godocx).
 
 ## Licenses
 
