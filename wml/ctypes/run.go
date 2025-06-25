@@ -30,97 +30,149 @@ type Run struct {
 
 	// 2. Choice - Run Inner content
 	// w_EG_RunInnerContent*
-	Children []RunChild
+	Children []RunChild `xml:",omitempty"`
 }
 
+// w_EG_RunInnerContent =
 type RunChild struct {
+
 	//specifies that a break shall be placed at the current location in the run content
+	// element br { w_CT_Br }
 	Break *Break `xml:"w:br,omitempty"`
 
 	//specifies that this run contains literal text which shall be displayed in the document
+	// | element t { w_CT_Text }
 	Text *Text `xml:"w:t,omitempty"`
 
+	// | element contentPart { w_CT_Rel }
+
 	//specifies that this run contains literal text which shall be displayed in the document
+	// | element delText { w_CT_Text }
 	DelText *Text `xml:"w:delText,omitempty"`
 
 	//Field Code
+	// | element instrText { w_CT_Text }
 	InstrText *Text `xml:"w:instrText,omitempty"`
 
 	//Deleted Field Code
+	// | element delInstrText { w_CT_Text }
 	DelInstrText *Text `xml:"w:delInstrText,omitempty"`
 
 	//Non Breaking Hyphen Character
+	// | element noBreakHyphen { w_CT_Empty }
 	NoBreakHyphen *common.Empty `xml:"w:noBreakHyphen,omitempty"`
 
 	//Non Breaking Hyphen Character
+	// | element softHyphen { w_CT_Empty }?
 	SoftHyphen *common.Empty `xml:"w:softHyphen,omitempty"`
 
 	//Date Block - Short Day Format
+	// | element dayShort { w_CT_Empty }?
 	DayShort *common.Empty `xml:"w:dayShort,omitempty"`
 
 	//Date Block - Short Month Format
+	// | element monthShort { w_CT_Empty }?
 	MonthShort *common.Empty `xml:"w:monthShort,omitempty"`
 
 	//Date Block - Short Year Format
+	// | element yearShort { w_CT_Empty }?
 	YearShort *common.Empty `xml:"w:yearShort,omitempty"`
 
 	//Date Block - Long Day Format
+	// | element dayLong { w_CT_Empty }?
 	DayLong *common.Empty `xml:"w:dayLong,omitempty"`
 
 	//Date Block - Long Month Format
+	// | element monthLong { w_CT_Empty }?
 	MonthLong *common.Empty `xml:"w:monthLong,omitempty"`
 
 	//Date Block - Long Year Format
+	// | element yearLong { w_CT_Empty }?
 	YearLong *common.Empty `xml:"w:yearLong,omitempty"`
 
 	//Comment Information Block
+	// | element annotationRef { w_CT_Empty }?
 	AnnotationRef *common.Empty `xml:"w:annotationRef,omitempty"`
 
 	//Footnote Reference Mark
+	// | element footnoteRef { w_CT_Empty }?
 	FootnoteRef *common.Empty `xml:"w:footnoteRef,omitempty"`
 
 	//Endnote Reference Mark
+	// | element endnoteRef { w_CT_Empty }?
 	EndnoteRef *common.Empty `xml:"w:endnoteRef,omitempty"`
 
 	//Footnote/Endnote Separator Mark
+	// | element separator { w_CT_Empty }?
 	Separator *common.Empty `xml:"w:separator,omitempty"`
 
 	//Continuation Separator Mark
+	// | element continuationSeparator { w_CT_Empty }?
 	ContSeparator *common.Empty `xml:"w:continuationSeparator,omitempty"`
 
 	//Symbol Character
+	// | element sym { w_CT_Sym }?
 	Sym *Sym `xml:"w:sym,omitempty"`
 
 	//Page Number Block
+	// | element pgNum { w_CT_Empty }?
 	PgNumBlock *common.Empty `xml:"w:pgNum,omitempty"`
 
 	//Carriage Return
+	// | element cr { w_CT_Empty }?
 	CarrRtn *common.Empty `xml:"w:cr,omitempty"`
 
 	//Tab Character
+	// | element tab { w_CT_Empty }?
 	Tab *common.Empty `xml:"w:tab,omitempty"`
 
 	//TODO:
+	// | element object { w_CT_Object }
 	// 	w:object    Inline Embedded Object
-	// w:pict    VML Object
+	// | element fldChar { w_CT_FldChar }
 	// w:fldChar    Complex Field Character
+	// | element ruby { w_CT_Ruby }
 	// w:ruby    Phonetic Guide
+	// | element footnoteReference { w_CT_FtnEdnRef }
 	// w:footnoteReference    Footnote Reference
+	// | element endnoteReference { w_CT_FtnEdnRef }
 	// w:endnoteReference    Endnote Reference
-	// w:commentReference    Comment Content Reference Mark
 
 	//Comment Content Reference Mark
+	// | element commentReference { w_CT_Markup }
 	CmntRef *Markup `xml:"w:commentReference,omitempty"`
 
 	//DrawingML Object
+	// | element drawing { w_CT_Drawing }
 	Drawing *dml.Drawing `xml:"w:drawing,omitempty"`
 
 	//Absolute Position Tab Character
+	// | element ptab { w_CT_PTab }?
 	PTab *PTab `xml:"w:ptab,omitempty"`
 
 	//Position of Last Calculated Page Break
+	// | element lastRenderedPageBreak { w_CT_Empty }?
 	LastRenPgBrk *common.Empty `xml:"w:lastRenderedPageBreak,omitempty"`
 }
+
+// 	func (group RunChild) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
+//
+// 	if group.NoFillProperties != nil {
+// 		propsElement := xml.StartElement{Name: xml.Name{Local: "a:noFill"}}
+// 		if err = e.EncodeElement(group.NoFillProperties, propsElement); err != nil {
+// 			return err
+// 		}
+// 	}
+// 	if group.SolidColorFillProperties != nil {
+// 		propsElement := xml.StartElement{Name: xml.Name{Local: "a:solidFill"}}
+// 		if err = e.EncodeElement(group.SolidColorFillProperties, propsElement); err != nil {
+// 			return err
+// 		}
+// 	}
+//
+// 	return nil
+//
+// }
 
 func NewRun() *Run {
 	return &Run{}
@@ -262,18 +314,6 @@ func NewSym(font, char string) *Sym {
 	}
 }
 
-func (s Sym) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	if s.Font != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:font"}, Value: *s.Font})
-	}
-
-	if s.Char != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:char"}, Value: *s.Char})
-	}
-
-	return e.EncodeElement("", start)
-}
-
 func (r *Run) MarshalChild(e *xml.Encoder) error {
 	var err error
 	for _, child := range r.Children {
@@ -315,7 +355,8 @@ func (r *Run) MarshalChild(e *xml.Encoder) error {
 		case child.ContSeparator != nil:
 			err = child.ContSeparator.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:continuationSeparator"}})
 		case child.Sym != nil:
-			err = child.Sym.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:sym"}})
+			propsElement := xml.StartElement{Name: xml.Name{Local: "w:sym"}}
+			err = e.EncodeElement(child.Sym, propsElement)
 		case child.PgNumBlock != nil:
 			err = child.PgNumBlock.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:pgNum"}})
 		case child.CarrRtn != nil:

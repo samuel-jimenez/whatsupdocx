@@ -2,10 +2,12 @@ package ctypes
 
 import (
 	"bytes"
-	"github.com/samuel-jimenez/xml"
 	"strings"
+
+	"github.com/samuel-jimenez/xml"
 )
 
+// w_CT_Text = s_ST_String, xml_space?
 type Text struct {
 	Text  string
 	Space *string
