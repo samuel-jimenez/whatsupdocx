@@ -28,7 +28,7 @@ type Paragraph struct {
 
 	// 1. Paragraph Properties
 	// element pPr { w_CT_PPr }?,
-	Property *ParagraphProp
+	Property *ParagraphProp `xml:"w:pPr,omitempty"`
 
 	// 2. Choices (Slice of Child elements)
 	// w_EG_PContent*
@@ -36,8 +36,8 @@ type Paragraph struct {
 }
 
 type ParagraphChild struct {
-	Link *Hyperlink // w:hyperlink
-	Run  *Run       // i.e w:r
+	Link *Hyperlink `xml:"w:hyperlink,omitempty"` // w:hyperlink
+	Run  *Run       `xml:"w:r,omitempty"`
 }
 
 type Hyperlink struct {
@@ -89,7 +89,7 @@ func (p Paragraph) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error
 
 	if p.Property != nil {
 		if err = p.Property.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:r"},
+			Name: xml.Name{Local: "w:pPr"},
 		}); err != nil {
 			return err
 		}
@@ -97,17 +97,16 @@ func (p Paragraph) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error
 
 	for _, cElem := range p.Children {
 		if cElem.Run != nil {
-			if err = cElem.Run.MarshalXML(e, xml.StartElement{
-				Name: xml.Name{Local: "w:r"},
-			}); err != nil {
+			propsElement := xml.StartElement{Name: xml.Name{Local: "w:r"}}
+			if err := e.EncodeElement(cElem.Run, propsElement); err != nil {
+				// if err := cElem.Run.MarshalXML(e, propsElement); err != nil {
 				return err
 			}
 		}
 
 		if cElem.Link != nil {
-			if err = e.EncodeElement(cElem.Link, xml.StartElement{
-				Name: xml.Name{Local: "w:hyperlink"},
-			}); err != nil {
+			propsElement := xml.StartElement{Name: xml.Name{Local: "w:hyperlink"}}
+			if err := e.EncodeElement(cElem.Link, propsElement); err != nil {
 				return err
 			}
 		}

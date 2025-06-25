@@ -11,87 +11,94 @@ import (
 )
 
 // A Run is part of a paragraph that has its own style. It could be (CT_R)
+// w_CT_R =
 type Run struct {
 	// Attributes
-	RsidRPr *stypes.LongHexNum // Revision Identifier for Run Properties
-	RsidR   *stypes.LongHexNum // Revision Identifier for Run
-	RsidDel *stypes.LongHexNum // Revision Identifier for Run Deletion
+	// attribute w:rsidRPr { w_ST_LongHexNumber }?,
+	RsidRPr *stypes.LongHexNum `xml:"w:rsidRPr,attr,omitempty"` // Revision Identifier for Run Properties
+	// attribute w:rsidDel { w_ST_LongHexNumber }?,
+	RsidDel *stypes.LongHexNum `xml:"w:rsidDel,attr,omitempty"` // Revision Identifier for Run Deletion
+	// attribute w:rsidR { w_ST_LongHexNumber }?,
+	RsidR *stypes.LongHexNum `xml:"w:rsidR,attr,omitempty"` // Revision Identifier for Run
 
 	// Sequence:
 
 	//1. Run Properties
-	Property *RunProperty
+	// w_EG_RPr?,
+	// w_EG_RPr = element rPr { w_CT_RPr }
+	Property *RunProperty `xml:"w:rPr,omitempty"`
 
 	// 2. Choice - Run Inner content
+	// w_EG_RunInnerContent*
 	Children []RunChild
 }
 
 type RunChild struct {
 	//specifies that a break shall be placed at the current location in the run content
-	Break *Break `xml:"br,omitempty"`
+	Break *Break `xml:"w:br,omitempty"`
 
 	//specifies that this run contains literal text which shall be displayed in the document
-	Text *Text `xml:"t,omitempty"`
+	Text *Text `xml:"w:t,omitempty"`
 
 	//specifies that this run contains literal text which shall be displayed in the document
-	DelText *Text `xml:"delText,omitempty"`
+	DelText *Text `xml:"w:delText,omitempty"`
 
 	//Field Code
-	InstrText *Text `xml:"instrText,omitempty"`
+	InstrText *Text `xml:"w:instrText,omitempty"`
 
 	//Deleted Field Code
-	DelInstrText *Text `xml:"delInstrText,omitempty"`
+	DelInstrText *Text `xml:"w:delInstrText,omitempty"`
 
 	//Non Breaking Hyphen Character
-	NoBreakHyphen *common.Empty `xml:"noBreakHyphen,omitempty"`
+	NoBreakHyphen *common.Empty `xml:"w:noBreakHyphen,omitempty"`
 
 	//Non Breaking Hyphen Character
-	SoftHyphen *common.Empty `xml:"softHyphen,omitempty"`
+	SoftHyphen *common.Empty `xml:"w:softHyphen,omitempty"`
 
 	//Date Block - Short Day Format
-	DayShort *common.Empty `xml:"dayShort,omitempty"`
+	DayShort *common.Empty `xml:"w:dayShort,omitempty"`
 
 	//Date Block - Short Month Format
-	MonthShort *common.Empty `xml:"monthShort,omitempty"`
+	MonthShort *common.Empty `xml:"w:monthShort,omitempty"`
 
 	//Date Block - Short Year Format
-	YearShort *common.Empty `xml:"yearShort,omitempty"`
+	YearShort *common.Empty `xml:"w:yearShort,omitempty"`
 
 	//Date Block - Long Day Format
-	DayLong *common.Empty `xml:"dayLong,omitempty"`
+	DayLong *common.Empty `xml:"w:dayLong,omitempty"`
 
 	//Date Block - Long Month Format
-	MonthLong *common.Empty `xml:"monthLong,omitempty"`
+	MonthLong *common.Empty `xml:"w:monthLong,omitempty"`
 
 	//Date Block - Long Year Format
-	YearLong *common.Empty `xml:"yearLong,omitempty"`
+	YearLong *common.Empty `xml:"w:yearLong,omitempty"`
 
 	//Comment Information Block
-	AnnotationRef *common.Empty `xml:"annotationRef,omitempty"`
+	AnnotationRef *common.Empty `xml:"w:annotationRef,omitempty"`
 
 	//Footnote Reference Mark
-	FootnoteRef *common.Empty `xml:"footnoteRef,omitempty"`
+	FootnoteRef *common.Empty `xml:"w:footnoteRef,omitempty"`
 
 	//Endnote Reference Mark
-	EndnoteRef *common.Empty `xml:"endnoteRef,omitempty"`
+	EndnoteRef *common.Empty `xml:"w:endnoteRef,omitempty"`
 
 	//Footnote/Endnote Separator Mark
-	Separator *common.Empty `xml:"separator,omitempty"`
+	Separator *common.Empty `xml:"w:separator,omitempty"`
 
 	//Continuation Separator Mark
-	ContSeparator *common.Empty `xml:"continuationSeparator,omitempty"`
+	ContSeparator *common.Empty `xml:"w:continuationSeparator,omitempty"`
 
 	//Symbol Character
-	Sym *Sym `xml:"sym,omitempty"`
+	Sym *Sym `xml:"w:sym,omitempty"`
 
 	//Page Number Block
-	PgNumBlock *common.Empty `xml:"pgNum,omitempty"`
+	PgNumBlock *common.Empty `xml:"w:pgNum,omitempty"`
 
 	//Carriage Return
-	CarrRtn *common.Empty `xml:"cr,omitempty"`
+	CarrRtn *common.Empty `xml:"w:cr,omitempty"`
 
 	//Tab Character
-	Tab *common.Empty `xml:"tab,omitempty"`
+	Tab *common.Empty `xml:"w:tab,omitempty"`
 
 	//TODO:
 	// 	w:object    Inline Embedded Object
@@ -103,16 +110,16 @@ type RunChild struct {
 	// w:commentReference    Comment Content Reference Mark
 
 	//Comment Content Reference Mark
-	CmntRef *Markup `xml:"commentReference,omitempty"`
+	CmntRef *Markup `xml:"w:commentReference,omitempty"`
 
 	//DrawingML Object
-	Drawing *dml.Drawing `xml:"drawing,omitempty"`
+	Drawing *dml.Drawing `xml:"w:drawing,omitempty"`
 
 	//Absolute Position Tab Character
-	PTab *PTab `xml:"ptab,omitempty"`
+	PTab *PTab `xml:"w:ptab,omitempty"`
 
 	//Position of Last Calculated Page Break
-	LastRenPgBrk *common.Empty `xml:"lastRenderedPageBreak,omitempty"`
+	LastRenPgBrk *common.Empty `xml:"w:lastRenderedPageBreak,omitempty"`
 }
 
 func NewRun() *Run {
@@ -120,7 +127,6 @@ func NewRun() *Run {
 }
 
 func (r Run) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	start.Name.Local = "w:r"
 
 	if r.RsidRPr != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:rsidRPr"}, Value: string(*r.RsidRPr)})
@@ -245,8 +251,8 @@ loop:
 
 // Sym represents a symbol character in a document.
 type Sym struct {
-	Font *string `xml:"font,attr,omitempty"`
-	Char *string `xml:"char,attr,omitempty"`
+	Font *string `xml:"w:font,attr,omitempty"`
+	Char *string `xml:"w:char,attr,omitempty"`
 }
 
 func NewSym(font, char string) *Sym {
@@ -317,7 +323,8 @@ func (r *Run) MarshalChild(e *xml.Encoder) error {
 		case child.Tab != nil:
 			err = child.Tab.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:tab"}})
 		case child.Drawing != nil:
-			err = child.Drawing.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:drawing"}})
+			propsElement := xml.StartElement{Name: xml.Name{Local: "w:drawing"}}
+			err = e.EncodeElement(child.Drawing, propsElement)
 		case child.LastRenPgBrk != nil:
 			err = child.LastRenPgBrk.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:lastRenderedPageBreak"}})
 		case child.PTab != nil:
