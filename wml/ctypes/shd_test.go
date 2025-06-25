@@ -1,9 +1,10 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
@@ -57,8 +58,9 @@ func TestShd_MarshalXML(t *testing.T) {
 			var b strings.Builder
 			enc := xml.NewEncoder(&b)
 			start := xml.StartElement{Name: xml.Name{Local: "w:shd"}}
-			err := tt.shading.MarshalXML(enc, start)
-			if err != nil {
+
+			if err := enc.EncodeElement(tt.shading, start); err != nil {
+				// if err := tt.shading.MarshalXML(enc, start); err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 

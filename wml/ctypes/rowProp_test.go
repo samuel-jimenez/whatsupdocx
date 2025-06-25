@@ -1,10 +1,11 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"errors"
 	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
@@ -70,7 +71,8 @@ func TestRowProperty_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:trPr"}}
-			err := tt.input.MarshalXML(encoder, start)
+
+			err := encoder.EncodeElement(tt.input, start)
 
 			encoder.Flush()
 

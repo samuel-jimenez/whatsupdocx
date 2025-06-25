@@ -9,7 +9,7 @@ type Row struct {
 	PropException *PropException
 
 	// 2.Table Row Properties
-	Property *RowProperty
+	Property *RowProperty `xml:"w:trPr,omitempty"`
 
 	// 3.1 Choice
 	Contents []TRCellContent
@@ -33,21 +33,27 @@ func (r Row) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 
 	//1.Table-Level Property Exceptions
 	if r.PropException != nil {
-		if err = r.PropException.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblPrEx"}}
+		if err := e.EncodeElement(r.PropException, propsElement); err != nil {
+			// if err := r.PropException.MarshalXML(e, propsElement); err != nil {
 			return err
 		}
 	}
 
 	//2. Table Properties
 	if r.Property != nil {
-		if err = r.Property.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:trPr"}}
+		if err := e.EncodeElement(r.Property, propsElement); err != nil {
+			// if err := r.Property.MarshalXML(e, propsElement); err != nil {
 			return err
 		}
 	}
 
 	// 3.1 Choice
 	for _, cont := range r.Contents {
-		if err = cont.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tc"}}
+		if err := e.EncodeElement(cont, propsElement); err != nil {
+			// if err := cont.MarshalXML(e, propsElement); err != nil {
 			return err
 		}
 	}
@@ -103,8 +109,10 @@ loop:
 	return nil
 }
 
+//TODO??TODO
+
 type TRCellContent struct {
-	Cell *Cell `xml:"tc,omitempty"`
+	Cell *Cell `xml:"w:tc,omitempty"`
 }
 
 func (c TRCellContent) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -115,9 +123,10 @@ func (c TRCellContent) MarshalXML(e *xml.Encoder, start xml.StartElement) error 
 }
 
 type RowContent struct {
-	Row *Row `xml:"tr,omitempty"`
+	Row *Row `xml:"w:tr,omitempty"`
 }
 
+// TODO RowContent
 func (r RowContent) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if r.Row != nil {
 		return r.Row.MarshalXML(e, xml.StartElement{})

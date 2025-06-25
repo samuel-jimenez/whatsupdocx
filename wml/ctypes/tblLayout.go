@@ -1,14 +1,12 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
 // TableLayout represents the layout of a table in a document.
 type TableLayout struct {
-	LayoutType *stypes.TableLayout `xml:"type,attr,omitempty"`
+	LayoutType *stypes.TableLayout `xml:"w:type,attr,omitempty"`
 }
 
 func DefaultTableLayout() *TableLayout {
@@ -18,13 +16,4 @@ func DefaultTableLayout() *TableLayout {
 // NewTableLayout creates a new TableLayout instance.
 func NewTableLayout(t stypes.TableLayout) *TableLayout {
 	return &TableLayout{LayoutType: &t}
-}
-
-// MarshalXML implements the xml.Marshaler interface for TableLayout.
-func (t TableLayout) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:tblLayout"
-	if t.LayoutType != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:type"}, Value: string(*t.LayoutType)})
-	}
-	return e.EncodeElement("", start)
 }

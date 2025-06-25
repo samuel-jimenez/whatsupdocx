@@ -159,11 +159,6 @@ func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	// element lnNumType { w_CT_LineNumber }?,
 	// element pgNumType { w_CT_PageNumber }?,
-	if s.PageNum != nil {
-		if err = s.PageNum.MarshalXML(e, xml.StartElement{}); err != nil {
-			return err
-		}
-	}
 
 	// element cols { w_CT_Columns }?,
 	// element formProt { w_CT_OnOff }?,

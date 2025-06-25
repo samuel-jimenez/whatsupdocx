@@ -284,10 +284,11 @@ func (rp RunProperty) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 			return fmt.Errorf("border: %w", err)
 		}
 	}
-
 	//30.Run Shading
 	if rp.Shading != nil {
-		if err = rp.Shading.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:shd"}}
+		if err := e.EncodeElement(rp.Shading, propsElement); err != nil {
+			// if err := rp.Shading.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("shading: %w", err)
 		}
 	}

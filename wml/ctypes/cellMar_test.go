@@ -34,7 +34,8 @@ func TestCellMarginsMarshalXML(t *testing.T) {
 		encoder := xml.NewEncoder(&result)
 
 		start := xml.StartElement{Name: xml.Name{Local: "w:tblCellMar"}}
-		err := tc.input.MarshalXML(encoder, start)
+			if err := encoder.EncodeElement(tc.input, start); err != nil {
+				// if err := tc.input.MarshalXML(encoder, start); err != nil {
 
 		if err != nil {
 			t.Errorf("Error during MarshalXML: %v", err)

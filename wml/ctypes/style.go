@@ -312,14 +312,18 @@ func (s *Style) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	// 19. TableProp: Style Table Properties
 	if s.TableProp != nil {
-		if err := s.TableProp.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:tblPr"}}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblPr"}}
+		if err := e.EncodeElement(s.TableProp, propsElement); err != nil {
+			// if err := s.TableProp.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("Style TableProp: %w", err)
 		}
 	}
 
 	// 20. TableRowProp: Style Table Row Properties
 	if s.TableRowProp != nil {
-		if err := s.TableRowProp.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:trPr"}}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:trPr"}}
+		if err := e.EncodeElement(s.TableRowProp, propsElement); err != nil {
+			// if err := s.TableRowProp.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("Style TableRowProp: %w", err)
 		}
 	}

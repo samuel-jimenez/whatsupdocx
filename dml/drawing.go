@@ -14,8 +14,8 @@ const (
 )
 
 type Drawing struct {
-	Inline []Inline  `xml:"inline,omitempty"`
-	Anchor []*Anchor `xml:"anchor,omitempty"`
+	Inline []Inline  `xml:"wp:inline,omitempty"`
+	Anchor []*Anchor `xml:"wp:anchor,omitempty"`
 }
 
 func (dr *Drawing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {

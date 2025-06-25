@@ -1,54 +1,20 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
 // Shading represents the shading properties for a run in a WordprocessingML document.
 type Shading struct {
-	Val            stypes.Shading     `xml:"val,attr"`
-	Color          *string            `xml:"color,attr,omitempty"`
-	ThemeColor     *stypes.ThemeColor `xml:"themeColor,attr,omitempty"`
-	ThemeFill      *stypes.ThemeColor `xml:"themeFill,attr,omitempty"`
-	ThemeTint      *string            `xml:"themeTint,attr,omitempty"`
-	ThemeShade     *string            `xml:"themeShade,attr,omitempty"`
-	Fill           *string            `xml:"fill,attr,omitempty"`
-	ThemeFillTint  *string            `xml:"themeFillTint,attr,omitempty"`
-	ThemeFillShade *string            `xml:"themeFillShade,attr,omitempty"`
-}
-
-func (s Shading) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:shd"
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: string(s.Val)})
-
-	if s.Color != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:color"}, Value: *s.Color})
-	}
-	if s.ThemeColor != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeColor"}, Value: string(*s.ThemeColor)})
-	}
-	if s.ThemeFill != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeFill"}, Value: string(*s.ThemeFill)})
-	}
-	if s.ThemeTint != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeTint"}, Value: *s.ThemeTint})
-	}
-	if s.ThemeShade != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeShade"}, Value: *s.ThemeShade})
-	}
-	if s.Fill != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:fill"}, Value: *s.Fill})
-	}
-	if s.ThemeFillTint != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeFillTint"}, Value: *s.ThemeFillTint})
-	}
-	if s.ThemeFillShade != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:themeFillShade"}, Value: *s.ThemeFillShade})
-	}
-
-	return e.EncodeElement("", start)
+	Val            stypes.Shading     `xml:"w:val,attr"`
+	Color          *string            `xml:"w:color,attr,omitempty"`
+	ThemeColor     *stypes.ThemeColor `xml:"w:themeColor,attr,omitempty"`
+	ThemeFill      *stypes.ThemeColor `xml:"w:themeFill,attr,omitempty"`
+	ThemeTint      *string            `xml:"w:themeTint,attr,omitempty"`
+	ThemeShade     *string            `xml:"w:themeShade,attr,omitempty"`
+	Fill           *string            `xml:"w:fill,attr,omitempty"`
+	ThemeFillTint  *string            `xml:"w:themeFillTint,attr,omitempty"`
+	ThemeFillShade *string            `xml:"w:themeFillShade,attr,omitempty"`
 }
 
 // DefaultShading creates a new Shading with default values.

@@ -1,9 +1,10 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"fmt"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 )

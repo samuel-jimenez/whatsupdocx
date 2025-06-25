@@ -44,7 +44,7 @@ type ParagraphProp struct {
 
 	// 7. Numbering Definition Instance Reference
 	// element numPr { w_CT_NumPr }?,
-	NumProp *NumProp `xml:"numPr,omitempty"`
+	NumProp *NumProp `xml:"w:numPr,omitempty"`
 
 	// 8. Suppress Line Numbers for Paragraph
 	// element suppressLineNumbers { w_CT_OnOff }?,
@@ -220,7 +220,9 @@ func (pp ParagraphProp) MarshalXML(e *xml.Encoder, start xml.StartElement) (err 
 
 	// 7. NumProp
 	if pp.NumProp != nil {
-		if err = pp.NumProp.MarshalXML(e, xml.StartElement{}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:numPr"}}
+		if err := e.EncodeElement(pp.NumProp, propsElement); err != nil {
+			// if err := pp.NumProp.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("NumberingProperty: %w", err)
 		}
 	}
@@ -245,9 +247,9 @@ func (pp ParagraphProp) MarshalXML(e *xml.Encoder, start xml.StartElement) (err 
 
 	// 10. Shading
 	if pp.Shading != nil {
-		if err = pp.Shading.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:shd"},
-		}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:shd"}}
+		if err := e.EncodeElement(pp.Shading, propsElement); err != nil {
+			// if err := pp.Shading.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("Shading: %w", err)
 		}
 	}

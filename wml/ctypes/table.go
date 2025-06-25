@@ -40,9 +40,10 @@ func (t Table) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 			return err
 		}
 	}
-
 	//2. Table Properties
-	if err = t.TableProp.MarshalXML(e, xml.StartElement{}); err != nil {
+	propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblPr"}}
+	if err := e.EncodeElement(t.TableProp, propsElement); err != nil {
+		// if err := t.TableProp.MarshalXML(e, propsElement); err != nil {
 		return err
 	}
 

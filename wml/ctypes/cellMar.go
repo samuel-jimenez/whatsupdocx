@@ -1,24 +1,22 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
 // Table Cell Margin Defaults
 type CellMargins struct {
 	// 1. Table Cell Top Margin Default
-	Top *TableWidth `xml:"top,omitempty"`
+	Top *TableWidth `xml:"w:top,omitempty"`
 
 	// 2. Table Cell Left Margin Default
-	Left *TableWidth `xml:"left,omitempty"`
+	Left *TableWidth `xml:"w:left,omitempty"`
 
 	// 3. Table Cell Bottom Margin Default
-	Bottom *TableWidth `xml:"bottom,omitempty"`
+	Bottom *TableWidth `xml:"w:bottom,omitempty"`
 
 	// 4. Table Cell Right Margin Default
-	Right *TableWidth `xml:"right,omitempty"`
+	Right *TableWidth `xml:"w:right,omitempty"`
 }
 
 func DefaultCellMargins() CellMargins {
@@ -51,41 +49,4 @@ func (tcm CellMargins) MarginLeft(v int, t stypes.TableWidth) CellMargins {
 func (tcm CellMargins) MarginBottom(v int, t stypes.TableWidth) CellMargins {
 	tcm.Bottom = NewTableWidth(v, t)
 	return tcm
-}
-
-func (tcm CellMargins) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-
-	if err = e.EncodeToken(start); err != nil {
-		return err
-	}
-
-	// 1. Top
-	if tcm.Top != nil {
-		if err = tcm.Top.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:top"}}); err != nil {
-			return err
-		}
-	}
-
-	// 2. Left
-	if tcm.Left != nil {
-		if err = tcm.Left.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:left"}}); err != nil {
-			return err
-		}
-	}
-
-	// 3. Bottom
-	if tcm.Bottom != nil {
-		if err = tcm.Bottom.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:bottom"}}); err != nil {
-			return err
-		}
-	}
-
-	// 4. Right
-	if tcm.Right != nil {
-		if err = tcm.Right.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:right"}}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

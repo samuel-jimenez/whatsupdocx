@@ -1,39 +1,18 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"errors"
-	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 type CellMerge struct {
-	ID         int               `xml:"id,attr"`
-	Author     string            `xml:"author,attr"`
-	Date       *string           `xml:"date,attr,omitempty"`
-	VMerge     *AnnotationVMerge `xml:"vMerge,attr,omitempty"`     //Revised Vertical Merge Setting
-	VMergeOrig *AnnotationVMerge `xml:"vMergeOrig,attr,omitempty"` //Vertical Merge Setting Removed by Revision
+	ID         int               `xml:"w:id,attr"`
+	Author     string            `xml:"w:author,attr"`
+	Date       *string           `xml:"w:date,attr,omitempty"`
+	VMerge     *AnnotationVMerge `xml:"w:vMerge,attr,omitempty"`     //Revised Vertical Merge Setting
+	VMergeOrig *AnnotationVMerge `xml:"w:vMergeOrig,attr,omitempty"` //Vertical Merge Setting Removed by Revision
 
-}
-
-func (t CellMerge) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "w:id"}, Value: strconv.Itoa(t.ID)},
-		{Name: xml.Name{Local: "w:author"}, Value: t.Author},
-	}
-
-	if t.Date != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:date"}, Value: *t.Date})
-	}
-
-	if t.VMerge != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:vMerge"}, Value: string(*t.VMerge)})
-	}
-
-	if t.VMergeOrig != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:vMergeOrig"}, Value: string(*t.VMergeOrig)})
-	}
-
-	return e.EncodeElement("", start)
 }
 
 type AnnotationVMerge string
