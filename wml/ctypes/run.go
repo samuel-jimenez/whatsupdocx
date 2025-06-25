@@ -30,7 +30,7 @@ type Run struct {
 
 	// 2. Choice - Run Inner content
 	// w_EG_RunInnerContent*
-	Children []RunChild `xml:",omitempty"`
+	Children []RunChild `xml:",group,any,omitempty"`
 }
 
 // w_EG_RunInnerContent =
@@ -155,60 +155,8 @@ type RunChild struct {
 	LastRenPgBrk *common.Empty `xml:"w:lastRenderedPageBreak,omitempty"`
 }
 
-// 	func (group RunChild) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-//
-// 	if group.NoFillProperties != nil {
-// 		propsElement := xml.StartElement{Name: xml.Name{Local: "a:noFill"}}
-// 		if err = e.EncodeElement(group.NoFillProperties, propsElement); err != nil {
-// 			return err
-// 		}
-// 	}
-// 	if group.SolidColorFillProperties != nil {
-// 		propsElement := xml.StartElement{Name: xml.Name{Local: "a:solidFill"}}
-// 		if err = e.EncodeElement(group.SolidColorFillProperties, propsElement); err != nil {
-// 			return err
-// 		}
-// 	}
-//
-// 	return nil
-//
-// }
-
 func NewRun() *Run {
 	return &Run{}
-}
-
-func (r Run) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-
-	if r.RsidRPr != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:rsidRPr"}, Value: string(*r.RsidRPr)})
-	}
-	if r.RsidR != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:rsidR"}, Value: string(*r.RsidR)})
-	}
-	if r.RsidDel != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:rsidDel"}, Value: string(*r.RsidDel)})
-	}
-
-	err = e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// 1. Property
-	if r.Property != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:rPr"}}
-		if err = e.EncodeElement(r.Property, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// 2. Remaining Child elemens
-	if err = r.MarshalChild(e); err != nil {
-		return err
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
 func (r *Run) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
@@ -312,72 +260,4 @@ func NewSym(font, char string) *Sym {
 		Font: &font,
 		Char: &char,
 	}
-}
-
-func (r *Run) MarshalChild(e *xml.Encoder) error {
-	var err error
-	for _, child := range r.Children {
-		switch {
-		case child.Break != nil:
-			err = child.Break.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:br"}})
-		case child.Text != nil:
-			err = child.Text.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:t"}})
-		case child.DelText != nil:
-			err = child.DelText.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:delText"}})
-		case child.InstrText != nil:
-			err = child.InstrText.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:instrText"}})
-		case child.DelInstrText != nil:
-			err = child.DelInstrText.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:delInstrText"}})
-		case child.NoBreakHyphen != nil:
-			err = child.NoBreakHyphen.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:noBreakHyphen"}})
-		case child.SoftHyphen != nil:
-			err = child.SoftHyphen.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:softHyphen"}})
-		case child.DayShort != nil:
-			err = child.DayShort.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:dayShort"}})
-		case child.MonthShort != nil:
-			err = child.MonthShort.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:monthShort"}})
-		case child.YearShort != nil:
-			err = child.YearShort.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:yearShort"}})
-		case child.DayLong != nil:
-			err = child.DayLong.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:dayLong"}})
-		case child.MonthLong != nil:
-			err = child.MonthLong.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:monthLong"}})
-		case child.YearLong != nil:
-			err = child.YearLong.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:yearLong"}})
-		case child.AnnotationRef != nil:
-			err = child.AnnotationRef.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:annotationRef"}})
-		case child.FootnoteRef != nil:
-			err = child.FootnoteRef.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:footnoteRef"}})
-		case child.EndnoteRef != nil:
-			err = child.EndnoteRef.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:endnoteRef"}})
-		case child.Separator != nil:
-			err = child.Separator.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:separator"}})
-		case child.ContSeparator != nil:
-			err = child.ContSeparator.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:continuationSeparator"}})
-		case child.Sym != nil:
-			propsElement := xml.StartElement{Name: xml.Name{Local: "w:sym"}}
-			err = e.EncodeElement(child.Sym, propsElement)
-		case child.PgNumBlock != nil:
-			err = child.PgNumBlock.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:pgNum"}})
-		case child.CarrRtn != nil:
-			err = child.CarrRtn.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:cr"}})
-		case child.Tab != nil:
-			err = child.Tab.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:tab"}})
-		case child.Drawing != nil:
-			propsElement := xml.StartElement{Name: xml.Name{Local: "w:drawing"}}
-			err = e.EncodeElement(child.Drawing, propsElement)
-		case child.LastRenPgBrk != nil:
-			err = child.LastRenPgBrk.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:lastRenderedPageBreak"}})
-		case child.PTab != nil:
-			err = child.PTab.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:ptab"}})
-		case child.CmntRef != nil:
-			err = child.CmntRef.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:commentReference"}})
-
-		}
-
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
