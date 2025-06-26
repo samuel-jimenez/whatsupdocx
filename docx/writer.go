@@ -55,7 +55,7 @@ func (rd *RootDoc) writeToZip(zw *zip.Writer) error {
 	if err != nil {
 		return err
 	}
-	rd.FileMap.Store(constants.ConentTypeFileIdx, []byte(ct))
+	rd.FileMap.Store(constants.ContentTypeFileIdx, []byte(ct))
 
 	docRelContent, err := marshal(rd.Document.DocRels)
 	if err != nil {

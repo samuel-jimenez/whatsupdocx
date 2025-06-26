@@ -81,4 +81,4 @@ const (
 
 const MediaPath = "word/media/"
 
-const ConentTypeFileIdx = "[Content_Types].xml"
+const ContentTypeFileIdx = "[Content_Types].xml"

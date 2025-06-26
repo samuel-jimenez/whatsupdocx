@@ -46,12 +46,12 @@ func Unpack(content *[]byte) (*docx.RootDoc, error) {
 	}
 
 	// Load content type details
-	ctBytes := fileIndex[constants.ConentTypeFileIdx]
+	ctBytes := fileIndex[constants.ContentTypeFileIdx]
 	ct, err := LoadContentTypes(ctBytes)
 	if err != nil {
 		return nil, err
 	}
-	delete(fileIndex, constants.ConentTypeFileIdx)
+	delete(fileIndex, constants.ContentTypeFileIdx)
 	rd.ContentType = *ct
 
 	rd.ImageCount = 0
