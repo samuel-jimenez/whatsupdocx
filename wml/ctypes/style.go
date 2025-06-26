@@ -16,6 +16,61 @@ var defaultStyleNSAttrs = map[string]string{
 }
 
 // Style Definitions
+// w_styles = element styles { w_CT_Styles }
+//
+// w_ST_StyleType =
+// string "paragraph"
+// | string "character"
+// | string "table"
+// | string "numbering"
+//
+// w_CT_Style =
+// attribute w:type { w_ST_StyleType }?,
+// attribute w:styleId { s_ST_String }?,
+// attribute w:default { s_ST_OnOff }?,
+// attribute w:customStyle { s_ST_OnOff }?,
+// element name { w_CT_String }?,
+// element aliases { w_CT_String }?,
+// element basedOn { w_CT_String }?,
+// element next { w_CT_String }?,
+// element link { w_CT_String }?,
+// element autoRedefine { w_CT_OnOff }?,
+// element hidden { w_CT_OnOff }?,
+// element uiPriority { w_CT_DecimalNumber }?,
+// element semiHidden { w_CT_OnOff }?,
+// element unhideWhenUsed { w_CT_OnOff }?,
+// element qFormat { w_CT_OnOff }?,
+// element locked { w_CT_OnOff }?,
+// element personal { w_CT_OnOff }?,
+// element personalCompose { w_CT_OnOff }?,
+// element personalReply { w_CT_OnOff }?,
+// element rsid { w_CT_LongHexNumber }?,
+// element pPr { w_CT_PPrGeneral }?,
+// element rPr { w_CT_RPr }?,
+// element tblPr { w_CT_TblPrBase }?,
+// element trPr { w_CT_TrPr }?,
+// element tcPr { w_CT_TcPr }?,
+// element tblStylePr { w_CT_TblStylePr }*
+// w_CT_LsdException =
+// attribute w:name { s_ST_String },
+// attribute w:locked { s_ST_OnOff }?,
+// attribute w:uiPriority { w_ST_DecimalNumber }?,
+// attribute w:semiHidden { s_ST_OnOff }?,
+// attribute w:unhideWhenUsed { s_ST_OnOff }?,
+// attribute w:qFormat { s_ST_OnOff }?
+// w_CT_LatentStyles =
+// attribute w:defLockedState { s_ST_OnOff }?,
+// attribute w:defUIPriority { w_ST_DecimalNumber }?,
+// attribute w:defSemiHidden { s_ST_OnOff }?,
+// attribute w:defUnhideWhenUsed { s_ST_OnOff }?,
+// attribute w:defQFormat { s_ST_OnOff }?,
+// attribute w:count { w_ST_DecimalNumber }?,
+// element lsdException { w_CT_LsdException }*
+//
+// w_CT_Styles =
+// element docDefaults { w_CT_DocDefaults }?,
+// element latentStyles { w_CT_LatentStyles }?,
+// element style { w_CT_Style }*
 type Styles struct {
 	XMLName xml.Name `xml:"w:styles"`
 

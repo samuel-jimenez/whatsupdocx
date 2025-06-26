@@ -23,21 +23,37 @@ var docAttrs = map[string]string{
 	"mc:Ignorable": "w14 wp14 w15",
 }
 
+// w_CT_DocumentBase = element background { w_CT_Background }?
+// w_CT_Document =
+// w_CT_DocumentBase,
+// element body { w_CT_Body }?,
+// attribute w:conformance { s_ST_ConformanceClass }?
+// w_CT_GlossaryDocument =
+// w_CT_DocumentBase,
+// element docParts { w_CT_DocParts }?
+// w_document = element document { w_CT_Document }
+
 // This element specifies the contents of a main document part in a WordprocessingML document.
+// w_CT_Document =
 type Document struct {
 	XMLName xml.Name `xml:"w:document"`
 
 	// Reference to the RootDoc
-	Root *RootDoc
+	Root *RootDoc `xml:"-"`
+
+	//TODO
+	// attribute w:conformance { s_ST_ConformanceClass }?
 
 	// Elements
-	Background *Background
-	Body       *Body
+	// w_CT_DocumentBase,
+	// w_CT_DocumentBase = element background { w_CT_Background }?
+	Background *Background `xml:"w:background,omitempty"`
+	// element body { w_CT_Body }?,
+	Body *Body `xml:"w:body,omitempty"`
 
-	// Non elements - helper fields
-	DocRels      Relationships // DocRels represents relationships specific to the document.
-	RID          int
-	relativePath string
+	DocRels      Relationships `xml:"-"` // DocRels represents relationships specific to the document.
+	RID          int           `xml:"-"`
+	relativePath string        `xml:"-"`
 }
 
 // IncRelationID increments the relation ID of the document and returns the new ID.
@@ -62,7 +78,8 @@ func (doc Document) MarshalXML(e *xml.Encoder, start xml.StartElement) (err erro
 	}
 
 	if doc.Background != nil {
-		if err = doc.Background.MarshalXML(e, xml.StartElement{}); err != nil {
+		element := xml.StartElement{Name: xml.Name{Local: "w:background"}}
+		if err = doc.Background.MarshalXML(e, element); err != nil {
 			return err
 		}
 	}
