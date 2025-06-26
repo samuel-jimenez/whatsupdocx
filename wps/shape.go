@@ -2,6 +2,7 @@ package wps
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/samuel-jimenez/xml"
 
@@ -19,7 +20,7 @@ type Shape struct {
 	//TODO
 
 	// element cNvPr { a_CT_NonVisualDrawingProps }?,
-	NonVisualDrawingProps *dmlct.CNvPr `xml:"cNvPr,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1)  that specifies non-visual properties. This element MUST NOT be present when the CT_WordprocessingShape is contained directly by a graphicData (Graphic Object Data) element as specified in [ISO/IEC29500-1:2016] section 20.1.2.2.17. This element MUST be present when the CT_WordprocessingShape is not contained directly by a graphicData element as specified in [ISO/IEC29500-1:2016] section 20.1.2.2.17.<120>
+	NonVisualDrawingProps *dmlct.CNvPr `xml:"wps:cNvPr,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1)  that specifies non-visual properties. This element MUST NOT be present when the CT_WordprocessingShape is contained directly by a graphicData (Graphic Object Data) element as specified in [ISO/IEC29500-1:2016] section 20.1.2.2.17. This element MUST be present when the CT_WordprocessingShape is not contained directly by a graphicData element as specified in [ISO/IEC29500-1:2016] section 20.1.2.2.17.<120>
 
 	// (element cNvSpPr { a_CT_NonVisualDrawingShapeProps }
 	// | element cNvCnPr { a_CT_NonVisualConnectorProperties }),
@@ -27,20 +28,20 @@ type Shape struct {
 
 	// 3.Shape Properties
 	// element spPr { a_CT_ShapeProperties },
-	PicShapeProp dmlpic.PicShapeProp `xml:"spPr"`
+	PicShapeProp dmlpic.PicShapeProp `xml:"wps:spPr"`
 
 	// element style { a_CT_ShapeStyle }?,
-	Style *ShapeStyle `xml:"style,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the style information for a shape.
+	Style *ShapeStyle `xml:"wps:style,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the style information for a shape.
 
 	// element extLst { a_CT_OfficeArtExtensionList }?,
-	ExtLst *OfficeArtExtensionList `xml:"extLst,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) to hold future extensions to the parent element of this extLst element.
+	ExtLst *OfficeArtExtensionList `xml:"wps:extLst,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) to hold future extensions to the parent element of this extLst element.
 
 	// (element txbx { wp_CT_TextboxInfo }
 	// | element linkedTxbx { wp_CT_LinkedTextboxInformation })?,
 	ShapeTextboxInfo *ShapeTextboxInfo
 
 	// element bodyPr { a_CT_TextBodyProperties}
-	BodyPr TextBodyProperties `xml:"bodyPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the body properties for the text body in a shape.
+	BodyPr TextBodyProperties `xml:"wps:bodyPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the body properties for the text body in a shape.
 
 }
 
@@ -50,8 +51,8 @@ type Shape struct {
 type NonVisualProps struct { /*
 		NonVisualDrawingShapeProps   *dmlct.CNvSpPr `xml:"cNvSpPr,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies non-visual shape properties.
 		NonVisualConnectorProperties *dmlct.CNvCnPr `xml:"cNvCnPr,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies non-visual connector properties.*/
-	NonVisualDrawingShapeProps   *dmlct.CNvSpPr `xml:"cNvSpPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies non-visual shape properties.
-	NonVisualConnectorProperties *dmlct.CNvCnPr `xml:"cNvCnPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies non-visual connector properties.
+	NonVisualDrawingShapeProps   *dmlct.CNvSpPr `xml:"wps:cNvSpPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies non-visual shape properties.
+	NonVisualConnectorProperties *dmlct.CNvCnPr `xml:"wps:cNvCnPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies non-visual connector properties.
 }
 
 func (props NonVisualProps) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
@@ -173,8 +174,7 @@ type TextBodyProperties struct {
 // MarshalXML implements the xml.Marshaler interface for the Shape type.
 // It encodes the Shape to its corresponding XML representation.
 func (shape Shape) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	start.Name.Local = "wps:wsp"
-
+	log.Println("Shape MarshalXML")
 	err = e.EncodeToken(start)
 	if err != nil {
 		return err

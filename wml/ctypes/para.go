@@ -1,6 +1,7 @@
 package ctypes
 
 import (
+	"log"
 	"strings"
 
 	"github.com/samuel-jimenez/xml"
@@ -18,13 +19,13 @@ type Paragraph struct {
 	// attribute w:rsidRPr { w_ST_LongHexNumber }?,
 	RsidRPr *stypes.LongHexNum `xml:"w:rsidRPr,attr,omitempty"` // Revision Identifier for Paragraph Glyph Formatting
 	// attribute w:rsidR { w_ST_LongHexNumber }?,
-	RsidR *stypes.LongHexNum // Revision Identifier for Paragraph
+	RsidR *stypes.LongHexNum `xml:"w:rsidR,attr,omitempty"` // Revision Identifier for Paragraph
 	// attribute w:rsidDel { w_ST_LongHexNumber }?,
-	RsidDel *stypes.LongHexNum // Revision Identifier for Paragraph Deletion
+	RsidDel *stypes.LongHexNum `xml:"w:rsidDel,attr,omitempty"` // Revision Identifier for Paragraph Deletion
 	// attribute w:rsidP { w_ST_LongHexNumber }?,
-	RsidP *stypes.LongHexNum // Revision Identifier for Paragraph Properties
+	RsidP *stypes.LongHexNum `xml:"w:rsidP,attr,omitempty"` // Revision Identifier for Paragraph Properties
 	// attribute w:rsidRDefault { w_ST_LongHexNumber }?,
-	RsidRDefault *stypes.LongHexNum // Default Revision Identifier for Runs
+	RsidRDefault *stypes.LongHexNum `xml:"w:rsidRDefault,attr,omitempty"` // Default Revision Identifier for Runs
 
 	// 1. Paragraph Properties
 	// element pPr { w_CT_PPr }?,
@@ -32,7 +33,7 @@ type Paragraph struct {
 
 	// 2. Choices (Slice of Child elements)
 	// w_EG_PContent*
-	Children []ParagraphChild
+	Children []ParagraphChild `xml:",group,any,omitempty"`
 }
 
 type ParagraphChild struct {
@@ -64,7 +65,7 @@ func (p Paragraph) String() string {
 }
 
 func (p Paragraph) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	start.Name.Local = "w:p"
+	log.Println("Paragraph MarshalXML")
 
 	if p.RsidRPr != nil {
 		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:rsidRPr"}, Value: string(*p.RsidRPr)})

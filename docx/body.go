@@ -1,6 +1,8 @@
 package docx
 
 import (
+	"log"
+
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
@@ -16,7 +18,7 @@ type Body struct {
 
 // DocumentChild represents a child element within a Word document, which can be a Paragraph or a Table.
 type DocumentChild struct {
-	Para  *Paragraph
+	Para  *Paragraph `xml:"w:p,omitempty"`
 	Table *Table
 }
 
@@ -31,6 +33,7 @@ func NewBody(root *RootDoc) *Body {
 // It encodes the Body to its corresponding XML representation.
 func (b Body) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 	start.Name.Local = "w:body"
+	log.Println("Body MarshalXML")
 
 	err = e.EncodeToken(start)
 	if err != nil {
@@ -40,7 +43,9 @@ func (b Body) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 	if b.Children != nil {
 		for _, child := range b.Children {
 			if child.Para != nil {
-				if err = child.Para.ct.MarshalXML(e, xml.StartElement{}); err != nil {
+				propsElement := xml.StartElement{Name: xml.Name{Local: "w:p"}}
+				// if err := e.EncodeElement(child.Para.ct, propsElement); err != nil {
+				if err := child.Para.ct.MarshalXML(e, propsElement); err != nil {
 					return err
 				}
 			}

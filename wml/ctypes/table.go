@@ -1,6 +1,8 @@
 package ctypes
 
 import (
+	"log"
+
 	"github.com/samuel-jimenez/xml"
 )
 
@@ -27,6 +29,7 @@ func DefaultTable() *Table {
 
 func (t Table) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
 	start.Name.Local = "w:tbl"
+	log.Println("Table MarshalXML")
 
 	err = e.EncodeToken(start)
 	if err != nil {

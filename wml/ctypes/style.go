@@ -2,7 +2,6 @@ package ctypes
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/samuel-jimenez/xml"
 
@@ -18,16 +17,18 @@ var defaultStyleNSAttrs = map[string]string{
 
 // Style Definitions
 type Styles struct {
+	XMLName xml.Name `xml:"w:styles"`
+
 	RelativePath string `xml:"-"`
 	Attr         []xml.Attr
 
 	// Sequence
 
 	//1. Document Default Paragraph and Run Properties
-	DocDefaults *DocDefault `xml:"docDefaults,omitempty"`
+	DocDefaults *DocDefault `xml:"w:docDefaults,omitempty"`
 
 	//2. Latent Style Information
-	LatentStyle *LatentStyle `xml:"latentStyles,omitempty"`
+	LatentStyle *LatentStyle `xml:"w:latentStyles,omitempty"`
 
 	//3. Style Definition
 	StyleList []Style `xml:",any"`
@@ -35,10 +36,6 @@ type Styles struct {
 
 func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name.Local = "w:styles"
-	log.Println("Styles MarshalXML s", s)
-	log.Println("Styles MarshalXML start", start)
-	log.Println("Styles MarshalXML s Attr", s.Attr)
-	log.Println("Styles MarshalXML len s Attr", len(s.Attr))
 
 	if len(s.Attr) == 0 {
 		for key, value := range defaultStyleNSAttrs {
@@ -47,7 +44,6 @@ func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		}
 	} else {
 		start.Attr = s.Attr
-		log.Println("MarshalXML", s, start)
 	}
 
 	if err := e.EncodeToken(start); err != nil {
@@ -70,7 +66,9 @@ func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	//3. Style Definition
 	for _, elem := range s.StyleList {
-		if err := elem.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:style"}}); err != nil {
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:style"}}
+		if err := e.EncodeElement(elem, propsElement); err != nil {
+			// if err := elem.MarshalXML(e, propsElement); err != nil {
 			return fmt.Errorf("style: %w", err)
 		}
 	}
@@ -82,67 +80,67 @@ type Style struct {
 	//Sequence:
 
 	//1. Primary Style Name
-	Name *CTString `xml:"name,omitempty"`
+	Name *CTString `xml:"w:name,omitempty"`
 
 	//2. Alternate Style Names
-	Alias *CTString `xml:"alias,omitempty"`
+	Alias *CTString `xml:"w:alias,omitempty"`
 
 	//3. Parent Style ID
-	BasedOn *CTString `xml:"basedOn,omitempty"`
+	BasedOn *CTString `xml:"w:basedOn,omitempty"`
 
 	//4. Style For Next Paragraph
-	Next *CTString `xml:"next,omitempty"`
+	Next *CTString `xml:"w:next,omitempty"`
 
 	//5. Linked Style Reference
-	Link *CTString `xml:"link,omitempty"`
+	Link *CTString `xml:"w:link,omitempty"`
 
 	//6.Automatically Merge User Formatting Into Style Definition
-	AutoRedefine *OnOff `xml:"autoRedefine,omitempty"`
+	AutoRedefine *OnOff `xml:"w:autoRedefine,omitempty"`
 
 	//7.Hide Style From User Interface
-	Hidden *OnOff `xml:"hidden,omitempty"`
+	Hidden *OnOff `xml:"w:hidden,omitempty"`
 
 	//8.Optional User Interface Sorting Order
-	UIPriority *DecimalNum `xml:"uiPriority,omitempty"`
+	UIPriority *DecimalNum `xml:"w:uiPriority,omitempty"`
 
 	// 9. Hide Style From Main User Interface
-	SemiHidden *OnOff `xml:"semiHidden,omitempty"`
+	SemiHidden *OnOff `xml:"w:semiHidden,omitempty"`
 
 	// 10. Remove Semi-Hidden Property When Style Is Used
-	UnhideWhenUsed *OnOff `xml:"unhideWhenUsed,omitempty"`
+	UnhideWhenUsed *OnOff `xml:"w:unhideWhenUsed,omitempty"`
 
 	// 11. Primary Style
-	QFormat *OnOff `xml:"qFormat,omitempty"`
+	QFormat *OnOff `xml:"w:qFormat,omitempty"`
 
 	// 12. Style Cannot Be Applied
-	Locked *OnOff `xml:"locked,omitempty"`
+	Locked *OnOff `xml:"w:locked,omitempty"`
 
 	// 13. E-Mail Message Text Style
-	Personal *OnOff `xml:"personal,omitempty"`
+	Personal *OnOff `xml:"w:personal,omitempty"`
 
 	// 14. E-Mail Message Composition Style
-	PersonalCompose *OnOff `xml:"personalCompose,omitempty"`
+	PersonalCompose *OnOff `xml:"w:personalCompose,omitempty"`
 
 	// 15. E-Mail Message Reply Style
-	PersonalReply *OnOff `xml:"personalReply,omitempty"`
+	PersonalReply *OnOff `xml:"w:personalReply,omitempty"`
 
 	//16. Revision Identifier for Style Definition
-	RevID *GenSingleStrVal[stypes.LongHexNum] `xml:"rsid,omitempty"`
+	RevID *GenSingleStrVal[stypes.LongHexNum] `xml:"w:rsid,omitempty"`
 
 	//17. Style Paragraph Properties
-	ParaProp *ParagraphProp `xml:"pPr,omitempty"`
+	ParaProp *ParagraphProp `xml:"w:pPr,omitempty"`
 
 	//18. Run Properties
-	RunProp *RunProperty `xml:"rPr,omitempty"`
+	RunProp *RunProperty `xml:"w:rPr,omitempty"`
 
 	//19. Style Table Properties
-	TableProp *TableProp `xml:"tblPr,omitempty"`
+	TableProp *TableProp `xml:"w:tblPr,omitempty"`
 
 	//20. Style Table Row Properties
-	TableRowProp *RowProperty `xml:"trPr,omitempty"`
+	TableRowProp *RowProperty `xml:"w:trPr,omitempty"`
 
 	//21. Style Table Cell Properties
-	TableCellProp *CellProperty `xml:"tcPr,omitempty"`
+	TableCellProp *CellProperty `xml:"w:tcPr,omitempty"`
 
 	//22.Style Conditional Table Formatting Properties
 	TableStylePr []TableStyleProp `xml:",any"`
@@ -150,201 +148,14 @@ type Style struct {
 	// Attributes
 
 	//Style Type
-	Type *stypes.StyleType `xml:"type,attr,omitempty"`
+	Type *stypes.StyleType `xml:"w:type,attr,omitempty"`
 
 	//Style ID
-	ID *string `xml:"styleId,attr,omitempty"`
+	ID *string `xml:"w:styleId,attr,omitempty"`
 
 	//Default Style
-	Default *stypes.OnOff `xml:"default,attr,omitempty"`
+	Default *stypes.OnOff `xml:"w:default,attr,omitempty"`
 
 	//User-Defined Style
-	CustomStyle *stypes.OnOff `xml:"customStyle,attr,omitempty"`
-}
-
-func (s *Style) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:style"
-
-	// Add attributes
-	if s.Type != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:type"}, Value: string(*s.Type)})
-	}
-	if s.ID != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:styleId"}, Value: *s.ID})
-	}
-
-	if s.Default != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:default"}, Value: string(*s.Default)})
-	}
-	if s.CustomStyle != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:customStyle"}, Value: string(*s.CustomStyle)})
-	}
-
-	if err := e.EncodeToken(start); err != nil {
-		return err
-	}
-
-	// 1. Name: Primary Style Name
-	if s.Name != nil {
-		if err := s.Name.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:name"}}); err != nil {
-			return fmt.Errorf("Style Name: %w", err)
-		}
-	}
-
-	// 2. Alias: Alternate Style Names
-	if s.Alias != nil {
-		if err := s.Alias.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:alias"}}); err != nil {
-			return fmt.Errorf("Style Alias: %w", err)
-		}
-	}
-
-	// 3. BasedOn: Parent Style ID
-	if s.BasedOn != nil {
-		if err := s.BasedOn.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:basedOn"}}); err != nil {
-			return fmt.Errorf("Style BasedOn: %w", err)
-		}
-	}
-
-	// 4. Next: Style For Next Paragraph
-	if s.Next != nil {
-		if err := s.Next.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:next"}}); err != nil {
-			return fmt.Errorf("Style Next: %w", err)
-		}
-	}
-
-	// 5. Link: Linked Style Reference
-	if s.Link != nil {
-		if err := s.Link.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:link"}}); err != nil {
-			return fmt.Errorf("Style Link: %w", err)
-		}
-	}
-
-	// 6. AutoRedefine: Automatically Merge User Formatting Into Style Definition
-	if s.AutoRedefine != nil {
-		if err := s.AutoRedefine.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:autoRedefine"}}); err != nil {
-			return fmt.Errorf("Style AutoRedefine: %w", err)
-		}
-	}
-
-	// 7. Hidden: Hide Style From User Interface
-	if s.Hidden != nil {
-		if err := s.Hidden.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:hidden"}}); err != nil {
-			return fmt.Errorf("Style Hidden: %w", err)
-		}
-	}
-
-	// 8. UIPriority: Optional User Interface Sorting Order
-	if s.UIPriority != nil {
-		if err := s.UIPriority.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:uiPriority"}}); err != nil {
-			return fmt.Errorf("Style UIPriority: %w", err)
-		}
-	}
-
-	// 9. SemiHidden: Hide Style From Main User Interface
-	if s.SemiHidden != nil {
-		if err := s.SemiHidden.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:semiHidden"}}); err != nil {
-			return fmt.Errorf("Style SemiHidden: %w", err)
-		}
-	}
-
-	// 10. UnhideWhenUsed: Remove Semi-Hidden Property When Style Is Used
-	if s.UnhideWhenUsed != nil {
-		if err := s.UnhideWhenUsed.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:unhideWhenUsed"}}); err != nil {
-			return fmt.Errorf("Style UnhideWhenUsed: %w", err)
-		}
-	}
-
-	// 11. QFormat: Primary Style
-	if s.QFormat != nil {
-		if err := s.QFormat.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:qFormat"}}); err != nil {
-			return fmt.Errorf("Style QFormat: %w", err)
-		}
-	}
-
-	// 12. Locked: Style Cannot Be Applied
-	if s.Locked != nil {
-		if err := s.Locked.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:locked"}}); err != nil {
-			return fmt.Errorf("Style Locked: %w", err)
-		}
-	}
-
-	// 13. Personal: E-Mail Message Text Style
-	if s.Personal != nil {
-		if err := s.Personal.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:personal"}}); err != nil {
-			return fmt.Errorf("Style Personal: %w", err)
-		}
-	}
-
-	// 14. PersonalCompose: E-Mail Message Composition Style
-	if s.PersonalCompose != nil {
-		if err := s.PersonalCompose.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:personalCompose"}}); err != nil {
-			return fmt.Errorf("Style PersonalCompose: %w", err)
-		}
-	}
-
-	// 15. PersonalReply: E-Mail Message Reply Style
-	if s.PersonalReply != nil {
-		if err := s.PersonalReply.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:personalReply"}}); err != nil {
-			return fmt.Errorf("Style PersonalReply: %w", err)
-		}
-	}
-
-	// 16. RevID: Revision Identifier for Style Definition
-	if s.RevID != nil {
-		if err := s.RevID.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:rsid"}}); err != nil {
-			return fmt.Errorf("Style RevID: %w", err)
-		}
-	}
-
-	// 17. ParaProp: Style Paragraph Properties
-	if s.ParaProp != nil {
-		if err := s.ParaProp.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:pPr"}}); err != nil {
-			return fmt.Errorf("Style ParaProp: %w", err)
-		}
-	}
-
-	// 18. RunProp: Run Properties
-	if s.RunProp != nil {
-		if err := s.RunProp.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:rPr"}}); err != nil {
-			return fmt.Errorf("Style RunProp: %w", err)
-		}
-	}
-
-	// 19. TableProp: Style Table Properties
-	if s.TableProp != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblPr"}}
-		if err := e.EncodeElement(s.TableProp, propsElement); err != nil {
-			// if err := s.TableProp.MarshalXML(e, propsElement); err != nil {
-			return fmt.Errorf("Style TableProp: %w", err)
-		}
-	}
-
-	// 20. TableRowProp: Style Table Row Properties
-	if s.TableRowProp != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:trPr"}}
-		if err := e.EncodeElement(s.TableRowProp, propsElement); err != nil {
-			// if err := s.TableRowProp.MarshalXML(e, propsElement); err != nil {
-			return fmt.Errorf("Style TableRowProp: %w", err)
-		}
-	}
-
-	// 21. TableCellProp: Style Table Cell Properties
-	if s.TableCellProp != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tcPr"}}
-		if err := e.EncodeElement(s.TableCellProp, propsElement); err != nil {
-			// if err := s.TableCellProp.MarshalXML(e, propsElement); err != nil {
-			return fmt.Errorf("Style TableCellProp: %w", err)
-		}
-	}
-
-	// 22. TableStylePr: Style Conditional Table Formatting Properties
-	for _, tsPr := range s.TableStylePr {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblStylePr"}}
-		if err := e.EncodeElement(tsPr, propsElement); err != nil {
-			// if err := tsPr.MarshalXML(e, propsElement); err != nil {
-			return fmt.Errorf("Style TableStylePr: %w", err)
-		}
-	}
-
-	return e.EncodeToken(start.End())
+	CustomStyle *stypes.OnOff `xml:"w:customStyle,attr,omitempty"`
 }

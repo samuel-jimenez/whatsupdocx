@@ -1,6 +1,8 @@
 package dml
 
 import (
+	"log"
+
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
@@ -11,15 +13,16 @@ import (
 // a_CT_GraphicalObject = element graphicData { a_CT_GraphicalObjectData }
 // a_graphic = element graphic { a_CT_GraphicalObject }
 type Graphic struct {
-	Data *GraphicData `xml:"graphicData,omitempty"`
+	DrawingMLMainNS string       `xml:"xmlns:a,attr,omitempty"`
+	Data            *GraphicData `xml:"a:graphicData,omitempty"`
 }
 
 func NewGraphic(data *GraphicData) *Graphic {
-	return &Graphic{Data: data}
+	return &Graphic{DrawingMLMainNS: constants.DrawingMLMainNS, Data: data}
 }
 
 func DefaultGraphic() *Graphic {
-	return &Graphic{}
+	return &Graphic{DrawingMLMainNS: constants.DrawingMLMainNS}
 }
 
 // a_CT_GraphicalObjectData =
@@ -34,12 +37,13 @@ type GraphicData struct {
 	// anyAttribute*,
 	// mixed { anyElement* }
 	// }
-	Pic   *dmlpic.Pic `xml:"pic,omitempty"`
-	Shape *wps.Shape  `xml:"wsp,omitempty"`
+	Pic   *dmlpic.Pic `xml:"pic:pic,omitempty"`
+	Shape *wps.Shape  `xml:"wps:wsp,omitempty"`
 }
 
 func NewPicGraphic(pic *dmlpic.Pic) *Graphic {
 	return &Graphic{
+		DrawingMLMainNS: constants.DrawingMLMainNS,
 		Data: &GraphicData{
 			URI: constants.DrawingMLPicNS,
 			Pic: pic,
@@ -49,6 +53,7 @@ func NewPicGraphic(pic *dmlpic.Pic) *Graphic {
 
 func NewShapeGraphic(shape *wps.Shape) *Graphic {
 	return &Graphic{
+		DrawingMLMainNS: constants.DrawingMLMainNS,
 		Data: &GraphicData{
 			URI:   constants.DrawingMLPicNS,
 			Shape: shape,
@@ -57,6 +62,9 @@ func NewShapeGraphic(shape *wps.Shape) *Graphic {
 }
 
 func (g Graphic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+
+	log.Println("Graphic MarshalXML ")
+
 	start.Name.Local = "a:graphic"
 	start.Attr = []xml.Attr{
 		{Name: xml.Name{Local: "xmlns:a"}, Value: constants.DrawingMLMainNS},
@@ -68,7 +76,9 @@ func (g Graphic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	if g.Data != nil {
-		if err = g.Data.MarshalXML(e, xml.StartElement{}); err != nil {
+		// if err := e.EncodeElement(g.Data, xml.StartElement{Name: xml.Name{Local: "a:graphicData"}}); err != nil {
+
+		if err = g.Data.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "a:graphicData"}}); err != nil {
 			return err
 		}
 	}
@@ -77,7 +87,8 @@ func (g Graphic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 }
 
 func (gd GraphicData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "a:graphicData"
+	log.Println("GraphicData MarshalXML ")
+
 	start.Attr = []xml.Attr{
 		{Name: xml.Name{Local: "uri"}, Value: gd.URI},
 	}

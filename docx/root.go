@@ -17,7 +17,7 @@ type RootDoc struct {
 	RootRels    Relationships // RootRels represents relationships at the root level.
 	ContentType ContentTypes
 	Document    *Document      `xml:"w:document"` // Document is the main document structure.
-	DocStyles   *ctypes.Styles // Document styles
+	DocStyles   *ctypes.Styles `xml:"w:styles"`   // Document styles
 
 	rID        int // rId is used to generate unique relationship IDs.
 	ImageCount uint

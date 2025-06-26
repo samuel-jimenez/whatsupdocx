@@ -110,7 +110,9 @@ type TCBlockContent struct {
 
 func (t TCBlockContent) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if t.Paragraph != nil {
-		return t.Paragraph.MarshalXML(e, xml.StartElement{})
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:p"}}
+		// return e.EncodeElement(t.Paragraph, propsElement)
+		return t.Paragraph.MarshalXML(e, propsElement)
 	}
 
 	if t.Table != nil {

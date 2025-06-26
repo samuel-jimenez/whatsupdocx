@@ -25,6 +25,8 @@ var docAttrs = map[string]string{
 
 // This element specifies the contents of a main document part in a WordprocessingML document.
 type Document struct {
+	XMLName xml.Name `xml:"w:document"`
+
 	// Reference to the RootDoc
 	Root *RootDoc
 
