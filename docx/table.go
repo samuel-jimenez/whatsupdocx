@@ -78,7 +78,7 @@ func NewTable(root *RootDoc) *Table {
 // table instance.
 //
 // Example usage:
-//   document := godocx.NewDocument()
+//   document := whatsupdocx.NewDocument()
 //   table := document.AddTable()
 //   table.Style("LightList-Accent2")
 //

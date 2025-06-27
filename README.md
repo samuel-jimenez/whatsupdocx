@@ -1,15 +1,15 @@
 # WhatsupDOCX
 
-[![Go CI](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml/badge.svg)](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gomutex/godocx) [![Go Reference](https://pkg.go.dev/badge/github.com/samuel-jimenez/whatsupdocx.svg)](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx)
+[![Go CI](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml/badge.svg)](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gomutex/whatsupdocx) [![Go Reference](https://pkg.go.dev/badge/github.com/samuel-jimenez/whatsupdocx.svg)](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx)
  [![Go Report Card](https://goreportcard.com/badge/github.com/samuel-jimenez/whatsupdocx)](https://goreportcard.com/report/github.com/samuel-jimenez/whatsupdocx) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
-<p align="center"><img width="650" src="./godocx.png" alt="WhatsupDOCX logo"></p>
+<p align="center"><img width="650" src="./whatsupdocx.png" alt="WhatsupDOCX logo"></p>
 
 
 WhatsupDOCX is a library written in pure Go providing a set of functions that allow you to write to and read from Docx file. 
 
-This library needs Go version 1.18 or later. The usage documentation for WhatsupDOCX can be accessed via the [WhatsupDOCX Documentation Page](https://gomutex.github.io/godocx). 
+This library needs Go version 1.18 or later. The usage documentation for WhatsupDOCX can be accessed via the [WhatsupDOCX Documentation Page](https://gomutex.github.io/whatsupdocx). 
 
 In depth, go docs can be seen using Go's built-in documentation tool, or online at [go.dev](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx). Please refer the [subpackage docx](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx/docx) for the list of functions that can be used.
 
@@ -18,7 +18,7 @@ In depth, go docs can be seen using Go's built-in documentation tool, or online 
 Here's a simple example of how you can use WhatsupDOCX to create and modify DOCX documents:
 
 ## Installation
-Use the godocx in your project
+Use whatsupdocx in your project
 ```bash
 go get github.com/samuel-jimenez/whatsupdocx
 ```
@@ -43,10 +43,10 @@ import (
 
 func main() {
 		// Open an existing DOCX document
-	// document, err := godocx.OpenDocument("./testdata/test.docx")
+	// document, err := whatsupdocx.OpenDocument("./testdata/test.docx")
 
 	// Create New Document
-	document, err := godocx.NewDocument()
+	document, err := whatsupdocx.NewDocument()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -90,7 +90,7 @@ func main() {
 
 ## Demo Output
 
-This is screenshot of demo document generated from the godocx library. 
+This is screenshot of demo document generated from the whatsupdocx library. 
 
 ![Screenshot of the demo output](https://github.com/samuel-jimenez/whatsupdocx-examples/raw/main/demo.png)
 

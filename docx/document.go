@@ -55,7 +55,7 @@ func (doc *Document) IncRelationID() int {
 //
 // Example:
 //
-//	document := godocx.NewDocument()
+//	document := whatsupdocx.NewDocument()
 //	para := document.AddPageBreak()
 func (rd *RootDoc) AddPageBreak() *Paragraph {
 	p := rd.AddEmptyParagraph()

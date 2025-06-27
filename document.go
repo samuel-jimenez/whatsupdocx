@@ -1,4 +1,4 @@
-package godocx
+package whatsupdocx
 
 import (
 	_ "embed"
