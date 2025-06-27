@@ -1,12 +1,13 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 type DocProp struct {
-	ID          uint64 `xml:"id,attr,omitempty"`
+	ID          uint64 `xml:"id,attr"`
 	Name        string `xml:"name,attr,omitempty"`
 	Description string `xml:"descr,attr,omitempty"`
 

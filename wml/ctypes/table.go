@@ -21,7 +21,7 @@ type Table struct {
 
 	//4.1 Choice:
 	// w_EG_ContentRowContent*
-	RowContents []RowContent
+	RowContents []RowContent `xml:",group,any,omitempty"`
 
 	//4.2 TODO: Remaining choices
 }

@@ -1,14 +1,15 @@
 package dmlct
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 // Wrapping Polygon Point2D
 type Point2D struct {
-	XAxis uint64 `xml:"x,attr,omitempty"`
-	YAxis uint64 `xml:"y,attr,omitempty"`
+	XAxis uint64 `xml:"x,attr"`
+	YAxis uint64 `xml:"y,attr"`
 }
 
 func NewPoint2D(x, y uint64) Point2D {

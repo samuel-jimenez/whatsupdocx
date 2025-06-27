@@ -20,16 +20,16 @@ type Inline struct {
 	// But MS Word requires them to be there
 
 	//Distance From Text on Top Edge
-	DistT uint `xml:"distT,attr,omitempty"`
+	DistT uint `xml:"distT,attr"`
 
 	//Distance From Text on Bottom Edge
-	DistB uint `xml:"distB,attr,omitempty"`
+	DistB uint `xml:"distB,attr"`
 
 	//Distance From Text on Left Edge
-	DistL uint `xml:"distL,attr,omitempty"`
+	DistL uint `xml:"distL,attr"`
 
 	//Distance From Text on Right Edge
-	DistR uint `xml:"distR,attr,omitempty"`
+	DistR uint `xml:"distR,attr"`
 
 	Attr []xml.Attr `xml:",any,attr,omitempty"`
 

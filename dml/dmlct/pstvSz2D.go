@@ -10,8 +10,8 @@ import (
 
 // Complex Type: CT_PositiveSize2D
 type PSize2D struct {
-	Width  uint64 `xml:"cx,attr,omitempty"`
-	Height uint64 `xml:"cy,attr,omitempty"`
+	Width  uint64 `xml:"cx,attr"`
+	Height uint64 `xml:"cy,attr"`
 }
 
 func NewPostvSz2D(width units.Emu, height units.Emu) *PSize2D {

@@ -4,12 +4,17 @@ import (
 	"github.com/samuel-jimenez/xml"
 )
 
+// w_CT_Tc =
 type Cell struct {
+	// attribute w:id { s_ST_String }?,
+
 	// 1.Table Cell Properties
+	// element tcPr { w_CT_TcPr }?,
 	Property *CellProperty
 
 	// 2.1 Choice: ZeroOrMore
 	// Any number of elements can exists within this choice group
+	// w_EG_BlockLevelElts+
 	Contents []TCBlockContent
 
 	//TODO: Remaining choices
@@ -101,6 +106,10 @@ loop:
 //TODO crossref  w_EG_ContentBlockContent
 
 // Table Cell - ContentBlockContent
+// w_EG_BlockLevelChunkElts = w_EG_ContentBlockContent*
+// w_EG_BlockLevelElts =
+// w_EG_BlockLevelChunkElts*
+// | element altChunk { w_CT_AltChunk }*
 type TCBlockContent struct {
 	//Paragraph
 	//	- ZeroOrMore: Any number of times Paragraph can repeat within cell

@@ -35,7 +35,7 @@ type Shape struct {
 
 	// (element txbx { wp_CT_TextboxInfo }
 	// | element linkedTxbx { wp_CT_LinkedTextboxInformation })?,
-	ShapeTextboxInfo *ShapeTextboxInfo
+	ShapeTextboxInfo *ShapeTextboxInfo `xml:",any,omitempty"`
 
 	// element bodyPr { a_CT_TextBodyProperties}
 	BodyPr TextBodyProperties `xml:"wps:bodyPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the body properties for the text body in a shape.
@@ -73,29 +73,6 @@ type ShapeStyle struct {
 	// element fontRef { a_CT_FontReference }
 	FontRef dmlct.FontReference `xml:"a:fontRef"`
 }
-
-//TODO use https://github.com/samuel-jimenez/xml
-// func (props ShapeStyle) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-//
-// 	err = e.EncodeToken(start)
-// 	if err != nil {
-// 		return err
-// 	}
-// 		propsElement := xml.StartElement{
-// 			Name: xml.Name{Local: "a:lnRef"},
-// 		}
-// 		if err = e.EncodeElement(props.LnRef, propsElement); err != nil {
-// 			return err
-// 		}
-//
-// 		propsElement := xml.StartElement{
-// 			Name: xml.Name{Local: "a:lnRef"},
-// 		}
-// 		if err = e.EncodeElement(props.LnRef, propsElement); err != nil {
-// 			return err
-// 		}
-// 	return e.EncodeToken(xml.EndElement{Name: start.Name})
-// }
 
 // OfficeArtExtensionList holds future extensions
 // CT_OfficeArtExtensionList
