@@ -6,6 +6,8 @@ import (
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 )
 
 // RootDoc represents the root document of an Office Open XML (OOXML) document.
@@ -39,6 +41,7 @@ func NewRootDoc() *RootDoc {
 //   - doc: The Document instance containing the decoded main document structure.
 //   - err: An error, if any occurred during the decoding process.
 func LoadDocXml(rd *RootDoc, fileName string, fileBytes []byte) (*Document, error) {
+	// constants.defaultDocNamespace
 	doc := Document{
 		Root: rd,
 	}
@@ -48,6 +51,10 @@ func LoadDocXml(rd *RootDoc, fileName string, fileBytes []byte) (*Document, erro
 	}
 
 	doc.relativePath = fileName
+	if len(doc.Attr) == 0 {
+		doc.Attr = constants.DefaultNamespacesDoc
+	}
+
 	return &doc, nil
 }
 
@@ -60,5 +67,9 @@ func LoadStyles(fileName string, fileBytes []byte) (*ctypes.Styles, error) {
 	}
 
 	styles.RelativePath = fileName
+	if len(styles.Attr) == 0 {
+		styles.Attr = constants.DefaultNamespacesStyle
+	}
+
 	return &styles, nil
 }

@@ -98,25 +98,29 @@ loop:
 	return nil
 }
 
+//TODO crossref  w_EG_ContentBlockContent
+
 // Table Cell - ContentBlockContent
 type TCBlockContent struct {
 	//Paragraph
 	//	- ZeroOrMore: Any number of times Paragraph can repeat within cell
-	Paragraph *Paragraph
+	// | element p { w_CT_P }*
+	Paragraph *Paragraph `xml:"w:p,omitempty"`
 	//Table
 	//	- ZeroOrMore: Any number of times Table can repeat within cell
-	Table *Table
+	// | element tbl { w_CT_Tbl }*
+	Table *Table `xml:"w:tbl,omitempty"`
 }
 
 func (t TCBlockContent) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if t.Paragraph != nil {
 		propsElement := xml.StartElement{Name: xml.Name{Local: "w:p"}}
-		// return e.EncodeElement(t.Paragraph, propsElement)
-		return t.Paragraph.MarshalXML(e, propsElement)
+		return e.EncodeElement(t.Paragraph, propsElement)
 	}
 
 	if t.Table != nil {
-		return t.Table.MarshalXML(e, xml.StartElement{})
+		propsElement := xml.StartElement{Name: xml.Name{Local: "w:tbl"}}
+		return e.EncodeElement(t.Paragraph, propsElement)
 	}
 
 	return nil

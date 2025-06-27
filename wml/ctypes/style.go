@@ -1,19 +1,10 @@
 package ctypes
 
 import (
-	"fmt"
-
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
-
-var defaultStyleNSAttrs = map[string]string{
-	"xmlns:w":      "http://schemas.openxmlformats.org/wordprocessingml/2006/main",
-	"xmlns:mc":     "http://schemas.openxmlformats.org/markup-compatibility/2006",
-	"xmlns:w14":    "http://schemas.microsoft.com/office/word/2010/wordml",
-	"mc:Ignorable": "w14",
-}
 
 // Style Definitions
 // w_styles = element styles { w_CT_Styles }
@@ -74,8 +65,8 @@ var defaultStyleNSAttrs = map[string]string{
 type Styles struct {
 	XMLName xml.Name `xml:"w:styles"`
 
-	RelativePath string `xml:"-"`
-	Attr         []xml.Attr
+	RelativePath string     `xml:"-"`
+	Attr         []xml.Attr `xml:",any,attr,omitempty"`
 
 	// Sequence
 
@@ -86,49 +77,7 @@ type Styles struct {
 	LatentStyle *LatentStyle `xml:"w:latentStyles,omitempty"`
 
 	//3. Style Definition
-	StyleList []Style `xml:",any"`
-}
-
-func (s *Styles) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:styles"
-
-	if len(s.Attr) == 0 {
-		for key, value := range defaultStyleNSAttrs {
-			attr := xml.Attr{Name: xml.Name{Local: key}, Value: value}
-			start.Attr = append(start.Attr, attr)
-		}
-	} else {
-		start.Attr = s.Attr
-	}
-
-	if err := e.EncodeToken(start); err != nil {
-		return err
-	}
-
-	// 1. Document Default Paragraph and Run Properties
-	if s.DocDefaults != nil {
-		if err := s.DocDefaults.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:docDefaults"}}); err != nil {
-			return fmt.Errorf("docDefaults: %w", err)
-		}
-	}
-
-	// 2. Latent Style Information
-	if s.LatentStyle != nil {
-		if err := s.LatentStyle.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:latentStyles"}}); err != nil {
-			return fmt.Errorf("latentStyle: %w", err)
-		}
-	}
-
-	//3. Style Definition
-	for _, elem := range s.StyleList {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:style"}}
-		if err := e.EncodeElement(elem, propsElement); err != nil {
-			// if err := elem.MarshalXML(e, propsElement); err != nil {
-			return fmt.Errorf("style: %w", err)
-		}
-	}
-
-	return e.EncodeToken(start.End())
+	StyleList []Style `xml:"w:style"`
 }
 
 type Style struct {

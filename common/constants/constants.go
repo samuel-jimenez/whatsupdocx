@@ -28,6 +28,44 @@ var (
 	SourceRelationshipChart2014             = xml.Attr{Name: xml.Name{Local: "c16", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2014/chart"}
 	SourceRelationshipChart201506           = xml.Attr{Name: xml.Name{Local: "c16r2", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2015/06/chart"}
 	SourceRelationshipCompatibility         = xml.Attr{Name: xml.Name{Local: "mc", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/markup-compatibility/2006"}
+
+	NameSpaceWordprocessingML = xml.Attr{Name: xml.Name{Local: "xmlns:w"}, Value: "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+	NameSpaceO                = xml.Attr{Name: xml.Name{Local: "xmlns:o"}, Value: "urn:schemas-microsoft-com:office:office"}
+	NameSpaceR                = xml.Attr{Name: xml.Name{Local: "xmlns:r"}, Value: "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
+	NameSpaceV                = xml.Attr{Name: xml.Name{Local: "xmlns:v"}, Value: "urn:schemas-microsoft-com:vml"}
+	NameSpaceW10              = xml.Attr{Name: xml.Name{Local: "xmlns:w10"}, Value: "urn:schemas-microsoft-com:office:word"}
+	NameSpaceWp               = xml.Attr{Name: xml.Name{Local: "xmlns:wp"}, Value: "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"}
+	NameSpaceWps              = xml.Attr{Name: xml.Name{Local: "xmlns:wps"}, Value: "http://schemas.microsoft.com/office/word/2010/wordprocessingShape"}
+	NameSpaceWpg              = xml.Attr{Name: xml.Name{Local: "xmlns:wpg"}, Value: "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"}
+	NameSpaceMc               = xml.Attr{Name: xml.Name{Local: "xmlns:mc"}, Value: "http://schemas.openxmlformats.org/markup-compatibility/2006"}
+	NameSpaceWp14             = xml.Attr{Name: xml.Name{Local: "xmlns:wp14"}, Value: "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"}
+	NameSpaceW14              = xml.Attr{Name: xml.Name{Local: "xmlns:w14"}, Value: "http://schemas.microsoft.com/office/word/2010/wordml"}
+	NameSpaceW15              = xml.Attr{Name: xml.Name{Local: "xmlns:w15"}, Value: "http://schemas.microsoft.com/office/word/2012/wordml"}
+	MCIgnorableDoc            = xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: "w14 wp14 w15"}
+	MCIgnorableStyle          = xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: "w14"}
+
+	DefaultNamespacesDoc = []xml.Attr{
+		NameSpaceWordprocessingML,
+		NameSpaceO,
+		NameSpaceR,
+		NameSpaceV,
+		NameSpaceW10,
+		NameSpaceWp,
+		NameSpaceWps,
+		NameSpaceWpg,
+		NameSpaceMc,
+		NameSpaceWp14,
+		NameSpaceW14,
+		NameSpaceW15,
+		MCIgnorableDoc,
+	}
+
+	DefaultNamespacesStyle = []xml.Attr{
+		NameSpaceWordprocessingML,
+		NameSpaceMc,
+		NameSpaceW14,
+		MCIgnorableStyle,
+	}
 )
 
 const (

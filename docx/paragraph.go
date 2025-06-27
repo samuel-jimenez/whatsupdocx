@@ -1,11 +1,12 @@
 package docx
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/common/units"
@@ -19,12 +20,13 @@ import (
 
 // Paragraph represents a paragraph in a DOCX document.
 type Paragraph struct {
-	root *RootDoc         // root is a reference to the root document.
-	ct   ctypes.Paragraph // ct holds the underlying Paragraph Complex Type.
+	root *RootDoc         `xml:"-"`          // root is a reference to the root document.
+	Ct   ctypes.Paragraph `xml:",group,any"` // ct holds the underlying Paragraph Complex Type.
 }
 
 func (p *Paragraph) unmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	return p.ct.UnmarshalXML(d, start)
+	return p.Ct.UnmarshalXML(d, start)
+	// if err = d.DecodeElement(r, &elem); err != nil {
 }
 
 type paraOpts struct {
@@ -57,14 +59,14 @@ func paraWithText(text string) paraOption {
 }
 
 func (p *Paragraph) ensureProp() {
-	if p.ct.Property == nil {
-		p.ct.Property = ctypes.DefaultParaProperty()
+	if p.Ct.Property == nil {
+		p.Ct.Property = ctypes.DefaultParaProperty()
 	}
 }
 
 // GetCT returns a pointer to the underlying Paragraph Complex Type.
 func (p *Paragraph) GetCT() *ctypes.Paragraph {
-	return &p.ct
+	return &p.Ct
 }
 
 // AddParagraph adds a new paragraph with the specified text to the document.
@@ -92,7 +94,7 @@ func (rd *RootDoc) AddParagraph(text string) *Paragraph {
 */
 func (p *Paragraph) Spacing(before uint64, after uint64) {
 	p.ensureProp()
-	p.ct.Property.Spacing = ctypes.NewParagraphSpacing(before, after)
+	p.Ct.Property.Spacing = ctypes.NewParagraphSpacing(before, after)
 }
 
 // Style sets the paragraph style.
@@ -106,7 +108,7 @@ func (p *Paragraph) Spacing(before uint64, after uint64) {
 //	paragraph.Style("List Number")
 func (p *Paragraph) Style(value string) {
 	p.ensureProp()
-	p.ct.Property.Style = ctypes.NewParagraphStyle(value)
+	p.Ct.Property.Style = ctypes.NewParagraphStyle(value)
 }
 
 // Justification sets the paragraph justification type.
@@ -122,7 +124,7 @@ func (p *Paragraph) Style(value string) {
 func (p *Paragraph) Justification(value stypes.Justification) {
 	p.ensureProp()
 
-	p.ct.Property.Justification = ctypes.NewGenSingleStrVal(value)
+	p.Ct.Property.Justification = ctypes.NewGenSingleStrVal(value)
 }
 
 // Numbering sets the paragraph numbering properties.
@@ -145,12 +147,12 @@ func (p *Paragraph) Numbering(id int, level int) {
 
 	p.ensureProp()
 
-	if p.ct.Property.NumProp == nil {
-		p.ct.Property.NumProp = &ctypes.NumProp{}
+	if p.Ct.Property.NumProp == nil {
+		p.Ct.Property.NumProp = &ctypes.NumProp{}
 	}
 
-	p.ct.Property.NumProp.NumID = ctypes.NewDecimalNum(id)
-	p.ct.Property.NumProp.ILvl = ctypes.NewDecimalNum(level)
+	p.Ct.Property.NumProp.NumID = ctypes.NewDecimalNum(id)
+	p.Ct.Property.NumProp.ILvl = ctypes.NewDecimalNum(level)
 }
 
 // Indent sets the paragraph indentation properties.
@@ -174,7 +176,7 @@ func (p *Paragraph) Indent(indentProp *ctypes.Indent) {
 
 	p.ensureProp()
 
-	p.ct.Property.Indent = indentProp
+	p.Ct.Property.Indent = indentProp
 }
 
 // Appends a new text to the Paragraph.
@@ -199,7 +201,7 @@ func (p *Paragraph) AddText(text string) *Run {
 		Children: runChildren,
 	}
 
-	p.ct.Children = append(p.ct.Children, ctypes.ParagraphChild{Run: run})
+	p.Ct.Children = append(p.Ct.Children, ctypes.ParagraphChild{Run: run})
 
 	return newRun(p.root, run)
 }
@@ -224,7 +226,7 @@ func (p *Paragraph) AddRun() *Run {
 
 	run := &ctypes.Run{}
 
-	p.ct.Children = append(p.ct.Children, ctypes.ParagraphChild{Run: run})
+	p.Ct.Children = append(p.Ct.Children, ctypes.ParagraphChild{Run: run})
 
 	return newRun(p.root, run)
 }
@@ -235,11 +237,11 @@ func (p *Paragraph) AddRun() *Run {
 //   - *ctypes.Style: The style information of the Paragraph.
 //   - error: An error if the style information is not found.
 func (p *Paragraph) GetStyle() (*ctypes.Style, error) {
-	if p.ct.Property == nil || p.ct.Property.Style == nil {
+	if p.Ct.Property == nil || p.Ct.Property.Style == nil {
 		return nil, errors.New("No property for the style")
 	}
 
-	style := p.root.GetStyleByID(p.ct.Property.Style.Val, stypes.StyleTypeParagraph)
+	style := p.root.GetStyleByID(p.Ct.Property.Style.Val, stypes.StyleTypeParagraph)
 	if style == nil {
 		return nil, errors.New("No style found for the paragraph")
 	}
@@ -268,7 +270,7 @@ func (p *Paragraph) AddLink(text string, link string) *Hyperlink {
 		Run: run,
 	}
 
-	p.ct.Children = append(p.ct.Children, ctypes.ParagraphChild{Link: hyperLink})
+	p.Ct.Children = append(p.Ct.Children, ctypes.ParagraphChild{Link: hyperLink})
 
 	return newHyperlink(p.root, hyperLink)
 }
@@ -309,7 +311,7 @@ func (p *Paragraph) addDrawing(rID string, imgCount uint, width units.Inch, heig
 		Children: runChildren,
 	}
 
-	p.ct.Children = append(p.ct.Children, ctypes.ParagraphChild{Run: run})
+	p.Ct.Children = append(p.Ct.Children, ctypes.ParagraphChild{Run: run})
 
 	return &inline
 }

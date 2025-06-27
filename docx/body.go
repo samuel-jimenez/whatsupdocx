@@ -9,17 +9,67 @@ import (
 )
 
 // This element specifies the contents of the body of the document – the main document editing surface.
+// w_CT_Body =
 type Body struct {
-	root     *RootDoc
-	XMLName  xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main body"`
-	Children []DocumentChild
-	SectPr   *ctypes.SectionProp
+	root    *RootDoc `xml:"-"`
+	XMLName xml.Name `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main body"`
+
+	// w_EG_BlockLevelElts*,
+	Children []DocumentChild `xml:",group,any,omitempty"`
+	// element sectPr { w_CT_SectPr }?
+	SectPr *ctypes.SectionProp `xml:"w:sectPr,omitempty"`
 }
 
 // DocumentChild represents a child element within a Word document, which can be a Paragraph or a Table.
+// w_EG_BlockLevelElts = w_EG_BlockLevelChunkElts*
+// | element altChunk { w_CT_AltChunk }*
+
+// w_CT_AltChunk =
+// r_id?,
+// element altChunkPr { w_CT_AltChunkPr }?
+// w_CT_AltChunkPr = element matchSrc { w_CT_OnOff }?
+
+// w_EG_BlockLevelChunkElts = w_EG_ContentBlockContent*
+// w_EG_ContentBlockContent =
+// element customXml { w_CT_CustomXmlBlock }
+// | element sdt { w_CT_SdtBlock }
+// | element p { w_CT_P }*
+// | element tbl { w_CT_Tbl }*
+// | w_EG_RunLevelElts*
+
+// w_EG_RunLevelElts =
+// element proofErr { w_CT_ProofErr }?
+// | element permStart { w_CT_PermStart }?
+// | element permEnd { w_CT_Perm }?
+// | w_EG_RangeMarkupElements*
+// | element ins { w_CT_RunTrackChange }?
+// | element del { w_CT_RunTrackChange }?
+// | element moveFrom { w_CT_RunTrackChange }
+// | element moveTo { w_CT_RunTrackChange }
+// | w_EG_MathContent*
+
+// w_EG_ContentBlockContent =
 type DocumentChild struct {
-	Para  *Paragraph `xml:"w:p,omitempty"`
-	Table *Table
+
+	// element customXml { w_CT_CustomXmlBlock }
+	// | element sdt { w_CT_SdtBlock }
+
+	// | element p { w_CT_P }*
+	Para *Paragraph `xml:"w:p,omitempty"`
+	// | element tbl { w_CT_Tbl }*
+	Table *Table `xml:"w:tbl,omitempty"`
+	// | w_EG_RunLevelElts*
+
+	// w_EG_RunLevelElts =
+	// element proofErr { w_CT_ProofErr }?
+	// | element permStart { w_CT_PermStart }?
+	// | element permEnd { w_CT_Perm }?
+	// | w_EG_RangeMarkupElements*
+	// | element ins { w_CT_RunTrackChange }?
+	// | element del { w_CT_RunTrackChange }?
+	// | element moveFrom { w_CT_RunTrackChange }
+	// | element moveTo { w_CT_RunTrackChange }
+
 }
 
 // Use this function to initialize a new Body before adding content to it.
@@ -27,44 +77,6 @@ func NewBody(root *RootDoc) *Body {
 	return &Body{
 		root: root,
 	}
-}
-
-// MarshalXML implements the xml.Marshaler interface for the Body type.
-// It encodes the Body to its corresponding XML representation.
-func (b Body) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	start.Name.Local = "w:body"
-	log.Println("Body MarshalXML")
-
-	err = e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if b.Children != nil {
-		for _, child := range b.Children {
-			if child.Para != nil {
-				propsElement := xml.StartElement{Name: xml.Name{Local: "w:p"}}
-				// if err := e.EncodeElement(child.Para.ct, propsElement); err != nil {
-				if err := child.Para.ct.MarshalXML(e, propsElement); err != nil {
-					return err
-				}
-			}
-
-			if child.Table != nil {
-				if err = child.Table.ct.MarshalXML(e, xml.StartElement{}); err != nil {
-					return err
-				}
-			}
-		}
-	}
-
-	if b.SectPr != nil {
-		if err = b.SectPr.MarshalXML(e, xml.StartElement{}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
 // UnmarshalXML implements the xml.Unmarshaler interface for the Body type.
@@ -85,6 +97,7 @@ func (body *Body) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err erro
 				if err := para.unmarshalXML(d, elem); err != nil {
 					return err
 				}
+				log.Println("Body UnmarshalXML", para)
 				body.Children = append(body.Children, DocumentChild{Para: para})
 			case "tbl":
 				tbl := NewTable(body.root)

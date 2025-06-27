@@ -46,9 +46,9 @@ func TestParagraph_Style(t *testing.T) {
 
 		p.Style(styleValue)
 
-		assert.NotNil(t, p.ct.Property)
-		assert.NotNil(t, p.ct.Property.Style)
-		assert.Equal(t, p.ct.Property.Style.Val, expectedStyleValue)
+		assert.NotNil(t, p.Ct.Property)
+		assert.NotNil(t, p.Ct.Property.Style)
+		assert.Equal(t, p.Ct.Property.Style.Val, expectedStyleValue)
 	}
 
 	f("Heading1", "Heading1")
@@ -62,9 +62,9 @@ func TestParagraph_Justification(t *testing.T) {
 
 		p.Justification(justificationValue)
 
-		assert.NotNil(t, p.ct.Property, "Expected ct.Property to be non-nil")
-		assert.NotNil(t, p.ct.Property.Justification, "Expected ct.Property.Justification to be non-nil")
-		assert.Equal(t, p.ct.Property.Justification.Val, expectedJustificationValue, "Paragraph.Justification() value mismatch")
+		assert.NotNil(t, p.Ct.Property, "Expected ct.Property to be non-nil")
+		assert.NotNil(t, p.Ct.Property.Justification, "Expected ct.Property.Justification to be non-nil")
+		assert.Equal(t, p.Ct.Property.Justification.Val, expectedJustificationValue, "Paragraph.Justification() value mismatch")
 	}
 
 	f(stypes.JustificationCenter, stypes.JustificationCenter)
@@ -81,10 +81,10 @@ func TestParagraph_Numbering(t *testing.T) {
 
 		p.Numbering(id, level)
 
-		assert.NotNil(t, p.ct.Property, "Expected ct.Property to be non-nil")
-		assert.NotNil(t, p.ct.Property.NumProp, "Expected ct.Property.NumProp to be non-nil")
-		assert.Equal(t, expectedNumID, p.ct.Property.NumProp.NumID.Val, "Paragraph.Numbering() NumID value mismatch")
-		assert.Equal(t, expectedILvl, p.ct.Property.NumProp.ILvl.Val, "Paragraph.Numbering() ILvl value mismatch")
+		assert.NotNil(t, p.Ct.Property, "Expected ct.Property to be non-nil")
+		assert.NotNil(t, p.Ct.Property.NumProp, "Expected ct.Property.NumProp to be non-nil")
+		assert.Equal(t, expectedNumID, p.Ct.Property.NumProp.NumID.Val, "Paragraph.Numbering() NumID value mismatch")
+		assert.Equal(t, expectedILvl, p.Ct.Property.NumProp.ILvl.Val, "Paragraph.Numbering() ILvl value mismatch")
 	}
 
 	f(1, 0, 1, 0)
@@ -101,9 +101,9 @@ func TestParagraph_Indent(t *testing.T) {
 
 		p.Indent(&indentValue)
 
-		assert.NotNil(t, p.ct.Property, "Expected ct.Property to be non-nil")
-		assert.NotNil(t, p.ct.Property.Indent, "Expected ct.Property.Indent to be non-nil")
-		assert.Equal(t, p.ct.Property.Indent, &expectedIndentValue, "Paragraph.Indent() value mismatch")
+		assert.NotNil(t, p.Ct.Property, "Expected ct.Property to be non-nil")
+		assert.NotNil(t, p.Ct.Property.Indent, "Expected ct.Property.Indent to be non-nil")
+		assert.Equal(t, p.Ct.Property.Indent, &expectedIndentValue, "Paragraph.Indent() value mismatch")
 	}
 
 	var size6 int = 6
@@ -130,7 +130,7 @@ func TestParagraph_AddText(t *testing.T) {
 		t.Helper()
 
 		p := &Paragraph{
-			ct: ctypes.Paragraph{
+			Ct: ctypes.Paragraph{
 				Children: []ctypes.ParagraphChild{},
 			},
 		}
@@ -138,12 +138,12 @@ func TestParagraph_AddText(t *testing.T) {
 		run := p.AddText(text)
 
 		assert.NotNil(t, run, "Expected AddText() to return a non-nil Run")
-		assert.Equal(t, len(p.ct.Children), 1, "Expected one Run to be added to Paragraph")
+		assert.Equal(t, len(p.Ct.Children), 1, "Expected one Run to be added to Paragraph")
 
-		assert.NotNil(t, p.ct.Children[0].Run, "Expected ct.Children[0].Run to be non-nil")
-		assert.GreaterOrEqual(t, len(p.ct.Children[0].Run.Children), 1, "Expected at least one Text element in Run")
-		assert.NotNil(t, p.ct.Children[0].Run.Children[0].Text, "Expected Text element in Run to be non-nil")
-		assert.Equal(t, p.ct.Children[0].Run.Children[0].Text.Text, expectedText, "Paragraph.AddText() Text value mismatch")
+		assert.NotNil(t, p.Ct.Children[0].Run, "Expected ct.Children[0].Run to be non-nil")
+		assert.GreaterOrEqual(t, len(p.Ct.Children[0].Run.Children), 1, "Expected at least one Text element in Run")
+		assert.NotNil(t, p.Ct.Children[0].Run.Children[0].Text, "Expected Text element in Run to be non-nil")
+		assert.Equal(t, p.Ct.Children[0].Run.Children[0].Text.Text, expectedText, "Paragraph.AddText() Text value mismatch")
 	}
 
 	f("Hello, World!", "Hello, World!")
@@ -154,7 +154,7 @@ func TestParagraph_AddText(t *testing.T) {
 
 func TestParagraph_AddRun(t *testing.T) {
 	p := &Paragraph{
-		ct: ctypes.Paragraph{
+		Ct: ctypes.Paragraph{
 			Children: []ctypes.ParagraphChild{},
 		},
 	}
@@ -163,11 +163,11 @@ func TestParagraph_AddRun(t *testing.T) {
 
 	assert.NotNil(t, run, "Expected AddRun() to return a non-nil Run")
 
-	assert.Equal(t, 1, len(p.ct.Children), "Expected one Run to be added to Paragraph")
-	assert.NotNil(t, p.ct.Children[0].Run, "Expected ct.Children[0].Run to be non-nil")
-	assert.Equal(t, run.ct, p.ct.Children[0].Run, "Expected the Run returned by AddRun() to match the Run added to Paragraph")
+	assert.Equal(t, 1, len(p.Ct.Children), "Expected one Run to be added to Paragraph")
+	assert.NotNil(t, p.Ct.Children[0].Run, "Expected ct.Children[0].Run to be non-nil")
+	assert.Equal(t, run.ct, p.Ct.Children[0].Run, "Expected the Run returned by AddRun() to match the Run added to Paragraph")
 
 	assert.Empty(t, run.ct.Children, "Expected new Run to have no initial Children")
 
-	assert.Equal(t, 0, len(p.ct.Children[0].Run.Children), "Expected the new Run to have no initial Children")
+	assert.Equal(t, 0, len(p.Ct.Children[0].Run.Children), "Expected the new Run to have no initial Children")
 }

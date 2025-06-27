@@ -18,14 +18,14 @@ func (rd *RootDoc) AddHeading(text string, level uint) (*Paragraph, error) {
 	}
 
 	p := newParagraph(rd)
-	p.ct.Property = ctypes.DefaultParaProperty()
+	p.Ct.Property = ctypes.DefaultParaProperty()
 
 	style := "Title"
 	if level != 0 {
 		style = fmt.Sprintf("Heading%d", level)
 	}
 
-	p.ct.Property.Style = ctypes.NewParagraphStyle(style)
+	p.Ct.Property.Style = ctypes.NewParagraphStyle(style)
 
 	bodyElem := DocumentChild{
 		Para: p,

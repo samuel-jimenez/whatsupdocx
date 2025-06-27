@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.24.2
 
 require (
-	github.com/samuel-jimenez/xml v0.0.3
+	github.com/samuel-jimenez/xml v0.1.0
 	github.com/stretchr/testify v1.9.0
 )
 

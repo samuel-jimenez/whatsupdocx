@@ -1,23 +1,26 @@
 package ctypes
 
 import (
-	"log"
-
 	"github.com/samuel-jimenez/xml"
 )
 
 // Table
+// w_CT_Tbl =
 type Table struct {
 	//1.Choice: RangeMarkupElements
+	// w_EG_RangeMarkupElements*,
 	RngMarkupElems []RngMarkupElem
 
 	//2. Table Properties
-	TableProp TableProp `xml:"tblPr,omitempty"`
+	// element tblPr { w_CT_TblPr },
+	TableProp TableProp `xml:"w:tblPr,omitempty"`
 
 	//3. Table Grid
-	Grid Grid `xml:"tblGrid,omitempty"`
+	// element tblGrid { w_CT_TblGrid },
+	Grid Grid `xml:"w:tblGrid,omitempty"`
 
 	//4.1 Choice:
+	// w_EG_ContentRowContent*
 	RowContents []RowContent
 
 	//4.2 TODO: Remaining choices
@@ -25,45 +28,6 @@ type Table struct {
 
 func DefaultTable() *Table {
 	return &Table{}
-}
-
-func (t Table) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	start.Name.Local = "w:tbl"
-	log.Println("Table MarshalXML")
-
-	err = e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	//1.Choice: RangeMarkupElements
-	for _, rme := range t.RngMarkupElems {
-		err := rme.MarshalXML(e, xml.StartElement{})
-		if err != nil {
-			return err
-		}
-	}
-	//2. Table Properties
-	propsElement := xml.StartElement{Name: xml.Name{Local: "w:tblPr"}}
-	if err := e.EncodeElement(t.TableProp, propsElement); err != nil {
-		// if err := t.TableProp.MarshalXML(e, propsElement); err != nil {
-		return err
-	}
-
-	//3. Table Grid
-	if err = t.Grid.MarshalXML(e, xml.StartElement{}); err != nil {
-		return err
-	}
-
-	// 4. Choice: RowContents
-	for _, rc := range t.RowContents {
-		err := rc.MarshalXML(e, xml.StartElement{})
-		if err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
 func (t *Table) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {

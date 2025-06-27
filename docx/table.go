@@ -1,22 +1,22 @@
 package docx
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
+	"github.com/samuel-jimenez/xml"
 )
 
 type Table struct {
 	// Reverse inheriting the Rootdoc into paragraph to access other elements
-	root *RootDoc
+	root *RootDoc `xml:"-"`
 
 	// Table Complex Type
-	ct ctypes.Table
+	Ct ctypes.Table `xml:",group,any,omitempty"`
 }
 
 func (t *Table) unmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	return t.ct.UnmarshalXML(d, start)
+	return t.Ct.UnmarshalXML(d, start)
+	// if err = d.DecodeElement(r, &elem); err != nil {
 }
 
 func (t *Table) Width(v int, u stypes.TableWidth) *Table {
@@ -24,7 +24,7 @@ func (t *Table) Width(v int, u stypes.TableWidth) *Table {
 		Width:     &v,
 		WidthType: &u,
 	}
-	t.ct.TableProp.Width = &w
+	t.Ct.TableProp.Width = &w
 	return t
 }
 
@@ -37,13 +37,13 @@ func (t *Table) Grid(widths ...uint64) *Table {
 	for _, w := range widths {
 		tw := w
 		col := ctypes.Column{Width: &tw}
-		t.ct.Grid.Col = append(t.ct.Grid.Col, col)
+		t.Ct.Grid.Col = append(t.Ct.Grid.Col, col)
 	}
 	return t
 }
 
 func (t *Table) CellMargin(top *ctypes.TableWidth, left *ctypes.TableWidth, bottom *ctypes.TableWidth, right *ctypes.TableWidth) *Table {
-	t.ct.TableProp.CellMargin = &ctypes.CellMargins{
+	t.Ct.TableProp.CellMargin = &ctypes.CellMargins{
 		Top:    top,
 		Left:   left,
 		Bottom: bottom,
@@ -53,7 +53,7 @@ func (t *Table) CellMargin(top *ctypes.TableWidth, left *ctypes.TableWidth, bott
 }
 
 func (t *Table) Layout(layout stypes.TableLayout) *Table {
-	t.ct.TableProp.Layout = &ctypes.TableLayout{
+	t.Ct.TableProp.Layout = &ctypes.TableLayout{
 		LayoutType: &layout,
 	}
 
@@ -62,7 +62,7 @@ func (t *Table) Layout(layout stypes.TableLayout) *Table {
 
 // GetCT returns a pointer to the underlying Table Complex Type.
 func (t *Table) GetCT() *ctypes.Table {
-	return &t.ct
+	return &t.Ct
 }
 
 func NewTable(root *RootDoc) *Table {
@@ -96,7 +96,7 @@ func NewTable(root *RootDoc) *Table {
 func (rd *RootDoc) AddTable() *Table {
 	tbl := Table{
 		root: rd,
-		ct:   *ctypes.DefaultTable(),
+		Ct:   *ctypes.DefaultTable(),
 	}
 
 	rd.Document.Body.Children = append(rd.Document.Body.Children, DocumentChild{
@@ -120,7 +120,7 @@ func (t *Table) AddRow() *Row {
 		ct:   *ctypes.DefaultRow(),
 	}
 
-	t.ct.RowContents = append(t.ct.RowContents, ctypes.RowContent{
+	t.Ct.RowContents = append(t.Ct.RowContents, ctypes.RowContent{
 		Row: &row.ct,
 	})
 
@@ -135,7 +135,7 @@ func (t *Table) ensureProp() {
 // Parameters:
 //   - indent: An integer specifying the indent width
 func (t *Table) Indent(indent int) {
-	t.ct.TableProp.Indent = ctypes.NewTableWidth(indent, stypes.TableWidthAuto)
+	t.Ct.TableProp.Indent = ctypes.NewTableWidth(indent, stypes.TableWidthAuto)
 }
 
 // Style sets the style for the table.
@@ -184,7 +184,7 @@ func (t *Table) Indent(indent int) {
 // Parameters:
 //   - value: A string representing the style value. It should match a valid table style defined in the WordprocessingML specification.
 func (t *Table) Style(value string) {
-	t.ct.TableProp.Style = ctypes.NewCTString(value)
+	t.Ct.TableProp.Style = ctypes.NewCTString(value)
 }
 
 // Row Wrapper
@@ -233,7 +233,7 @@ func (c *Cell) GetCt() *ctypes.Cell {
 func (c *Cell) AddParagraph(text string) *Paragraph {
 	p := newParagraph(c.root, paraWithText(text))
 	tblContent := ctypes.TCBlockContent{
-		Paragraph: &p.ct,
+		Paragraph: &p.Ct,
 	}
 
 	c.ct.Contents = append(c.ct.Contents, tblContent)
@@ -245,7 +245,7 @@ func (c *Cell) AddParagraph(text string) *Paragraph {
 func (c *Cell) AddEmptyPara() *Paragraph {
 	p := newParagraph(c.root)
 	tblContent := ctypes.TCBlockContent{
-		Paragraph: &p.ct,
+		Paragraph: &p.Ct,
 	}
 
 	c.ct.Contents = append(c.ct.Contents, tblContent)

@@ -122,8 +122,31 @@ func (c TRCellContent) MarshalXML(e *xml.Encoder, start xml.StartElement) error 
 	return nil
 }
 
+// w_EG_ContentBlockContent =
+// element customXml { w_CT_CustomXmlBlock }
+// | element sdt { w_CT_SdtBlock }
+// | element p { w_CT_P }*
+// | element tbl { w_CT_Tbl }*
+// | w_EG_RunLevelElts*
+// w_CT_SdtContentBlock = w_EG_ContentBlockContent*
+
+// w_CT_SdtContentRow = w_EG_ContentRowContent*
+// w_EG_ContentCellContent =
+// element tc { w_CT_Tc }*
+// | element customXml { w_CT_CustomXmlCell }
+// | element sdt { w_CT_SdtCell }
+// | w_EG_RunLevelElts*
+//
+//
+
+// w_EG_ContentRowContent
+// w_EG_ContentRowContent =
 type RowContent struct {
+	// element tr { w_CT_Row }*
 	Row *Row `xml:"w:tr,omitempty"`
+	// | element customXml { w_CT_CustomXmlRow }
+	// | element sdt { w_CT_SdtRow }
+	// | w_EG_RunLevelElts*
 }
 
 // TODO RowContent
