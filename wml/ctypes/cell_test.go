@@ -2,8 +2,9 @@ package ctypes
 
 import (
 	"bytes"
-	"github.com/samuel-jimenez/xml"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
@@ -26,7 +27,7 @@ func TestCell_MarshalXML(t *testing.T) {
 				Property: &CellProperty{
 					NoWrap: &OnOff{Val: internal.ToPtr(stypes.OnOffTrue)},
 				},
-				Contents: []TCBlockContent{
+				Contents: []BlockLevel{
 					{
 						Paragraph: AddParagraph("Test paragraph content"),
 					},
@@ -38,7 +39,7 @@ func TestCell_MarshalXML(t *testing.T) {
 		{
 			name: "Cell with Table Content",
 			input: Cell{
-				Contents: []TCBlockContent{
+				Contents: []BlockLevel{
 					{
 						Table: &Table{},
 					},
@@ -54,7 +55,8 @@ func TestCell_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&buf)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:tc"}}
-			if err := tt.input.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.input, start); err != nil {
+				// if err := tt.input.MarshalXML(encoder, start); err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
@@ -127,7 +129,7 @@ func TestCellUnmarshalXML(t *testing.T) {
 				t.Fatalf("cell.Contents[%d].Table should not be nil", i)
 			}
 		} else {
-			t.Errorf("Unexpected TCBlockContent: %+v", content)
+			t.Errorf("Unexpected BlockLevel: %+v", content)
 		}
 	}
 }

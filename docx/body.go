@@ -18,6 +18,8 @@ type Body struct {
 	SectPr *ctypes.SectionProp `xml:"w:sectPr,omitempty"`
 }
 
+//TODO crossref  w_EG_ContentBlockContent
+
 // DocumentChild represents a child element within a Word document, which can be a Paragraph or a Table.
 // w_EG_BlockLevelElts = w_EG_BlockLevelChunkElts*
 // | element altChunk { w_CT_AltChunk }*

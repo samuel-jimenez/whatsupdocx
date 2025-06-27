@@ -232,7 +232,7 @@ func (c *Cell) GetCt() *ctypes.Cell {
 // Adds paragraph with text and returns Paragraph
 func (c *Cell) AddParagraph(text string) *Paragraph {
 	p := newParagraph(c.root, paraWithText(text))
-	tblContent := ctypes.TCBlockContent{
+	tblContent := ctypes.BlockLevel{
 		Paragraph: &p.Ct,
 	}
 
@@ -244,7 +244,7 @@ func (c *Cell) AddParagraph(text string) *Paragraph {
 // Add empty paragraph without any text and returns Paragraph
 func (c *Cell) AddEmptyPara() *Paragraph {
 	p := newParagraph(c.root)
-	tblContent := ctypes.TCBlockContent{
+	tblContent := ctypes.BlockLevel{
 		Paragraph: &p.Ct,
 	}
 

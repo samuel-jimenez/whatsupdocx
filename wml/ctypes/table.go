@@ -77,3 +77,13 @@ loop:
 
 	return nil
 }
+
+// w_EG_ContentRowContent
+// w_EG_ContentRowContent =
+type RowContent struct {
+	// element tr { w_CT_Row }*
+	Row *Row `xml:"w:tr,omitempty"`
+	// | element customXml { w_CT_CustomXmlRow }
+	// | element sdt { w_CT_SdtRow }
+	// | w_EG_RunLevelElts*
+}
