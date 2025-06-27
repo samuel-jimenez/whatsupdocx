@@ -1,8 +1,6 @@
 package wps
 
 import (
-	"fmt"
-
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
@@ -168,62 +166,6 @@ type TextBodyProperties struct {
 	// element scene3d { a_CT_Scene3D }?,
 	// a_EG_Text3D?,
 	// element extLst { a_CT_OfficeArtExtensionList }?
-}
-
-// MarshalXML implements the xml.Marshaler interface for the Shape type.
-// It encodes the Shape to its corresponding XML representation.
-func (shape Shape) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	err = e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// ## default value: false
-	// attribute normalEastAsianFlow { xsd:boolean }?,
-	//TODO
-
-	// element cNvPr { a_CT_NonVisualDrawingProps }?,
-	if shape.NonVisualDrawingProps != nil {
-		if err = shape.NonVisualDrawingProps.MarshalXML(e, xml.StartElement{}); err != nil {
-			return err
-		}
-	}
-
-	// (element cNvSpPr { a_CT_NonVisualDrawingShapeProps }
-	// | element cNvCnPr { a_CT_NonVisualConnectorProperties })
-	if err = shape.NonVisualProps.MarshalXML(e, xml.StartElement{}); err != nil {
-		return err
-	}
-
-	// element spPr { a_CT_ShapeProperties },
-	if err = shape.PicShapeProp.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "wps:spPr"},
-	}); err != nil {
-		return fmt.Errorf("marshalling PicShapeProp: %w", err)
-	}
-
-	// element style { a_CT_ShapeStyle }?,
-	if shape.Style != nil {
-		if err = e.EncodeElement(shape.Style, xml.StartElement{Name: xml.Name{Local: "wps:style"}}); err != nil {
-			return fmt.Errorf("marshalling Style: %w", err)
-		}
-	}
-
-	// TODO
-
-	// element extLst { a_CT_OfficeArtExtensionList }?,
-	// ExtLst *OfficeArtExtensionList `xml:"extLst,omitempty"` //element ([ISO/IEC29500-1:2016] section A.4.1) to hold future extensions to the parent element of this extLst element.
-
-	// (element txbx { wp_CT_TextboxInfo }
-	// | element linkedTxbx { wp_CT_LinkedTextboxInformation })?,
-	// ShapeTextboxInfo *ShapeTextboxInfo
-
-	// element bodyPr { a_CT_TextBodyProperties}
-	if err = e.EncodeElement(shape.BodyPr, xml.StartElement{Name: xml.Name{Local: "wps:bodyPr"}}); err != nil {
-		return fmt.Errorf("marshalling Style: %w", err)
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
 // UnmarshalXML implements the xml.Unmarshaler interface for the Shape type.

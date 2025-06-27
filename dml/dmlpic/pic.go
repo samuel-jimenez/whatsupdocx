@@ -88,8 +88,8 @@ func WithTFExtent(width units.Emu, height units.Emu) TFGroupOption {
 }
 
 type Offset struct {
-	X uint64 `xml:"x,attr,omitempty"`
-	Y uint64 `xml:"y,attr,omitempty"`
+	X uint64 `xml:"x,attr"`
+	Y uint64 `xml:"y,attr"`
 }
 
 type PresetGeometry struct {
