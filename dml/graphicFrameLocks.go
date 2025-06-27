@@ -12,6 +12,7 @@ type GraphicFrameLocks struct {
 	NoChangeAspect dmlst.OptBool
 }
 
+// TODO
 func (g GraphicFrameLocks) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name.Local = "a:graphicFrameLocks"
 
@@ -31,6 +32,7 @@ func (g GraphicFrameLocks) MarshalXML(e *xml.Encoder, start xml.StartElement) er
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
+// TODO
 func (g *GraphicFrameLocks) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) error {
 	for _, a := range start.Attr {
 		if a.Name.Local == "noChangeAspect" {

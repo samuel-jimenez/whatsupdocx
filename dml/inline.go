@@ -2,8 +2,6 @@ package dml
 
 import (
 	"github.com/samuel-jimenez/xml"
-	"fmt"
-	"strconv"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
@@ -33,25 +31,32 @@ type Inline struct {
 	//Distance From Text on Right Edge
 	DistR uint `xml:"distR,attr,omitempty"`
 
+	Attr []xml.Attr `xml:",any,attr,omitempty"`
+
 	// Child elements:
 	// 1. Drawing Object Size
-	Extent dmlct.PSize2D `xml:"extent,omitempty"`
+	Extent dmlct.PSize2D `xml:"wp:extent,omitempty"`
 
 	// 2. Inline Wrapping Extent
-	EffectExtent *EffectExtent `xml:"effectExtent,omitempty"`
+	EffectExtent *EffectExtent `xml:"wp:effectExtent,omitempty"`
 
 	// 3. Drawing Object Non-Visual Properties
-	DocProp DocProp `xml:"docPr,omitempty"`
+	DocProp DocProp `xml:"wp:docPr,omitempty"`
 
 	//4.Common DrawingML Non-Visual Properties
-	CNvGraphicFramePr *NonVisualGraphicFrameProp `xml:"cNvGraphicFramePr,omitempty"`
+	CNvGraphicFramePr *NonVisualGraphicFrameProp `xml:"wp:cNvGraphicFramePr,omitempty"`
 
 	//5.Graphic Object
-	Graphic Graphic `xml:"graphic,omitempty"`
+	Graphic Graphic `xml:"a:graphic,omitempty"`
 }
 
 func NewInline(extent dmlct.PSize2D, docProp DocProp, graphic Graphic) Inline {
 	return Inline{
+		Attr: []xml.Attr{
+			//TODO extract
+			{Name: xml.Name{Local: "xmlns:a"}, Value: constants.DrawingMLMainNS},
+			{Name: xml.Name{Local: "xmlns:pic"}, Value: constants.DrawingMLPicNS},
+		},
 		Extent:  extent,
 		DocProp: docProp,
 		Graphic: graphic,
@@ -61,53 +66,4 @@ func NewInline(extent dmlct.PSize2D, docProp DocProp, graphic Graphic) Inline {
 			},
 		},
 	}
-}
-
-func (i Inline) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "wp:inline"
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "xmlns:a"}, Value: constants.DrawingMLMainNS},
-		{Name: xml.Name{Local: "xmlns:pic"}, Value: constants.DrawingMLPicNS},
-	}
-
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distT"}, Value: strconv.FormatUint(uint64(i.DistT), 10)})
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distB"}, Value: strconv.FormatUint(uint64(i.DistB), 10)})
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distL"}, Value: strconv.FormatUint(uint64(i.DistL), 10)})
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distR"}, Value: strconv.FormatUint(uint64(i.DistR), 10)})
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// 1.Extent
-	if err := i.Extent.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "wp:extent"}}); err != nil {
-		return fmt.Errorf("marshalling Extent: %w", err)
-	}
-
-	// 2. EffectExtent
-	if i.EffectExtent != nil {
-		if err := i.EffectExtent.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "wp:effectExtent"}}); err != nil {
-			return fmt.Errorf("EffectExtent: %v", err)
-		}
-	}
-
-	// 3. docPr
-	if err = i.DocProp.MarshalXML(e, xml.StartElement{}); err != nil {
-		return fmt.Errorf("marshalling DocProp: %w", err)
-	}
-
-	// 4. cNvGraphicFramePr
-	if i.CNvGraphicFramePr != nil {
-		if err = i.CNvGraphicFramePr.MarshalXML(e, xml.StartElement{}); err != nil {
-			return fmt.Errorf("marshalling cNvGraphicFramePr: %w", err)
-		}
-	}
-
-	// 5. graphic
-	if err = i.Graphic.MarshalXML(e, xml.StartElement{}); err != nil {
-		return fmt.Errorf("marshalling Graphic: %w", err)
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
