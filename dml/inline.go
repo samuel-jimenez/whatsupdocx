@@ -52,11 +52,8 @@ type Inline struct {
 
 func NewInline(extent dmlct.PSize2D, docProp DocProp, graphic Graphic) Inline {
 	return Inline{
-		Attr: []xml.Attr{
-			//TODO extract
-			{Name: xml.Name{Local: "xmlns:a"}, Value: constants.DrawingMLMainNS},
-			{Name: xml.Name{Local: "xmlns:pic"}, Value: constants.DrawingMLPicNS},
-		},
+		//TODO
+		Attr:    constants.DefaultNamespacesInline,
 		Extent:  extent,
 		DocProp: docProp,
 		Graphic: graphic,

@@ -1,9 +1,9 @@
 package dmlpic
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"fmt"
-	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/common/units"
@@ -13,14 +13,16 @@ import (
 )
 
 type Pic struct {
+	Attr []xml.Attr `xml:",any,attr,omitempty"`
+
 	// 1. Non-Visual Picture Properties
 	NonVisualPicProp NonVisualPicProp `xml:"nvPicPr,omitempty"`
 
 	// 2.Picture Fill
-	BlipFill BlipFill `xml:"blipFill,omitempty"`
+	BlipFill BlipFill `xml:"pic:blipFill,omitempty"`
 
 	// 3.Shape Properties
-	PicShapeProp PicShapeProp `xml:"spPr,omitempty"`
+	PicShapeProp PicShapeProp `xml:"pic:spPr,omitempty"`
 }
 
 func NewPic(rID string, imgCount uint, width units.Emu, height units.Emu) *Pic {
@@ -42,46 +44,11 @@ func NewPic(rID string, imgCount uint, width units.Emu, height units.Emu) *Pic {
 	}
 
 	return &Pic{
+		Attr:             []xml.Attr{constants.NameSpaceDrawingMLPic},
 		BlipFill:         blipFill,
 		NonVisualPicProp: nvPicProp,
 		PicShapeProp:     *shapeProp,
 	}
-}
-
-func (p Pic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "pic:pic"
-
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "xmlns:pic"}, Value: constants.DrawingMLPicNS},
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// 1. nvPicPr
-	if err = p.NonVisualPicProp.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "pic:nvPicPr"},
-	}); err != nil {
-		return fmt.Errorf("marshalling NonVisualPicProp: %w", err)
-	}
-
-	// 2. BlipFill
-	if err = p.BlipFill.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "pic:blipFill"},
-	}); err != nil {
-		return fmt.Errorf("marshalling BlipFill: %w", err)
-	}
-
-	// 3. spPr
-	if err = p.PicShapeProp.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "pic:spPr"},
-	}); err != nil {
-		return fmt.Errorf("marshalling PicShapeProp: %w", err)
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
 // a_CT_Transform2D =
@@ -97,9 +64,9 @@ type TransformGroup struct {
 	// attribute flipV { xsd:boolean }?,
 
 	// element off { a_CT_Point2D }?,
-	Offset *Offset `xml:"off,omitempty"`
+	Offset *Offset `xml:"a:off,omitempty"`
 	// element ext { a_CT_PositiveSize2D }?
-	Extent *dmlct.PSize2D `xml:"ext,omitempty"`
+	Extent *dmlct.PSize2D `xml:"a:ext,omitempty"`
 }
 
 type TFGroupOption func(*TransformGroup)
@@ -120,76 +87,18 @@ func WithTFExtent(width units.Emu, height units.Emu) TFGroupOption {
 	}
 }
 
-func (t TransformGroup) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "a:xfrm"
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if t.Offset != nil {
-		if err := e.EncodeElement(t.Offset, xml.StartElement{Name: xml.Name{Local: "a:off"}}); err != nil {
-			return err
-		}
-	}
-
-	if t.Extent != nil {
-		if err := e.EncodeElement(t.Extent, xml.StartElement{Name: xml.Name{Local: "a:ext"}}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
-
 type Offset struct {
 	X uint64 `xml:"x,attr,omitempty"`
 	Y uint64 `xml:"y,attr,omitempty"`
 }
 
-func (o Offset) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "a:off"
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "x"}, Value: strconv.FormatUint(o.X, 10)},
-		{Name: xml.Name{Local: "y"}, Value: strconv.FormatUint(o.Y, 10)},
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
-
 type PresetGeometry struct {
 	Preset       string             `xml:"prst,attr,omitempty"`
-	AdjustValues *geom.AdjustValues `xml:"avLst,omitempty"`
+	AdjustValues *geom.AdjustValues `xml:"a:avLst,omitempty"`
 }
 
 func NewPresetGeom(preset string) *PresetGeometry {
 	return &PresetGeometry{
 		Preset: preset,
 	}
-}
-
-func (p PresetGeometry) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "a:prstGeom"
-	start.Attr = []xml.Attr{}
-
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "prst"}, Value: p.Preset})
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if p.AdjustValues != nil {
-		if err := e.EncodeElement(p.AdjustValues, xml.StartElement{Name: xml.Name{Local: "a:avLst"}}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

@@ -1,9 +1,6 @@
 package dmlpic
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"fmt"
-
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 )
 
@@ -53,19 +50,19 @@ type PicShapeProp struct {
 	// -- Child Elements --
 	//1.2D Transform for Individual Objects
 	// element xfrm { a_CT_Transform2D }?,
-	TransformGroup *TransformGroup `xml:"xfrm,omitempty"`
+	TransformGroup *TransformGroup `xml:"a:xfrm,omitempty"`
 
 	// 2. Choice
 	//TODO: Modify it as Geometry choice
 	// a_EG_Geometry?,
-	PresetGeometry *PresetGeometry `xml:"prstGeom,omitempty"`
+	PresetGeometry *PresetGeometry `xml:"a:prstGeom,omitempty"`
 
 	//TODO
 	// a_EG_FillProperties?,
 	// FillProperties *dmlct.FillProperties
 
 	// element ln { a_CT_LineProperties }?,
-	LineProperties *dmlct.LineProperties `xml:"ln,omitempty"`
+	LineProperties *dmlct.LineProperties `xml:"a:ln,omitempty"`
 
 	//TODO: Remaining sequence of elements
 	// a_EG_EffectProperties?,
@@ -102,46 +99,4 @@ func NewPicShapeProp(options ...PicShapePropOption) *PicShapeProp {
 	}
 
 	return p
-}
-
-func (p PicShapeProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if p.BwMode != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "bwMode"}, Value: *p.BwMode})
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	//1. Transform
-	if p.TransformGroup != nil {
-		if err = p.TransformGroup.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "a:xfrm"},
-		}); err != nil {
-			return fmt.Errorf("marshalling TransformGroup: %w", err)
-		}
-	}
-
-	//2. Geometry
-	if p.PresetGeometry != nil {
-
-		if err = p.PresetGeometry.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "a:prstGeom"},
-		}); err != nil {
-			return fmt.Errorf("marshalling PresetGeometry: %w", err)
-		}
-	}
-
-	//3. LineProperties
-	if p.LineProperties != nil {
-
-		if err = p.LineProperties.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "a:ln"},
-		}); err != nil {
-			return fmt.Errorf("marshalling LineProperties: %w", err)
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

@@ -13,12 +13,14 @@ const (
 )
 
 var (
+	//TODO collapse
 	DrawingMLMainNS = "http://schemas.openxmlformats.org/drawingml/2006/main"
 	DrawingMLPicNS  = "http://schemas.openxmlformats.org/drawingml/2006/picture"
 
 	NameSpaceDocumentPropertiesVariantTypes = xml.Attr{Name: xml.Name{Local: "vt", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"}
 	NameSpaceDrawing2016SVG                 = xml.Attr{Name: xml.Name{Local: "asvg", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2016/SVG/main"}
-	NameSpaceDrawingML                      = xml.Attr{Name: xml.Name{Local: "a", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/drawingml/2006/main"}
+	NameSpaceDrawingML                      = xml.Attr{Name: xml.Name{Local: "xmlns:a"}, Value: DrawingMLMainNS}
+	NameSpaceDrawingMLPic                   = xml.Attr{Name: xml.Name{Local: "xmlns:pic"}, Value: DrawingMLPicNS}
 	NameSpaceDrawingMLA14                   = xml.Attr{Name: xml.Name{Local: "a14", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2010/main"}
 	NameSpaceDrawingMLChart                 = xml.Attr{Name: xml.Name{Local: "c", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/drawingml/2006/chart"}
 	NameSpaceDrawingMLSlicer                = xml.Attr{Name: xml.Name{Local: "sle", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2010/slicer"}
@@ -65,6 +67,11 @@ var (
 		NameSpaceMc,
 		NameSpaceW14,
 		MCIgnorableStyle,
+	}
+
+	DefaultNamespacesInline = []xml.Attr{
+		NameSpaceDrawingML,
+		NameSpaceDrawingMLPic,
 	}
 )
 
