@@ -1,8 +1,6 @@
 package dml
 
 import (
-	"log"
-
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
@@ -63,8 +61,6 @@ func NewShapeGraphic(shape *wps.Shape) *Graphic {
 
 func (g Graphic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
-	log.Println("Graphic MarshalXML ")
-
 	start.Name.Local = "a:graphic"
 	start.Attr = []xml.Attr{
 		{Name: xml.Name{Local: "xmlns:a"}, Value: constants.DrawingMLMainNS},
@@ -87,7 +83,6 @@ func (g Graphic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 }
 
 func (gd GraphicData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	log.Println("GraphicData MarshalXML ")
 
 	start.Attr = []xml.Attr{
 		{Name: xml.Name{Local: "uri"}, Value: gd.URI},

@@ -1,8 +1,6 @@
 package docx
 
 import (
-	"log"
-
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
@@ -97,7 +95,6 @@ func (body *Body) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err erro
 				if err := para.unmarshalXML(d, elem); err != nil {
 					return err
 				}
-				log.Println("Body UnmarshalXML", para)
 				body.Children = append(body.Children, DocumentChild{Para: para})
 			case "tbl":
 				tbl := NewTable(body.root)

@@ -2,7 +2,6 @@ package dml
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/samuel-jimenez/xml"
@@ -93,7 +92,6 @@ func NewAnchor() *Anchor {
 func (a Anchor) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	start.Name.Local = "wp:anchor"
 
-	log.Println("Anchor MarshalXML")
 	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "behindDoc"}, Value: strconv.Itoa(a.BehindDoc)})
 
 	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distT"}, Value: strconv.FormatUint(uint64(a.DistT), 10)})
@@ -147,21 +145,15 @@ func (a Anchor) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		return fmt.Errorf("EffectExtent: %v", err)
 	}
 
-	log.Println("Anchor MarshalXML Wrap")
-
 	// 6. Wrap Choice
 	if err := a.MarshalWrap(e); err != nil {
 		return err
 	}
 
-	log.Println("Anchor MarshalXML DocProp")
-
 	// 7. DocProp
 	if err := a.DocProp.MarshalXML(e, xml.StartElement{}); err != nil {
 		return err
 	}
-
-	log.Println("Anchor MarshalXML CNvGraphicFramePr")
 
 	// 8. CNvGraphicFramePr
 	if a.CNvGraphicFramePr != nil {
@@ -169,13 +161,11 @@ func (a Anchor) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 			return err
 		}
 	}
-	log.Println("Anchor MarshalXML Graphic")
 
 	// 9. Graphic
 	if err := a.Graphic.MarshalXML(e, xml.StartElement{}); err != nil {
 		return err
 	}
-	log.Println("Anchor MarshalXML close")
 
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

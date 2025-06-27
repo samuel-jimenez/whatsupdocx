@@ -2,7 +2,6 @@ package wps
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/samuel-jimenez/xml"
 
@@ -174,7 +173,6 @@ type TextBodyProperties struct {
 // MarshalXML implements the xml.Marshaler interface for the Shape type.
 // It encodes the Shape to its corresponding XML representation.
 func (shape Shape) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	log.Println("Shape MarshalXML")
 	err = e.EncodeToken(start)
 	if err != nil {
 		return err
