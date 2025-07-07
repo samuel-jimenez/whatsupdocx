@@ -10,21 +10,6 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
-// 		//TODO run.Clear()
-// 			run.Children = nil
-//
-// 			//TODO run.AddText()
-// 			// para.AddText(p_name)}
-// 			t := TextFromString(text)
-//
-// 			run.Children = append(run.Children, RunChild{
-// 				Text: t,
-// 			})
-// 		}
-//
-// 	}
-// }
-
 // A Run is part of a paragraph that has its own style. It could be (CT_R)
 // w_CT_R =
 type Run struct {
@@ -46,6 +31,25 @@ type Run struct {
 	// 2. Choice - Run Inner content
 	// w_EG_RunInnerContent*
 	Children []RunChild `xml:",group,any,omitempty"`
+}
+
+// Appends a new text to the run.
+// Example:
+//
+//	run.AddText("Hello, World!")
+//
+// Parameters:
+//   - text: A string representing the text to be added to the Run.
+func (run *Run) AddText(text string) {
+	t := TextFromString(text)
+	run.Children = append(run.Children, RunChild{
+		Text: t,
+	})
+}
+
+// Clears the run's children.
+func (run *Run) Clear() {
+	run.Children = nil
 }
 
 // w_EG_RunInnerContent =

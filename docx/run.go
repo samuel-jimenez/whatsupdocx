@@ -205,3 +205,17 @@ func (r *Run) VerticalAlign(value stypes.VerticalAlignRun) *Run {
 	r.getProp().VertAlign = ctypes.NewGenSingleStrVal(value)
 	return r
 }
+
+// Appends a new text to the run.
+// Example:
+//
+//	run.AddText("Hello, World!")
+//
+// Parameters:
+//   - text: A string representing the text to be added to the Run.
+func (run *Run) AddText(text string) {
+	t := ctypes.TextFromString(text)
+	run.ct.Children = append(run.ct.Children, ctypes.RunChild{
+		Text: t,
+	})
+}
