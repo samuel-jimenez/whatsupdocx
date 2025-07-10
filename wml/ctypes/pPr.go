@@ -39,7 +39,7 @@ type ParagraphProp struct {
 
 	// 7. Numbering Definition Instance Reference
 	// element numPr { w_CT_NumPr }?,
-	NumProp *NumProp `xml:"w:w:numPr,omitempty"`
+	NumProp *NumProp `xml:"w:numPr,omitempty"`
 
 	// 8. Suppress Line Numbers for Paragraph
 	// element suppressLineNumbers { w_CT_OnOff }?,
@@ -47,7 +47,7 @@ type ParagraphProp struct {
 
 	// 9. Paragraph Borders
 	// element pBdr { w_CT_PBdr }?,
-	Border *ParaBorder `xml:"w:w:pBdr,omitempty"`
+	Border *ParaBorder `xml:"w:pBdr,omitempty"`
 
 	// 10. This element specifies the shading applied to the contents of the paragraph.
 	// element shd { w_CT_Shd }?,

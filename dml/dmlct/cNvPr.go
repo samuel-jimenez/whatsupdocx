@@ -1,8 +1,9 @@
 package dmlct
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 // Non-Visual Drawing Properties

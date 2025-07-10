@@ -1,32 +1,47 @@
 package ctypes
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/samuel-jimenez/xml"
 
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+type ShadingXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element Shading  `xml:"w:shd"`
+}
+
+func wrapShadingXML(el Shading) *ShadingXML {
+	return &ShadingXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapShadingOutput(output string) string {
+	return `<ShadingXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</ShadingXML>`
+}
 
 func TestShd_MarshalXML(t *testing.T) {
 	themeColor1 := stypes.ThemeColorAccent2
 	themeFill1 := stypes.ThemeColorAccent1
 	tests := []struct {
 		name     string
-		shading  Shading
+		input    Shading
 		expected string
 	}{
 		{
 			name: "Basic Shd with Val",
-			shading: Shading{
+			input: Shading{
 				Val: stypes.ShdClear,
 			},
 			expected: `<w:shd w:val="clear"></w:shd>`,
 		},
 		{
 			name: "Shd with all attributes",
-			shading: Shading{
+			input: Shading{
 				Val:            stypes.ShdSolid,
 				Color:          stringPtr("FFFFFF"),
 				ThemeColor:     &themeColor1,
@@ -41,7 +56,7 @@ func TestShd_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Shd with some attributes nil",
-			shading: Shading{
+			input: Shading{
 				Val:            stypes.ShdDiagStripe,
 				ThemeColor:     &themeColor1,
 				ThemeFill:      &themeFill1,
@@ -55,20 +70,13 @@ func TestShd_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var b strings.Builder
-			enc := xml.NewEncoder(&b)
-			start := xml.StartElement{Name: xml.Name{Local: "w:shd"}}
-
-			if err := enc.EncodeElement(tt.shading, start); err != nil {
-				// if err := tt.shading.MarshalXML(enc, start); err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+			output, err := xml.Marshal(wrapShadingXML(tt.input))
+			expected := wrapShadingOutput(tt.expected)
+			if err != nil {
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			enc.Flush()
-
-			result := b.String()
-			if result != tt.expected {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expected, result)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

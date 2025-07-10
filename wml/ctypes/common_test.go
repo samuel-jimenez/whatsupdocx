@@ -1,14 +1,47 @@
 package ctypes
 
 import (
-	"bytes"
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
 	"github.com/samuel-jimenez/whatsupdocx/common"
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
+
+type WrapperXML struct {
+	XMLName struct{}   `xml:"testwrapper"`
+	Attr    []xml.Attr `xml:",any,attr,omitempty"`
+	Element any
+}
+
+func wrapXML(el any) *WrapperXML {
+	return &WrapperXML{
+		Attr: []xml.Attr{
+			constants.NameSpaceWordprocessingML,
+			constants.NameSpaceR,
+		},
+		Element: el,
+	}
+}
+
+func wrapXMLOutput(output string) string {
+	return `<testwrapper` +
+		` xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"` +
+		` xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"` +
+		`>` + output + `</testwrapper>`
+}
+
+// !--- Tests for CTString start here ---!
+
+func wrapCTStringXML(el CTString) *WrapperXML {
+	return wrapXML(struct {
+		CTString
+		XMLName struct{} `xml:"w:rStyle"`
+	}{CTString: el})
+}
 
 func TestCTString_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -29,22 +62,18 @@ func TestCTString_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapCTStringXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:rStyle"}}
-
-			err := tt.input.MarshalXML(encoder, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
 		})
 	}
 }
@@ -83,7 +112,16 @@ func TestCTString_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of CTString ends here ---!
+// !--- Tests for CTString end here ---!
+
+// !--- Tests for DecimalNum start here ---!
+
+func wrapDecimalNumXML(el DecimalNum) *WrapperXML {
+	return wrapXML(struct {
+		DecimalNum
+		XMLName struct{} `xml:"w:outlineLvl"`
+	}{DecimalNum: el})
+}
 
 func TestDecimalNum_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -104,22 +142,18 @@ func TestDecimalNum_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapDecimalNumXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:outlineLvl"}}
-
-			err := tt.input.MarshalXML(encoder, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
 		})
 	}
 }
@@ -158,9 +192,16 @@ func TestDecimalNum_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of DecimalNum ends here ---!
+// !--- Tests for DecimalNum end here ---!
 
-// !--- Tests of Uint64 starts here ---!
+// !--- Tests for Uint64 start here ---!
+
+func wrapUint64ElemXML(el Uint64Elem) *WrapperXML {
+	return wrapXML(struct {
+		Uint64Elem
+		XMLName struct{} `xml:"w:kern"`
+	}{Uint64Elem: el})
+}
 
 func TestUint64Elem_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -181,22 +222,18 @@ func TestUint64Elem_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapUint64ElemXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:kern"}}
-
-			err := tt.input.MarshalXML(encoder, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
 		})
 	}
 }
@@ -230,32 +267,39 @@ func TestUint64Elem_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of Uint64 ends here ---!
+// !--- Tests for Uint64 end here ---!
+
+// !--- Tests for GenSingleStrVal start here ---!
+
+func wrapGenSingleStrValXML(el string) *WrapperXML {
+	return wrapXML(struct {
+		*GenSingleStrVal[string]
+		XMLName struct{} `xml:"GenSingleStrVal"`
+	}{GenSingleStrVal: NewGenSingleStrVal(el)})
+}
 
 func TestGenSingleStrVal_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name string
-		val  string
-		want string
+		name     string
+		input    string
+		expected string
 	}{
 		{"Test1", "Hello", `<GenSingleStrVal w:val="Hello"></GenSingleStrVal>`},
 		{"Test2", "World", `<GenSingleStrVal w:val="World"></GenSingleStrVal>`},
 	}
-
 	for _, tt := range tests {
+		object := wrapGenSingleStrValXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			gen := NewGenSingleStrVal(tt.val)
-
-			var buf bytes.Buffer
-			enc := xml.NewEncoder(&buf)
-			start := xml.StartElement{Name: xml.Name{Local: "GenSingleStrVal"}}
-			if err := gen.MarshalXML(enc, start); err != nil {
-				t.Errorf("MarshalXML() error = %v", err)
-				return
-			}
-			if got := buf.String(); got != tt.want {
-				t.Errorf("MarshalXML() = %v, want %v", got, tt.want)
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_1TOO
 		})
 	}
 }
@@ -287,7 +331,9 @@ func TestGenSingleStrVal_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of GenSingleStrVal ends here ---!
+// !--- Tests for GenSingleStrVal end here ---!
+
+// !--- Tests for Empty start here ---!
 
 func TestEmpty_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -308,7 +354,7 @@ func TestEmpty_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{Name: xml.Name{Local: "w:tab"}}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -316,7 +362,7 @@ func TestEmpty_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}
@@ -345,7 +391,16 @@ func TestEmpty_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of common.Empty ends here ---!
+// !--- Tests for Empty end here ---!
+
+// !--- Tests for Markup start here ---!
+
+func wrapMarkupXML(el Markup) *WrapperXML {
+	return wrapXML(struct {
+		Markup
+		XMLName struct{} `xml:"Markup"`
+	}{Markup: el})
+}
 
 func TestMarkup_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -366,21 +421,18 @@ func TestMarkup_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapMarkupXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "Markup"}}
-
-			err := tt.input.MarshalXML(encoder, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
 		})
 	}
 }
@@ -419,52 +471,50 @@ func TestMarkup_UnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of Markup ends here ---!
+// !--- Tests for Markup end here ---!
+
+// !--- Tests for GenOptStrVal start here ---!
+
+func wrapGenOptStrValstringXML(el GenOptStrVal[string]) *WrapperXML {
+	return wrapXML(struct {
+		GenOptStrVal[string]
+		XMLName struct{} `xml:"element"`
+	}{GenOptStrVal: el})
+}
 
 // Test function for MarshalXML method
 func TestMarshalXML(t *testing.T) {
 	tests := []struct {
-		name        string
-		instance    GenOptStrVal[string]
-		expectedXML string
+		name     string
+		input    GenOptStrVal[string]
+		expected string
 	}{
 		{
-			name:        "WithValue",
-			instance:    GenOptStrVal[string]{Val: internal.ToPtr("test")},
-			expectedXML: `<element w:val="test"></element>`,
+			name:     "WithValue",
+			input:    GenOptStrVal[string]{Val: internal.ToPtr("test")},
+			expected: `<element w:val="test"></element>`,
 		},
 		{
-			name:        "WithNilValue",
-			instance:    GenOptStrVal[string]{Val: nil},
-			expectedXML: `<element></element>`,
+			name:     "WithNilValue",
+			input:    GenOptStrVal[string]{Val: nil},
+			expected: `<element></element>`,
 		},
 		{
-			name:        "EmptyValue",
-			instance:    GenOptStrVal[string]{Val: internal.ToPtr("")},
-			expectedXML: `<element w:val=""></element>`,
+			name:     "EmptyValue",
+			input:    GenOptStrVal[string]{Val: internal.ToPtr("")},
+			expected: `<element w:val=""></element>`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var buf bytes.Buffer
-			encoder := xml.NewEncoder(&buf)
-
-			start := xml.StartElement{Name: xml.Name{Local: "element"}}
-			err := tt.instance.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapGenOptStrValstringXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
-				t.Errorf("MarshalXML error: %v", err)
-				return
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			// Convert expected and actual values to pointers for comparison
-			expectedPtr := internal.ToPtr(tt.expectedXML)
-			actualPtr := internal.ToPtr(buf.String())
-
-			// Compare using ComparePtr function
-			err = internal.ComparePtr("XML Output", expectedPtr, actualPtr)
-			if err != nil {
-				t.Errorf("Comparison error: %v", err)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}
@@ -523,4 +573,4 @@ func TestUnmarshalXML(t *testing.T) {
 	}
 }
 
-// !--- Tests of GenOptStrVal[string] ends here ---!
+// !--- Tests for GenOptStrVal[string] end here ---!

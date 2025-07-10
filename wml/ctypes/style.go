@@ -147,7 +147,7 @@ type Style struct {
 	TableCellProp *CellProperty `xml:"w:tcPr,omitempty"`
 
 	//22.Style Conditional Table Formatting Properties
-	TableStylePr []TableStyleProp `xml:",any"`
+	TableStylePr []TableStyleProp `xml:"w:tblStylePr"`
 
 	// Attributes
 

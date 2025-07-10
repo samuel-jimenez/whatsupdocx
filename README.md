@@ -1,6 +1,6 @@
 # WhatsupDOCX
 
-[![Go CI](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml/badge.svg)](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/gomutex/whatsupdocx) [![Go Reference](https://pkg.go.dev/badge/github.com/samuel-jimenez/whatsupdocx.svg)](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx)
+[![Go CI](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml/badge.svg)](https://github.com/samuel-jimenez/whatsupdocx/actions/workflows/go.yml) ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/samuel-jimenez/whatsupdocx) [![Go Reference](https://pkg.go.dev/badge/github.com/samuel-jimenez/whatsupdocx.svg)](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx)
  [![Go Report Card](https://goreportcard.com/badge/github.com/samuel-jimenez/whatsupdocx)](https://goreportcard.com/report/github.com/samuel-jimenez/whatsupdocx) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -8,10 +8,11 @@
 
 
 WhatsupDOCX is a library written in pure Go providing a set of functions that allow you to write to and read from Docx file. 
+It should be correct, supporting reading, writing, and editing. Roundtrip reading, then writing should not break.
+It is intended to be streamlined, offloading most functionality to the xml parser.
 
-This library needs Go version 1.18 or later. The usage documentation for WhatsupDOCX can be accessed via the [WhatsupDOCX Documentation Page](https://gomutex.github.io/whatsupdocx). 
-
-In depth, go docs can be seen using Go's built-in documentation tool, or online at [go.dev](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx). Please refer the [subpackage docx](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx/docx) for the list of functions that can be used.
+This library needs Go version 1.18 or later. The usage documentation for WhatsupDOCX can be accessed via Go's built-in documentation tool, or online at [go.dev](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx). 
+Please refer the [subpackage docx](https://pkg.go.dev/github.com/samuel-jimenez/whatsupdocx/docx) for the list of functions that can be used.
 
 
 ## Usage

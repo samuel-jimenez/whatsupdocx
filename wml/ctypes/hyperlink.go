@@ -1,25 +1,27 @@
-package docx
+package ctypes
 
 import (
-	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
+	"github.com/samuel-jimenez/xml"
 )
 
 type Hyperlink struct {
-	root *RootDoc          // root is the root document to which this hyperlink belongs.
-	ct   *ctypes.Hyperlink // ct is the underlying hyperlink element from the wml/ctypes package.
+	XMLName  xml.Name         `xml:"http://schemas.openxmlformats.org/wordprocessingml/2006/main hyperlink,omitempty"`
+	ID       string           `xml:"http://schemas.openxmlformats.org/officeDocument/2006/relationships id,attr"`
+	Run      *Run             `xml:"w:r,omitempty"`
+	Children []ParagraphChild `xml:",group,any,omitempty"`
 }
 
-func newHyperlink(root *RootDoc, ct *ctypes.Hyperlink) *Hyperlink {
-	return &Hyperlink{root: root, ct: ct}
+func NewHyperlink() *Hyperlink {
+	return &Hyperlink{}
 }
 
-// getProp returns the hyperlink properties. If not initialized, it creates and returns a new instance.
-func (r *Hyperlink) getProp() *ctypes.RunProperty {
-	if r.ct.Run.Property == nil {
-		r.ct.Run.Property = &ctypes.RunProperty{}
+// GetProp returns the hyperlink properties. If not initialized, it creates and returns a new instance.
+func (r *Hyperlink) GetProp() *RunProperty {
+	if r.Run.Property == nil {
+		r.Run.Property = &RunProperty{}
 	}
-	return r.ct.Run.Property
+	return r.Run.Property
 }
 
 // Sets the color of the Hyperlink.
@@ -34,7 +36,7 @@ func (r *Hyperlink) getProp() *ctypes.RunProperty {
 // Returns:
 //   - *Hyperlink: The modified Hyperlink instance with the updated color.
 func (r *Hyperlink) Color(colorCode string) *Hyperlink {
-	r.getProp().Color = ctypes.NewColor(colorCode)
+	r.GetProp().Color = NewColor(colorCode)
 	return r
 }
 
@@ -52,127 +54,127 @@ func (r *Hyperlink) Color(colorCode string) *Hyperlink {
 // Returns:
 //   - *Hyperlink: The modified Hyperlink instance with the updated size.
 func (r *Hyperlink) Size(size uint64) *Hyperlink {
-	r.getProp().Size = ctypes.NewFontSize(size * 2)
+	r.GetProp().Size = NewFontSize(size * 2)
 	return r
 }
 
 // Font sets the font for the hyperlink.
 func (r *Hyperlink) Font(font string) *Hyperlink {
-	if r.getProp().Fonts == nil {
-		r.getProp().Fonts = &ctypes.RunFonts{}
+	if r.GetProp().Fonts == nil {
+		r.GetProp().Fonts = &RunFonts{}
 	}
 
-	r.getProp().Fonts.Ascii = font
-	r.getProp().Fonts.HAnsi = font
+	r.GetProp().Fonts.Ascii = font
+	r.GetProp().Fonts.HAnsi = font
 	return r
 }
 
 // Shading sets the shading properties (type, color, fill) for the hyperlink
 func (r *Hyperlink) Shading(shdType stypes.Shading, color, fill string) *Hyperlink {
-	r.getProp().Shading = ctypes.NewShading().SetShadingType(shdType).SetColor(color).SetFill(fill)
+	r.GetProp().Shading = NewShading().SetShadingType(shdType).SetColor(color).SetFill(fill)
 	return r
 }
 
 // AddHighlight sets the highlight color for the hyperlink.
 func (r *Hyperlink) Highlight(color string) *Hyperlink {
-	r.getProp().Highlight = ctypes.NewCTString(color)
+	r.GetProp().Highlight = NewCTString(color)
 	return r
 }
 
 // AddBold enables bold formatting for the hyperlink.
 func (r *Hyperlink) Bold(value bool) *Hyperlink {
-	r.getProp().Bold = ctypes.OnOffFromBool(value)
+	r.GetProp().Bold = OnOffFromBool(value)
 	return r
 }
 
 // Italic enables or disables italic formatting for the hyperlink.
 func (r *Hyperlink) Italic(value bool) *Hyperlink {
-	r.getProp().Italic = ctypes.OnOffFromBool(value)
+	r.GetProp().Italic = OnOffFromBool(value)
 	return r
 }
 
 // Specifies that the contents of this hyperlink shall be displayed with a single horizontal line through the center of the line.
 func (r *Hyperlink) Strike(value bool) *Hyperlink {
-	r.getProp().Strike = ctypes.OnOffFromBool(value)
+	r.GetProp().Strike = OnOffFromBool(value)
 	return r
 }
 
 // Specifies that the contents of this hyperlink shall be displayed with two horizontal lines through each character displayed on the line
 func (r *Hyperlink) DoubleStrike(value bool) *Hyperlink {
-	r.getProp().DoubleStrike = ctypes.OnOffFromBool(value)
+	r.GetProp().DoubleStrike = OnOffFromBool(value)
 	return r
 }
 
 // Display All Characters As Capital Letters
 // Any lowercase characters in this text hyperlink shall be formatted for display only as their capital letter character equivalents
 func (r *Hyperlink) Caps(value bool) *Hyperlink {
-	r.getProp().Caps = ctypes.OnOffFromBool(value)
+	r.GetProp().Caps = OnOffFromBool(value)
 	return r
 }
 
 // Specifies that all small letter characters in this text hyperlink shall be formatted for display only as their capital letter character equivalents
 func (r *Hyperlink) SmallCaps(value bool) *Hyperlink {
-	r.getProp().Caps = ctypes.OnOffFromBool(value)
+	r.GetProp().Caps = OnOffFromBool(value)
 	return r
 }
 
 // Outline enables or disables outline formatting for the hyperlink.
 func (r *Hyperlink) Outline(value bool) *Hyperlink {
-	r.getProp().Outline = ctypes.OnOffFromBool(value)
+	r.GetProp().Outline = OnOffFromBool(value)
 	return r
 }
 
 // Shadow enables or disables shadow formatting for the hyperlink.
 func (r *Hyperlink) Shadow(value bool) *Hyperlink {
-	r.getProp().Shadow = ctypes.OnOffFromBool(value)
+	r.GetProp().Shadow = OnOffFromBool(value)
 	return r
 }
 
 // Emboss enables or disables embossing formatting for the hyperlink.
 func (r *Hyperlink) Emboss(value bool) *Hyperlink {
-	r.getProp().Emboss = ctypes.OnOffFromBool(value)
+	r.GetProp().Emboss = OnOffFromBool(value)
 	return r
 }
 
 // Imprint enables or disables imprint formatting for the hyperlink.
 func (r *Hyperlink) Imprint(value bool) *Hyperlink {
-	r.getProp().Imprint = ctypes.OnOffFromBool(value)
+	r.GetProp().Imprint = OnOffFromBool(value)
 	return r
 }
 
 // Do Not Check Spelling or Grammar
 func (r *Hyperlink) NoGrammer(value bool) *Hyperlink {
-	r.getProp().NoGrammar = ctypes.OnOffFromBool(value)
+	r.GetProp().NoGrammar = OnOffFromBool(value)
 	return r
 }
 
 // Use Document Grid Settings For Inter-Character Spacing
 func (r *Hyperlink) SnapToGrid(value bool) *Hyperlink {
-	r.getProp().SnapToGrid = ctypes.OnOffFromBool(value)
+	r.GetProp().SnapToGrid = OnOffFromBool(value)
 	return r
 }
 
 // Hidden Text
 func (r *Hyperlink) HideText(value bool) *Hyperlink {
-	r.getProp().Vanish = ctypes.OnOffFromBool(value)
+	r.GetProp().Vanish = OnOffFromBool(value)
 	return r
 }
 
 // Spacing sets the spacing between characters in the hyperlink.
 func (r *Hyperlink) Spacing(value int) *Hyperlink {
-	r.getProp().Spacing = ctypes.NewDecimalNum(value)
+	r.GetProp().Spacing = NewDecimalNum(value)
 	return r
 }
 
 // Underline sets the underline style for the hyperlink.
 func (r *Hyperlink) Underline(value stypes.Underline) *Hyperlink {
-	r.getProp().Underline = ctypes.NewGenSingleStrVal(value)
+	r.GetProp().Underline = NewGenSingleStrVal(value)
 	return r
 }
 
 // Style sets the style of the Hyperlink.
 func (r *Hyperlink) Style(value string) *Hyperlink {
-	r.getProp().Style = ctypes.NewRunStyle(value)
+	r.GetProp().Style = NewRunStyle(value)
 	return r
 }
 
@@ -184,6 +186,6 @@ func (r *Hyperlink) Style(value string) *Hyperlink {
 //
 // Returns: The modified Hyperlink instance with the updated vertical alignment.
 func (r *Hyperlink) VerticalAlign(value stypes.VerticalAlignRun) *Hyperlink {
-	r.getProp().VertAlign = ctypes.NewGenSingleStrVal(value)
+	r.GetProp().VertAlign = NewGenSingleStrVal(value)
 	return r
 }

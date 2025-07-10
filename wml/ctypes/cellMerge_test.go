@@ -1,36 +1,52 @@
 package ctypes
 
 import (
-	"bytes"
-	"github.com/samuel-jimenez/xml"
 	"reflect"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
 
+func wrapCellMergeXML(el *CellMerge) *WrapperXML {
+	return wrapXML(struct {
+		*CellMerge
+		XMLName struct{} `xml:"CellMerge"`
+	}{CellMerge: el})
+}
+
 func TestCellMerge_MarshalXML(t *testing.T) {
-	// Create a CellMerge instance for testing
-	cellMerge := &CellMerge{
-		ID:         1,
-		Author:     "John Doe",
-		Date:       nil,
-		VMerge:     internal.ToPtr(AnnotationVMergeCont),
-		VMergeOrig: internal.ToPtr(AnnotationVMergeRest),
-	}
+	tests := []struct {
+		name     string
+		input    *CellMerge
+		expected string
+	}{{
+		name: "Default",
+		input: &CellMerge{
+			ID:         1,
+			Author:     "John Doe",
+			Date:       nil,
+			VMerge:     internal.ToPtr(AnnotationVMergeCont),
+			VMergeOrig: internal.ToPtr(AnnotationVMergeRest),
+		},
+		expected: `<CellMerge w:id="1" w:author="John Doe" w:vMerge="cont" w:vMergeOrig="rest"></CellMerge>`,
+	}}
 
-	// Marshal the CellMerge instance to XML
-	xmlData, err := xml.Marshal(cellMerge)
-	if err != nil {
-		t.Fatalf("Error marshaling CellMerge to XML: %v", err)
-	}
-
-	// Define the expected XML string
-	expectedXMLString := `<CellMerge w:id="1" w:author="John Doe" w:vMerge="cont" w:vMergeOrig="rest"></CellMerge>`
-
-	// Compare the generated XML with the expected XML string
-	if !bytes.Contains(xmlData, []byte(expectedXMLString)) {
-		t.Errorf("Expected XML string %s, got %s", expectedXMLString, string(xmlData))
+	for _, tt := range tests {
+		object := wrapCellMergeXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+		})
 	}
 }
 

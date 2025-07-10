@@ -1,23 +1,30 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+func wrapEALayoutXML(el EALayout) *WrapperXML {
+	return wrapXML(struct {
+		EALayout
+		XMLName struct{} `xml:"w:eastAsianLayout"`
+	}{EALayout: el})
+}
+
 func TestEALayout_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		layout   EALayout
+		input    EALayout
 		expected string
 	}{
 		{
 			name: "All attributes set",
-			layout: EALayout{
+			input: EALayout{
 				ID:           internal.ToPtr(1),
 				Combine:      internal.ToPtr(stypes.OnOffOn),
 				CombineBrkts: internal.ToPtr(stypes.CombineBracketsRound),
@@ -28,58 +35,55 @@ func TestEALayout_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Only ID set",
-			layout: EALayout{
+			input: EALayout{
 				ID: internal.ToPtr(2),
 			},
 			expected: `<w:eastAsianLayout w:id="2"></w:eastAsianLayout>`,
 		},
 		{
 			name: "Only Combine set",
-			layout: EALayout{
+			input: EALayout{
 				Combine: internal.ToPtr(stypes.OnOffOn),
 			},
 			expected: `<w:eastAsianLayout w:combine="on"></w:eastAsianLayout>`,
 		},
 		{
 			name: "Only CombineBrkts set",
-			layout: EALayout{
+			input: EALayout{
 				CombineBrkts: internal.ToPtr(stypes.CombineBracketsSquare),
 			},
 			expected: `<w:eastAsianLayout w:combineBrackets="square"></w:eastAsianLayout>`,
 		},
 		{
 			name: "Only Vert set",
-			layout: EALayout{
+			input: EALayout{
 				Vert: internal.ToPtr(stypes.OnOffOff),
 			},
 			expected: `<w:eastAsianLayout w:vert="off"></w:eastAsianLayout>`,
 		},
 		{
 			name: "Only VertCompress set",
-			layout: EALayout{
+			input: EALayout{
 				VertCompress: internal.ToPtr(stypes.OnOffOn),
 			},
 			expected: `<w:eastAsianLayout w:vertCompress="on"></w:eastAsianLayout>`,
 		},
 		{
 			name:     "No attributes set",
-			layout:   EALayout{},
+			input:    EALayout{},
 			expected: `<w:eastAsianLayout></w:eastAsianLayout>`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			e := xml.NewEncoder(&result)
-			err := tt.layout.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:eastAsianLayout"}})
+			output, err := xml.Marshal(wrapEALayoutXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-			e.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

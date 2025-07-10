@@ -1,14 +1,45 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
-	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+type TabXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element Tab      `xml:"w:tab"`
+}
+
+func wrapTabXML(el Tab) *TabXML {
+	return &TabXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapTabOutput(output string) string {
+	return `<TabXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</TabXML>`
+}
+
+type TabsXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element Tabs     `xml:"w:tabs"`
+}
+
+func wrapTabsXML(el Tabs) *TabsXML {
+	return &TabsXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapTabsOutput(output string) string {
+	return `<TabsXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</TabsXML>`
+}
 
 func TestTab_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -42,23 +73,18 @@ func TestTab_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:tab"}}
-
-			err := tt.input.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapTabXML(tt.input))
+			expected := wrapTabOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}
 }
+
 func TestTab_UnmarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -122,17 +148,17 @@ func TestTab_UnmarshalXML(t *testing.T) {
 func TestTabs_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		tabs     Tabs
+		input    Tabs
 		expected string
 	}{
 		{
 			name:     "Empty Tabs",
-			tabs:     Tabs{},
+			input:    Tabs{},
 			expected: ``,
 		},
 		{
 			name: "Tabs with Multiple Tab elements",
-			tabs: Tabs{
+			input: Tabs{
 				Tab: []Tab{
 					{Val: stypes.CustTabStopCenter, Position: 100, LeaderChar: internal.ToPtr(stypes.CustLeadCharDot)},
 					{Val: stypes.CustTabStopLeft, Position: 200, LeaderChar: internal.ToPtr(stypes.CustLeadCharHyphen)},
@@ -141,17 +167,15 @@ func TestTabs_MarshalXML(t *testing.T) {
 			expected: `<w:tabs><w:tab w:val="center" w:pos="100" w:leader="dot"></w:tab><w:tab w:val="left" w:pos="200" w:leader="hyphen"></w:tab></w:tabs>`,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			xmlBytes, err := xml.Marshal(tt.tabs)
+			output, err := xml.Marshal(wrapTabsXML(tt.input))
+			expected := wrapTabsOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Unexpected error during Marshal: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			actual := strings.TrimSpace(string(xmlBytes))
-			if actual != tt.expected {
-				t.Fatalf("Unexpected XML output: expected '%s' but got '%s'", tt.expected, actual)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

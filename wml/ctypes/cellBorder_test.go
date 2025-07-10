@@ -1,16 +1,24 @@
 package ctypes
 
 import (
-	"bytes"
-	"github.com/samuel-jimenez/xml"
 	"reflect"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+func wrapCellBordersXML(el *CellBorders) *WrapperXML {
+	return wrapXML(struct {
+		*CellBorders
+		XMLName struct{} `xml:"w:tcBorders"`
+	}{CellBorders: el})
+}
+
 func TestCellBorders_MarshalXML(t *testing.T) {
+
 	colorRed := "red"
 	themeColorAccent1 := stypes.ThemeColor("accent1")
 	themeTint := "80"
@@ -19,49 +27,54 @@ func TestCellBorders_MarshalXML(t *testing.T) {
 	shadow := stypes.OnOff("true")
 	frame := stypes.OnOff("false")
 
-	borders := &CellBorders{
-		Top:     &Border{Val: stypes.BorderStyleSingle, Color: &colorRed, ThemeColor: &themeColorAccent1, ThemeTint: &themeTint, ThemeShade: &themeShade, Space: &space, Shadow: &shadow, Frame: &frame},
-		Left:    &Border{Val: stypes.BorderStyleDouble},
-		Bottom:  &Border{Val: stypes.BorderStyleDashed},
-		Right:   &Border{Val: stypes.BorderStyleDotted},
-		InsideH: &Border{Val: stypes.BorderStyleSingle},
-		InsideV: &Border{Val: stypes.BorderStyleDouble},
-		TL2BR:   &Border{Val: stypes.BorderStyleThick},
-		TR2BL:   &Border{Val: stypes.BorderStyleThick},
+	tests := []struct {
+		name     string
+		input    *CellBorders
+		expected string
+	}{{
+		name: "With all attributes",
+		input: &CellBorders{
+			Top:     &Border{Val: stypes.BorderStyleSingle, Color: &colorRed, ThemeColor: &themeColorAccent1, ThemeTint: &themeTint, ThemeShade: &themeShade, Space: &space, Shadow: &shadow, Frame: &frame},
+			Left:    &Border{Val: stypes.BorderStyleDouble},
+			Bottom:  &Border{Val: stypes.BorderStyleDashed},
+			Right:   &Border{Val: stypes.BorderStyleDotted},
+			InsideH: &Border{Val: stypes.BorderStyleSingle},
+			InsideV: &Border{Val: stypes.BorderStyleDouble},
+			TL2BR:   &Border{Val: stypes.BorderStyleThick},
+			TR2BL:   &Border{Val: stypes.BorderStyleThick},
+		},
+		expected: `<w:tcBorders>` +
+			`<w:top w:val="single" w:color="red" w:themeColor="accent1" w:themeTint="80" w:themeShade="20" w:space="4" w:shadow="true" w:frame="false"></w:top>` +
+			`<w:left w:val="double"></w:left>` +
+			`<w:bottom w:val="dashed"></w:bottom>` +
+			`<w:right w:val="dotted"></w:right>` +
+			`<w:insideH w:val="single"></w:insideH>` +
+			`<w:insideV w:val="double"></w:insideV>` +
+			`<w:tl2br w:val="thick"></w:tl2br>` +
+			`<w:tr2bl w:val="thick"></w:tr2bl>` +
+			`</w:tcBorders>`,
+	},
+		{
+			name:     "Default",
+			input:    DefaultCellBorders(),
+			expected: `<w:tcBorders></w:tcBorders>`,
+		},
 	}
 
-	xmlData, err := xml.Marshal(borders)
-	if err != nil {
-		t.Fatalf("Error marshaling CellBorders to XML: %v", err)
-	}
-
-	expectedXMLString := `<w:tcBorders>` +
-		`<w:top w:val="single" w:color="red" w:themeColor="accent1" w:themeTint="80" w:themeShade="20" w:space="4" w:shadow="true" w:frame="false"></w:top>` +
-		`<w:left w:val="double"></w:left>` +
-		`<w:bottom w:val="dashed"></w:bottom>` +
-		`<w:right w:val="dotted"></w:right>` +
-		`<w:insideH w:val="single"></w:insideH>` +
-		`<w:insideV w:val="double"></w:insideV>` +
-		`<w:tl2br w:val="thick"></w:tl2br>` +
-		`<w:tr2bl w:val="thick"></w:tr2bl>` +
-		`</w:tcBorders>`
-
-	if !bytes.Contains(xmlData, []byte(expectedXMLString)) {
-		t.Errorf("Expected XML string %s, got %s", expectedXMLString, string(xmlData))
-	}
-}
-
-func TestDefaultCellBorders_MarshalXML(t *testing.T) {
-	borders := DefaultCellBorders()
-
-	xmlData, err := xml.Marshal(borders)
-	if err != nil {
-		t.Fatalf("Error marshaling DefaultCellBorders to XML: %v", err)
-	}
-
-	expectedXMLString := `<w:tcBorders></w:tcBorders>`
-	if string(xmlData) != expectedXMLString {
-		t.Errorf("Expected XML string %s, got %s", expectedXMLString, string(xmlData))
+	for _, tt := range tests {
+		object := wrapCellBordersXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+		})
 	}
 }
 

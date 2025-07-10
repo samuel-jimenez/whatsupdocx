@@ -1,8 +1,6 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
@@ -39,16 +37,17 @@ import (
 type SectionProp struct {
 	// TODO
 	// w_AG_SectPrAttributes,
-	// w_AG_SectPrAttributes =
-	// attribute w:rsidRPr { w_ST_LongHexNumber }?,
-	// attribute w:rsidDel { w_ST_LongHexNumber }?,
-	// attribute w:rsidR { w_ST_LongHexNumber }?,
-	// attribute w:rsidSect { w_ST_LongHexNumber }?
+	// 		// w_AG_SectPrAttributes =
+	// 		// attribute w:rsidRPr { w_ST_LongHexNumber }?,
+	// 		// attribute w:rsidDel { w_ST_LongHexNumber }?,
+	// 		// attribute w:rsidR { w_ST_LongHexNumber }?,
+	// 		// attribute w:rsidSect { w_ST_LongHexNumber }?
+	//
 
 	// w_EG_HdrFtrReferences*,
-	// w_EG_HdrFtrReferences =
-	// element headerReference { w_CT_HdrFtrRef }?
-	// | element footerReference { w_CT_HdrFtrRef }?
+	// // w_EG_HdrFtrReferences =
+	// // element headerReference { w_CT_HdrFtrRef }?
+	// // | element footerReference { w_CT_HdrFtrRef }?
 	HeaderReference *HeaderFooterReference `xml:"w:headerReference,omitempty"`
 	FooterReference *HeaderFooterReference `xml:"w:footerReference,omitempty"`
 
@@ -93,113 +92,4 @@ type SectionProp struct {
 
 func NewSectionProper() *SectionProp {
 	return &SectionProp{}
-}
-
-func (s SectionProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:sectPr"
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// w_EG_HdrFtrReferences*,
-	// w_EG_HdrFtrReferences =
-	// element headerReference { w_CT_HdrFtrRef }?
-	// | element footerReference { w_CT_HdrFtrRef }?
-	if s.HeaderReference != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:headerReference"}}
-		if err = e.EncodeElement(s.HeaderReference, propsElement); err != nil {
-			return err
-		}
-	}
-
-	if s.FooterReference != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:footerReference"}}
-		if err = e.EncodeElement(s.FooterReference, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// element footnotePr { w_CT_FtnProps }?,
-	// element endnotePr { w_CT_EdnProps }?,
-	// element type { w_CT_SectType }?,
-	if s.Type != nil {
-		if err := s.Type.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:type"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// element pgSz { w_CT_PageSz }?,
-	if s.PageSize != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:pgSz"}}
-		if err = e.EncodeElement(s.PageSize, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// element pgMar { w_CT_PageMar }?,
-	if s.PageMargin != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:pgBorders"}}
-		if err = e.EncodeElement(s.PageMargin, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// element paperSrc { w_CT_PaperSource }?,
-	// element pgBorders { w_CT_PageBorders }?,
-	if s.PageBorders != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:pgBorders"}}
-		if err = e.EncodeElement(s.PageBorders, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// element lnNumType { w_CT_LineNumber }?,
-	// element pgNumType { w_CT_PageNumber }?,
-
-	// element cols { w_CT_Columns }?,
-	// element formProt { w_CT_OnOff }?,
-	if s.FormProt != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:formProt"}}
-		if err = s.FormProt.MarshalXML(e, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// element vAlign { w_CT_VerticalJc }?,
-	// element noEndnote { w_CT_OnOff }?,
-	// element titlePg { w_CT_OnOff }?,
-	if s.TitlePg != nil {
-		if err = s.TitlePg.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:titlePg"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// element textDirection { w_CT_TextDirection }?,
-	if s.TextDir != nil {
-		if s.TextDir.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "w:textDirection"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	// element bidi { w_CT_OnOff }?,
-	// element rtlGutter { w_CT_OnOff }?,
-	// element docGrid { w_CT_DocGrid }?,
-	if s.DocGrid != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "w:docGrid"}}
-		if err = e.EncodeElement(s.DocGrid, propsElement); err != nil {
-			return err
-		}
-	}
-
-	// element printerSettings { w_CT_Rel }?
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

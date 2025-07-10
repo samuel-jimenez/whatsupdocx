@@ -1,12 +1,44 @@
 package docx
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
+	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+func assertParaText(t *testing.T, para *ctypes.Paragraph, expected string) {
+	t.Helper()
+
+	assert.NotNil(t, para)
+	assert.GreaterOrEqual(t, len(para.Children), 1)
+	run := para.Children[0].Run
+	assert.NotNil(t, run)
+	assert.GreaterOrEqual(t, len(run.Children), 1)
+	text := run.Children[0].Text
+	assert.NotNil(t, text)
+
+	assert.Equal(t, text.Text, expected)
+
+}
+
+func TestAddParagraph(t *testing.T) {
+	rd := setupRootDoc(t)
+	para := rd.AddParagraph("Test paragraph")
+	assertParaText(t, para, "Test paragraph")
+}
+
+func TestEmptyParagraph(t *testing.T) {
+	rd := setupRootDoc(t)
+	para := rd.AddEmptyParagraph()
+	para.AddText("Test paragraph")
+	assertParaText(t, para, "Test paragraph")
+}
 
 func TestDocument_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -17,13 +49,14 @@ func TestDocument_MarshalXML(t *testing.T) {
 		{
 			name: "With Background and Body",
 			input: Document{
+				Attr: constants.DefaultNamespacesDoc,
 				Background: &Background{
 					Color:      StringPtr("FF0000"),
 					ThemeColor: ThemeColorPtr(stypes.ThemeColorAccent1),
 					ThemeTint:  StringPtr("500"),
 					ThemeShade: StringPtr("200"),
 				},
-				Body: &Body{},
+				Body: &ctypes.Body{},
 			},
 			expected: []string{
 				`xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"`,
@@ -50,7 +83,7 @@ func TestDocument_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{Name: xml.Name{Local: "w:document"}}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}

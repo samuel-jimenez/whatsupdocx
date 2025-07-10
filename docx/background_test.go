@@ -1,22 +1,54 @@
 package docx
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
+	"reflect"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+// TODO move
+type WrapperXML struct {
+	XMLName struct{}   `xml:"testwrapper"`
+	Attr    []xml.Attr `xml:",any,attr,omitempty"`
+	Element any
+}
+
+func wrapXML(el any) *WrapperXML {
+	return &WrapperXML{
+		Attr: []xml.Attr{constants.NameSpaceWordprocessingML,
+			constants.NameSpaceR,
+		},
+		Element: el,
+	}
+}
+
+func wrapXMLOutput(output string) string {
+	return `<testwrapper` +
+		` xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"` +
+		` xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"` +
+		`>` + output + `</testwrapper>`
+}
+
+func wrapBackgroundXML(el *Background) *WrapperXML {
+	return wrapXML(struct {
+		*Background
+		XMLName struct{} `xml:"w:background"`
+	}{Background: el})
+}
 
 func TestBackground_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    Background
+		input    *Background
 		expected string
 	}{
 		{
 			name: "With all attributes",
-			input: Background{
+			input: &Background{
 				Color:      StringPtr("FFFFFF"),
 				ThemeColor: ThemeColorPtr(stypes.ThemeColorAccent1),
 				ThemeTint:  StringPtr("500"),
@@ -26,7 +58,7 @@ func TestBackground_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Without optional attributes",
-			input: Background{
+			input: &Background{
 				Color: StringPtr("000000"),
 			},
 			expected: `<w:background w:color="000000"></w:background>`,
@@ -34,21 +66,37 @@ func TestBackground_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapBackgroundXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:background"}}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+			// //TODO
+			// 	//TestDocGrid_UnmarshalXML_NoAttributes     Expected:
+			//              // &{{} [{{ xmlns:w} http://schemas.openxmlformats.org/wordprocessingml/2006/main} {{ xmlns:r} http://schemas.openxmlformats.org/officeDocument/2006/relationships}] {{ %!s(*int=<nil>) %!s(*int=<nil>)} {}}}
+			//              // Actual:
+			//              // &{{} [{{http://www.w3.org/2000/xmlns/ w} http://schemas.openxmlformats.org/wordprocessingml/2006/main} {{http://www.w3.org/2000/xmlns/ r} http://schemas.openxmlformats.org/officeDocument/2006/relationships}] <nil>}
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expected = tt.expected
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expected), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nExpected:\n%v\nActual:\n%v", tt.expected, want, got)
+				}
 
-			err := tt.input.MarshalXML(encoder, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
-			}
+			})
 		})
 	}
 }

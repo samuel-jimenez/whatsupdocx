@@ -46,7 +46,7 @@ func TestRelativeRect_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 
 			start := xml.StartElement{Name: xml.Name{Local: "RelativeRect"}}
-			if err := tt.input.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.input, start); err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
@@ -54,7 +54,7 @@ func TestRelativeRect_MarshalXML(t *testing.T) {
 
 			got := strings.TrimSpace(result.String())
 			if got != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, got)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, got)
 			}
 		})
 	}

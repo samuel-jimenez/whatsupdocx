@@ -1,13 +1,15 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
 
+// TODO fix this
 type WrapNone struct {
 	XMLName xml.Name `xml:"wrapNone"`
 }

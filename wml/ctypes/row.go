@@ -52,3 +52,14 @@ type TRCellContent struct {
 //
 // w_CT_SdtContentRow = w_EG_ContentRowContent*
 //
+
+// Add Cell to row and returns Cell
+func (r *Row) AddCell() *Cell {
+	cell := *DefaultCell()
+
+	r.Contents = append(r.Contents, TRCellContent{
+		Cell: &cell,
+	})
+
+	return &cell
+}

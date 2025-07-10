@@ -10,6 +10,13 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+func wrapCellPropertyXML(el CellProperty) *WrapperXML {
+	return wrapXML(struct {
+		CellProperty
+		XMLName struct{} `xml:"w:tcPr"`
+	}{CellProperty: el})
+}
+
 func TestCellProperty_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -73,23 +80,18 @@ func TestCellProperty_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapCellPropertyXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-
-			start := xml.StartElement{Name: xml.Name{Local: "w:tcPr"}}
-			if err := encoder.EncodeElement(tt.input, start); err != nil {
-				// if err := tt.input.MarshalXML(encoder, start); err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			got := strings.TrimSpace(result.String())
-			if got != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, got)
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
 		})
 	}
 }

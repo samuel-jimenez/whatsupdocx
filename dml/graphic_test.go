@@ -1,8 +1,9 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
@@ -12,14 +13,47 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/dml/shapes"
 )
 
+type WrapperXML struct {
+	XMLName struct{}   `xml:"testwrapper"`
+	Attr    []xml.Attr `xml:",any,attr,omitempty"`
+	Element any
+}
+
+func wrapXML(el any) *WrapperXML {
+	return &WrapperXML{
+		Attr: []xml.Attr{
+			constants.NameSpaceDrawingMLPic,
+			constants.NameSpaceR,
+		},
+		Element: el,
+	}
+}
+
+func wrapXMLOutput(output string) string {
+	return `<testwrapper` +
+		` xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"` +
+		` xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"` +
+		`>` + output + `</testwrapper>`
+}
+
+func wrapGraphicXML(el *Graphic) *WrapperXML {
+	return wrapXML(struct {
+		*Graphic
+		XMLName struct{} `xml:"a:graphic"`
+	}{Graphic: el})
+}
+
 func TestMarshalGraphic(t *testing.T) {
 	tests := []struct {
-		graphic     *Graphic
+		name        string
+		input       *Graphic
 		expectedXML string
 		xmlName     string
 	}{
 		{
-			graphic: NewPicGraphic(&dmlpic.Pic{
+			name: "All Attributes",
+			input: NewPicGraphic(&dmlpic.Pic{
+				Attr: []xml.Attr{constants.NameSpaceDrawingMLPic},
 				NonVisualPicProp: dmlpic.NonVisualPicProp{
 					CNvPr: dmlct.CNvPr{
 						ID:          1,
@@ -63,22 +97,55 @@ func TestMarshalGraphic(t *testing.T) {
 			xmlName:     "a:graphic",
 		},
 		{
-			graphic:     DefaultGraphic(),
+			name:        "DefaultGraphic",
+			input:       DefaultGraphic(),
 			expectedXML: `<a:graphic xmlns:a="` + constants.DrawingMLMainNS + `"></a:graphic>`,
 			xmlName:     "a:graphic",
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.xmlName, func(t *testing.T) {
-			generatedXML, err := xml.Marshal(tt.graphic)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
-			}
+		object := wrapGraphicXML(tt.input)
+		expected := wrapXMLOutput(tt.expectedXML)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			})
+			//TODO UnmarshalXML_TOO_3
+			//                 // Expected:
+			//              // {"DrawingMLMainNS":"http://schemas.openxmlformats.org/drawingml/2006/main","Data":{"URI":"http://schemas.openxmlformats.org/drawingml/2006/picture","Pic":{"Attr":[{"Name":{"Space":"","Local":"xmlns:pic"},"Value":"http://schemas.openxmlformats.org/drawingml/2006/picture"}],"NonVisualPicProp":{"CNvPr":{"ID":1,"Name":"Pic 1","Description":"Description","Hidden":null},"CNvPicPr":{"PreferRelativeResize":null,"PicLocks":{"DisallowShadowGrouping":{"Bool":false,"Valid":false},"NoSelect":{"Bool":false,"Valid":false},"NoRot":{"Bool":false,"Valid":false},"NoChangeAspect":{"Bool":true,"Valid":true},"NoMove":{"Bool":false,"Valid":false},"NoResize":{"Bool":false,"Valid":false},"NoEditPoints":{"Bool":false,"Valid":false},"NoAdjustHandles":{"Bool":false,"Valid":false},"NoChangeArrowheads":{"Bool":true,"Valid":true},"NoChangeShapeType":{"Bool":false,"Valid":false},"NoCrop":{"Bool":false,"Valid":false}}}},"BlipFill":{"Blip":{"EmbedID":"rId1"},"SrcRect":null,"FillModeProps":{"Stretch":{"FillRect":{"Top":null,"Left":null,"Bottom":null,"Right":null}},"Tile":null},"DPI":null,"RotWithShape":null},"PicShapeProp":{"BwMode":null,"TransformGroup":{"Offset":{"X":0,"Y":0},"Extent":{"Width":100000,"Height":100000}},"PresetGeometry":{"Preset":"rect","AdjustValues":null},"LineProperties":null}},"Shape":null}}
+			//              // Actual:
+			//              // {"DrawingMLMainNS":"http://schemas.openxmlformats.org/drawingml/2006/main","Data":{"URI":"http://schemas.openxmlformats.org/drawingml/2006/picture","Pic":{"Attr":[{"Name":{"Space":"http://www.w3.org/2000/xmlns/","Local":"pic"},"Value":"http://schemas.openxmlformats.org/drawingml/2006/picture"}],"NonVisualPicProp":{"CNvPr":{"ID":1,"Name":"Pic 1","Description":"Description","Hidden":null},"CNvPicPr":{"PreferRelativeResize":null,"PicLocks":{"DisallowShadowGrouping":{"Bool":false,"Valid":false},"NoSelect":{"Bool":false,"Valid":false},"NoRot":{"Bool":false,"Valid":false},"NoChangeAspect":{"Bool":true,"Valid":true},"NoMove":{"Bool":false,"Valid":false},"NoResize":{"Bool":false,"Valid":false},"NoEditPoints":{"Bool":false,"Valid":false},"NoAdjustHandles":{"Bool":false,"Valid":false},"NoChangeArrowheads":{"Bool":true,"Valid":true},"NoChangeShapeType":{"Bool":false,"Valid":false},"NoCrop":{"Bool":false,"Valid":false}}}},"BlipFill":{"Blip":{"EmbedID":"rId1"},"SrcRect":null,"FillModeProps":{"Stretch":null,"Tile":null},"DPI":null,"RotWithShape":null},"PicShapeProp":{"BwMode":null,"TransformGroup":{"Offset":{"X":0,"Y":0},"Extent":{"Width":100000,"Height":100000}},"PresetGeometry":{"Preset":"rect","AdjustValues":null},"LineProperties":null}},"Shape":null}}
+			// t.Run("UnMarshalXML", func(t *testing.T) {
+			// 	object := tt.input
+			// 	expected = tt.expectedXML
+			// 	vt := reflect.TypeOf(object)
+			// 	dest := reflect.New(vt.Elem()).Interface()
+			// 	err := xml.Unmarshal([]byte(expected), dest)
+			// 	if err != nil {
+			// 		t.Fatalf("Error unmarshaling from XML: %v", err)
+			// 	}
+			// 	//TODO UnmarshalXML_TOO
+			//
+			// 	if got, want := dest, object; !reflect.DeepEqual(got, want) {
+			// 		//TODO
+			// 		// t.Errorf("XML mismatch unmarshal(%s):\nExpected:\n%#v\nActual:\n%#+v", tt.expectedXML, want, got)
+			//
+			// 		// TODO spew.Dump(raspberry)
+			// 		// "github.com/davecgh/go-spew/spew"
+			// 		// gosamples.dev/print-struct-variables/
+			// 		want_j, _ := json.Marshal(want)
+			// 		got_j, _ := json.Marshal(got)
+			// 		t.Errorf("XML mismatch unmarshal(%s):\nExpected:\n%s\nActual:\n%s", tt.expectedXML, want_j, got_j)
+			// 	}
+			//
+			// })
 		})
 	}
 }

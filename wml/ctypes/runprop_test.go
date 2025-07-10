@@ -1,10 +1,11 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
+	"github.com/samuel-jimenez/xml"
 )
 
 func optBoolElemPtr(value OnOff) *OnOff {
@@ -23,16 +24,31 @@ func singleStrValPtr(value CTString) *CTString {
 	return &value
 }
 
+type RunPropertyXML struct {
+	Attr    xml.Attr    `xml:",any,attr,omitempty"`
+	Element RunProperty `xml:"w:rPr"`
+}
+
+func wrapRunPropertyXML(el RunProperty) *RunPropertyXML {
+	return &RunPropertyXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapRunPropertyOutput(output string) string {
+	return `<RunPropertyXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</RunPropertyXML>`
+}
+
 func TestRunProperty_MarshalXML(t *testing.T) {
 	// trueOptBool := types.NewOptBool(true)
 	tests := []struct {
 		name     string
-		prop     RunProperty
+		input    RunProperty
 		expected string
 	}{
 		{
 			name: "All attributes set",
-			prop: RunProperty{
+			input: RunProperty{
 				Bold:         optBoolElemPtr(OnOff{}),
 				BoldCS:       optBoolElemPtr(OnOff{}),
 				Italic:       optBoolElemPtr(OnOff{}),
@@ -62,30 +78,27 @@ func TestRunProperty_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Only Bold set",
-			prop: RunProperty{
+			input: RunProperty{
 				Bold: optBoolElemPtr(OnOff{}),
 			},
 			expected: `<w:rPr><w:b></w:b></w:rPr>`,
 		},
 		{
 			name:     "No attributes set",
-			prop:     RunProperty{},
+			input:    RunProperty{},
 			expected: `<w:rPr></w:rPr>`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			e := xml.NewEncoder(&result)
-			err := tt.prop.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:rPr"}})
+			output, err := xml.Marshal(wrapRunPropertyXML(tt.input))
+			expected := wrapRunPropertyOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-			e.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

@@ -1,10 +1,23 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 )
+
+func wrapFontSizeXML(el FontSize) *WrapperXML {
+	return wrapXML(struct {
+		FontSize
+		XMLName struct{} `xml:"w:sz"`
+	}{FontSize: el})
+}
+func wrapFontSizeCSXML(el FontSize) *WrapperXML {
+	return wrapXML(struct {
+		FontSize
+		XMLName struct{} `xml:"w:szCs"`
+	}{FontSize: el})
+}
 
 func TestFontSize_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -26,20 +39,13 @@ func TestFontSize_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:sz"}}
-
-			err := tt.input.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapFontSizeXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}
@@ -82,37 +88,29 @@ func TestFontSize_UnmarshalXML(t *testing.T) {
 func TestFontSizeCS_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    FontSizeCS
+		input    FontSize
 		expected string
 	}{
 		{
 			name:     "With value",
-			input:    *NewFontSizeCS(24),
+			input:    *NewFontSize(24),
 			expected: `<w:szCs w:val="24"></w:szCs>`,
 		},
 		{
 			name:     "Without value",
-			input:    FontSizeCS{},
+			input:    FontSize{},
 			expected: `<w:szCs w:val="0"></w:szCs>`,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:szCs"}}
-
-			err := tt.input.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapFontSizeCSXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}
@@ -122,23 +120,23 @@ func TestFontSizeCS_UnmarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
 		inputXML string
-		expected FontSizeCS
+		expected FontSize
 	}{
 		{
 			name:     "With value",
 			inputXML: `<w:szCs w:val="24"></w:szCs>`,
-			expected: FontSizeCS{Value: 24},
+			expected: FontSize{Value: 24},
 		},
 		{
 			name:     "Without value",
 			inputXML: `<w:szCs></w:szCs>`,
-			expected: FontSizeCS{Value: 0},
+			expected: FontSize{Value: 0},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result FontSizeCS
+			var result FontSize
 
 			err := xml.Unmarshal([]byte(tt.inputXML), &result)
 			if err != nil {

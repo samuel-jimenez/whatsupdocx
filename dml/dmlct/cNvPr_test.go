@@ -34,7 +34,7 @@ func TestMarshalCNvPr(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 
 			start := xml.StartElement{Name: xml.Name{Local: "pic:cNvPr"}}
-			err := tt.cnvpr.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.cnvpr, start)
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -45,7 +45,7 @@ func TestMarshalCNvPr(t *testing.T) {
 			}
 
 			if result.String() != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, result.String())
 			}
 		})
 	}

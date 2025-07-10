@@ -1,22 +1,10 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+// w_CT_TextEffect = attribute w:val { w_ST_TextEffect }
 type Effect struct {
-	Val *stypes.TextEffect `xml:"val,attr,omitempty"`
-}
-
-// MarshalXML implements the xml.Marshaler interface for the Effect type.
-// It encodes the instance into XML using the "w:XMLName" element with a "w:val" attribute.
-func (eff Effect) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if eff.Val != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: string(*eff.Val)})
-	}
-	err := e.EncodeElement("", start)
-
-	return err
+	Val *stypes.TextEffect `xml:"w:val,attr,omitempty"`
 }

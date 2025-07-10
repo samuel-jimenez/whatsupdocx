@@ -1,43 +1,70 @@
 package dmlpic
 
 import (
-	"github.com/samuel-jimenez/xml"
+	"reflect"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 )
 
-func TestMarshalPicShapeProp(t *testing.T) {
+func wrapPicShapePropXML(el *PicShapeProp) *WrapperXML {
+	return wrapXML(struct {
+		*PicShapeProp
+		XMLName struct{} `xml:"pic:spPr"`
+	}{PicShapeProp: el})
+}
+
+func TestPicShapeProp_MarshalXML(t *testing.T) {
 	bwMode := BlackWhiteModeGray
 
 	tests := []struct {
-		picShapeProp *PicShapeProp
-		expectedXML  string
-	}{
-		{
-			picShapeProp: &PicShapeProp{
-				BwMode:         &bwMode,
-				TransformGroup: &TransformGroup{},
-				PresetGeometry: &PresetGeometry{
-					Preset: "rect",
-				},
+		name     string
+		input    *PicShapeProp
+		expected string
+	}{{
+		name: "With attributes",
+		input: &PicShapeProp{
+			BwMode:         &bwMode,
+			TransformGroup: &TransformGroup{},
+			PresetGeometry: &PresetGeometry{
+				Preset: "rect",
 			},
-			expectedXML: `<pic:spPr bwMode="gray"><a:xfrm></a:xfrm><a:prstGeom prst="rect"></a:prstGeom></pic:spPr>`,
 		},
+		expected: `<pic:spPr bwMode="gray"><a:xfrm></a:xfrm><a:prstGeom prst="rect"></a:prstGeom></pic:spPr>`,
+	},
 		{
-			picShapeProp: &PicShapeProp{},
-			expectedXML:  `<pic:spPr></pic:spPr>`,
+			name:     "Empty",
+			input:    &PicShapeProp{},
+			expected: `<pic:spPr></pic:spPr>`,
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.expectedXML, func(t *testing.T) {
-			generatedXML, err := xml.Marshal(tt.picShapeProp)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
-			}
+		object := wrapPicShapePropXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%v\nActual:\n%v", expected, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expected = tt.expected
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expected), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nExpected:\n%v\nActual:\n%v", tt.expected, want, got)
+				}
+			})
 		})
 	}
 }

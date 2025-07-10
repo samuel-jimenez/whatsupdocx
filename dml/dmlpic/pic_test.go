@@ -1,68 +1,127 @@
 package dmlpic
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlprops"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 	"github.com/samuel-jimenez/whatsupdocx/dml/shapes"
 )
 
-func TestPicMarshalXML(t *testing.T) {
-	p := &Pic{
-		NonVisualPicProp: NonVisualPicProp{
-			CNvPr: dmlct.CNvPr{
-				ID:          1,
-				Name:        "Pic 1",
-				Description: "Description",
-			},
-			CNvPicPr: CNvPicPr{
-				PicLocks: &dmlprops.PicLocks{
-					NoChangeAspect:     dmlst.NewOptBool(true),
-					NoChangeArrowheads: dmlst.NewOptBool(true),
-				},
-			},
+type WrapperXML struct {
+	XMLName struct{}   `xml:"testwrapper"`
+	Attr    []xml.Attr `xml:",any,attr,omitempty"`
+	Element any
+}
+
+func wrapXML(el any) *WrapperXML {
+	return &WrapperXML{
+		Attr: []xml.Attr{
+			constants.NameSpaceDrawingMLPic,
+			constants.NameSpaceR,
 		},
-		BlipFill: BlipFill{
-			Blip: &Blip{
-				EmbedID: "rId1",
-			},
-			FillModeProps: FillModeProps{
-				Stretch: &shapes.Stretch{
-					FillRect: &dmlct.RelativeRect{},
-				},
-			},
-		},
-		PicShapeProp: PicShapeProp{
-			TransformGroup: &TransformGroup{
-				Offset: &Offset{
-					X: 0,
-					Y: 0,
-				},
-				Extent: &dmlct.PSize2D{
-					Width:  100000,
-					Height: 100000,
-				},
-			},
-			PresetGeometry: &PresetGeometry{
-				Preset: "rect",
-			},
-		},
+		Element: el,
 	}
+}
 
-	// Expected XML output
-	expectedXML := `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Pic 1" descr="Description"></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"></a:picLocks></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId1"></a:blip><a:stretch><a:fillRect></a:fillRect></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"></a:off><a:ext cx="100000" cy="100000"></a:ext></a:xfrm><a:prstGeom prst="rect"></a:prstGeom></pic:spPr></pic:pic>`
+func wrapXMLOutput(output string) string {
+	return `<testwrapper` +
+		` xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"` +
+		` xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"` +
+		`>` + output + `</testwrapper>`
+}
 
-	output, err := xml.Marshal(p)
-	if err != nil {
-		t.Fatalf("Error marshaling Pic to XML: %v", err)
-	}
+func wrapPicXML(el *Pic) *WrapperXML {
+	return wrapXML(struct {
+		*Pic
+		XMLName struct{} `xml:"pic:pic"`
+	}{Pic: el})
+}
 
-	if strings.TrimSpace(string(output)) != strings.TrimSpace(expectedXML) {
-		t.Errorf("Generated XML does not match expected XML.\nExpected:\n%s\nGenerated:\n%s", expectedXML, output)
+func TestPic_MarshalXML(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    *Pic
+		expected string
+	}{{
+		name: "",
+		input: &Pic{
+			Attr: []xml.Attr{constants.NameSpaceDrawingMLPic},
+			NonVisualPicProp: NonVisualPicProp{
+				CNvPr: dmlct.CNvPr{
+					ID:          1,
+					Name:        "Pic 1",
+					Description: "Description",
+				},
+				CNvPicPr: CNvPicPr{
+					PicLocks: &dmlprops.PicLocks{
+						NoChangeAspect:     dmlst.NewOptBool(true),
+						NoChangeArrowheads: dmlst.NewOptBool(true),
+					},
+				},
+			},
+			BlipFill: BlipFill{
+				Blip: &Blip{
+					EmbedID: "rId1",
+				},
+				FillModeProps: FillModeProps{
+					Stretch: &shapes.Stretch{
+						FillRect: &dmlct.RelativeRect{},
+					},
+				},
+			},
+			PicShapeProp: PicShapeProp{
+				TransformGroup: &TransformGroup{
+					Offset: &Offset{
+						X: 0,
+						Y: 0,
+					},
+					Extent: &dmlct.PSize2D{
+						Width:  100000,
+						Height: 100000,
+					},
+				},
+				PresetGeometry: &PresetGeometry{
+					Preset: "rect",
+				},
+			},
+		},
+		expected: `<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="Pic 1" descr="Description"></pic:cNvPr><pic:cNvPicPr><a:picLocks noChangeAspect="1" noChangeArrowheads="1"></a:picLocks></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId1"></a:blip><a:stretch><a:fillRect></a:fillRect></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"></a:off><a:ext cx="100000" cy="100000"></a:ext></a:xfrm><a:prstGeom prst="rect"></a:prstGeom></pic:spPr></pic:pic>`,
+	}}
+
+	for _, tt := range tests {
+		object := wrapPicXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+			// t.Run("UnMarshalXML", func(t *testing.T) {
+			// 	object := tt.input
+			// 	expected = tt.expected
+			// 	vt := reflect.TypeOf(object)
+			// 	dest := reflect.New(vt.Elem()).Interface()
+			// 	err := xml.Unmarshal([]byte(expected), dest)
+			// 	if err != nil {
+			// 		t.Fatalf("Error unmarshaling from XML: %v", err)
+			// 	}
+			// 	if got, want := dest, object; !reflect.DeepEqual(got, want) {
+			// 		t.Errorf("XML mismatch unmarshal(%s):\nExpected:\n%v\nActual:\n%v", tt.expected, want, got)
+			// 	}
+			//
+			// })
+		})
 	}
 }
 

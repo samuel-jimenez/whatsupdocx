@@ -9,10 +9,22 @@ import (
 )
 
 // This element specifies that the DrawingML object located at this position in the document is an inline object. Within a WordprocessingML document, drawing objects can exist in two states:
-//
-//• Inline - The drawing object is in line with the text, and affects the line height and layout of its line (like a character glyph of similar size).
-
+// CT_Inline
+// §A.4.4
+// • Inline - The drawing object is in line with the text, and affects the line height and layout of its line (like a character glyph of similar size).
+// wp_CT_Inline =
+// attribute distT { wp_ST_WrapDistance }?,
+// attribute distB { wp_ST_WrapDistance }?,
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element extent { a_CT_PositiveSize2D },
+// element effectExtent { wp_CT_EffectExtent }?,
+// element docPr { a_CT_NonVisualDrawingProps },
+// element cNvGraphicFramePr { a_CT_NonVisualGraphicFrameProperties }?,
+// a_graphic
 type Inline struct {
+	Attr []xml.Attr `xml:",any,attr,omitempty"`
+
 	/// Specifies the minimum distance which shall be maintained between the top edge of this drawing object and any subsequent text within the document when this graphical object is displayed within the document's contents.,
 	/// The distance shall be measured in EMUs (English Mektric Units).,
 	//
@@ -30,8 +42,6 @@ type Inline struct {
 
 	//Distance From Text on Right Edge
 	DistR uint `xml:"distR,attr"`
-
-	Attr []xml.Attr `xml:",any,attr,omitempty"`
 
 	// Child elements:
 	// 1. Drawing Object Size

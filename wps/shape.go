@@ -21,7 +21,7 @@ type Shape struct {
 
 	// (element cNvSpPr { a_CT_NonVisualDrawingShapeProps }
 	// | element cNvCnPr { a_CT_NonVisualConnectorProperties }),
-	NonVisualProps NonVisualProps
+	NonVisualProps NonVisualProps `xml:",group"`
 
 	// 3.Shape Properties
 	// element spPr { a_CT_ShapeProperties },
@@ -35,7 +35,7 @@ type Shape struct {
 
 	// (element txbx { wp_CT_TextboxInfo }
 	// | element linkedTxbx { wp_CT_LinkedTextboxInformation })?,
-	ShapeTextboxInfo *ShapeTextboxInfo `xml:",any,omitempty"`
+	ShapeTextboxInfo *ShapeTextboxInfo `xml:",group,any,omitempty"`
 
 	// element bodyPr { a_CT_TextBodyProperties}
 	BodyPr TextBodyProperties `xml:"wps:bodyPr"` //element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the body properties for the text body in a shape.

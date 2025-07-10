@@ -1,26 +1,65 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
-func TestBreakMarshaling(t *testing.T) {
-	breakType := stypes.BreakTypePage
-	br := NewBreak(breakType)
+func wrapBreakXML(el *Break) *WrapperXML {
+	return wrapXML(struct {
+		*Break
+		XMLName struct{} `xml:"w:br"`
+	}{Break: el})
+}
 
-	expectedXML := `<w:br w:type="page"></w:br>`
+func TestBreak_MarshalXML(t *testing.T) {
+	breakTypePage := stypes.BreakTypePage
+	breakTypeColumn := stypes.BreakTypeColumn
+	breakClearAll := stypes.BreakClearAll
+
+	tests := []struct {
+		name     string
+		input    *Break
+		expected string
+	}{
+		{
+			name: "With all attributes",
+			input: &Break{
+				BreakType: &breakTypeColumn,
+				Clear:     &breakClearAll,
+			},
+			expected: `<w:br w:type="column" w:clear="all"></w:br>`,
+		}, {
+			name:     "BreakTypePage",
+			input:    NewBreak(breakTypePage),
+			expected: `<w:br w:type="page"></w:br>`,
+		}}
+
+	for _, tt := range tests {
+		object := wrapBreakXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+		})
+	}
+
+	//TODO
+	br := NewBreak(breakTypePage)
 
 	xmlData, err := xml.Marshal(br)
 	if err != nil {
 		t.Fatalf("Error marshaling Break to XML: %v", err)
-	}
-
-	if strings.TrimSpace(string(xmlData)) != expectedXML {
-		t.Errorf("Unexpected XML output. Expected:\n%s\nGot:\n%s", expectedXML, string(xmlData))
 	}
 
 	var unmarshalledBreak Break

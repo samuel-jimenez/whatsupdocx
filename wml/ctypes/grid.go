@@ -1,40 +1,16 @@
 package ctypes
 
-import (
-	"github.com/samuel-jimenez/xml"
-	"fmt"
-)
-
 // Table Grid
+// w_CT_TblGridBase = element gridCol { w_CT_TblGridCol }*
+// w_CT_TblGrid =
+// w_CT_TblGridBase,
+// element tblGridChange { w_CT_TblGridChange }?
 type Grid struct {
 	//1. Grid Column Definition
-	Col []Column `xml:"gridCol,omitempty"`
+	// element gridCol { w_CT_TblGridCol }*
+	Col []Column `xml:"w:gridCol,omitempty"`
 
 	//2.Revision Information for Table Grid Column Definitions
-	GridChange *GridChange `xml:"tblGridChange,omitempty"`
-}
-
-func (g Grid) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "w:tblGrid"
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	//1. Grid Column Definition
-	for _, col := range g.Col {
-		if err := col.MarshalXML(e, xml.StartElement{}); err != nil {
-			return fmt.Errorf("table grid marshalling column: %w", err)
-		}
-	}
-
-	//2.Revision Information for Table Grid Column Definitions
-	if g.GridChange != nil {
-		if err := g.GridChange.MarshalXML(e, xml.StartElement{}); err != nil {
-			return fmt.Errorf("table grid marshalling gridchange : %w", err)
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
+	// element tblGridChange { w_CT_TblGridChange }?
+	GridChange *GridChange `xml:"w:tblGridChange,omitempty"`
 }

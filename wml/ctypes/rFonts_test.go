@@ -1,37 +1,63 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
-func TestRunFontsMarshalXML(t *testing.T) {
-	rf := RunFonts{
-		Hint:          stypes.FontTypeHintDefault,
-		Ascii:         "Arial",
-		HAnsi:         "Calibri",
-		EastAsia:      "SimSun",
-		CS:            "Arial",
-		AsciiTheme:    stypes.ThemeFontMajorAscii,
-		HAnsiTheme:    stypes.ThemeFontMajorHAnsi,
-		EastAsiaTheme: stypes.ThemeFontMajorEastAsia,
-		CSTheme:       stypes.ThemeFontMajorBidi,
+type RunFontsXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element RunFonts `xml:"w:val"`
+}
+
+func wrapRunFontsXML(el RunFonts) *RunFontsXML {
+	return &RunFontsXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapRunFontsOutput(output string) string {
+	return `<RunFontsXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</RunFontsXML>`
+}
+
+func TestRunFonts_MarshalXML(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    RunFonts
+		expected string
+	}{
+		{
+			name: "Base",
+			input: RunFonts{
+				Hint:          stypes.FontTypeHintDefault,
+				Ascii:         "Arial",
+				HAnsi:         "Calibri",
+				EastAsia:      "SimSun",
+				CS:            "Arial",
+				AsciiTheme:    stypes.ThemeFontMajorAscii,
+				HAnsiTheme:    stypes.ThemeFontMajorHAnsi,
+				EastAsiaTheme: stypes.ThemeFontMajorEastAsia,
+				CSTheme:       stypes.ThemeFontMajorBidi,
+			},
+			expected: `<w:rFonts w:eastAsia="SimSun" w:hint="default" w:ascii="Arial" w:hAnsi="Calibri" w:cs="Arial" w:asciiTheme="majorAscii" w:hAnsiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"></w:rFonts>`,
+		},
 	}
 
-	var output strings.Builder
-	encoder := xml.NewEncoder(&output)
-	err := rf.MarshalXML(encoder, xml.StartElement{})
-	if err != nil {
-		t.Fatalf("Error marshaling XML: %v", err)
-	}
-	encoder.Flush()
-
-	expected := `<w:rFonts w:eastAsia="SimSun" w:hint="default" w:ascii="Arial" w:hAnsi="Calibri" w:cs="Arial" w:asciiTheme="majorAscii" w:hAnsiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:cstheme="majorBidi"></w:rFonts>`
-	if output.String() != expected {
-		t.Errorf("Expected %s but got %s", expected, output.String())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output, err := xml.Marshal(wrapRunFontsXML(tt.input))
+			expected := wrapRunFontsOutput(tt.expected)
+			if err != nil {
+				t.Fatalf("Error marshaling to XML: %v", err)
+			}
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+			}
+		})
 	}
 }
 

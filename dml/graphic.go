@@ -59,29 +59,6 @@ func NewShapeGraphic(shape *wps.Shape) *Graphic {
 	}
 }
 
-func (g Graphic) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-
-	start.Name.Local = "a:graphic"
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "xmlns:a"}, Value: constants.DrawingMLMainNS},
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if g.Data != nil {
-		// if err := e.EncodeElement(g.Data, xml.StartElement{Name: xml.Name{Local: "a:graphicData"}}); err != nil {
-
-		if err = g.Data.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "a:graphicData"}}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
-
 func (gd GraphicData) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	start.Attr = []xml.Attr{

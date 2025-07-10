@@ -33,25 +33,6 @@ type Run struct {
 	Children []RunChild `xml:",group,any,omitempty"`
 }
 
-// Appends a new text to the run.
-// Example:
-//
-//	run.AddText("Hello, World!")
-//
-// Parameters:
-//   - text: A string representing the text to be added to the Run.
-func (run *Run) AddText(text string) {
-	t := TextFromString(text)
-	run.Children = append(run.Children, RunChild{
-		Text: t,
-	})
-}
-
-// Clears the run's children.
-func (run *Run) Clear() {
-	run.Children = nil
-}
-
 // w_EG_RunInnerContent =
 type RunChild struct {
 
@@ -178,6 +159,234 @@ func NewRun() *Run {
 	return &Run{}
 }
 
+// Sym represents a symbol character in a document.
+// w_CT_Sym
+// w_CT_Sym =
+type Sym struct {
+	// attribute w:font { s_ST_String }?,
+	Font *string `xml:"w:font,attr,omitempty"`
+	// attribute w:char { w_ST_ShortHexNumber }?
+	Char *string `xml:"w:char,attr,omitempty"`
+}
+
+func NewSym(font, char string) *Sym {
+	return &Sym{
+		Font: &font,
+		Char: &char,
+	}
+}
+
+// Appends a new text to the run.
+// Example:
+//
+//	run.AddText("Hello, World!")
+//
+// Parameters:
+//   - text: A string representing the text to be added to the Run.
+func (run *Run) AddText(text string) {
+	t := TextFromString(text)
+	run.Children = append(run.Children, RunChild{
+		Text: t,
+	})
+}
+
+// Clears the run's children.
+func (run *Run) Clear() {
+	run.Children = nil
+}
+
+// getProp returns the run properties. If not initialized, it creates and returns a new instance.
+func (r *Run) getProp() *RunProperty {
+	if r.Property == nil {
+		r.Property = &RunProperty{}
+	}
+	return r.Property
+}
+
+// Sets the color of the Run.
+//
+// Example:
+//
+//	modifiedRun := run.Color("FF0000")
+//
+// Parameters:
+//   - colorCode: A string representing the color code (e.g., "FF0000" for red).
+//
+// Returns:
+//   - *Run: The modified Run instance with the updated color.
+func (r *Run) Color(colorCode string) *Run {
+	r.getProp().Color = NewColor(colorCode)
+	return r
+}
+
+// Sets the size of the Run.
+
+// This method takes an integer parameter representing the desired font size.
+// It updates the size property of the Run instance with the specified size,
+// Example:
+
+// 	modifiedRun := run.Size(12)
+
+// Parameters:
+//   - size: An integer representing the font size.
+
+// Returns:
+//   - *Run: The modified Run instance with the updated size.
+func (r *Run) Size(size uint64) *Run {
+	r.getProp().Size = NewFontSize(size * 2)
+	return r
+}
+
+// Font sets the font for the run.
+func (r *Run) Font(font string) *Run {
+	if r.getProp().Fonts == nil {
+		r.getProp().Fonts = &RunFonts{}
+	}
+
+	r.getProp().Fonts.Ascii = font
+	r.getProp().Fonts.HAnsi = font
+	return r
+}
+
+// Shading sets the shading properties (type, color, fill) for the run
+func (r *Run) Shading(shdType stypes.Shading, color, fill string) *Run {
+	r.getProp().Shading = NewShading().SetShadingType(shdType).SetColor(color).SetFill(fill)
+	return r
+}
+
+// AddHighlight sets the highlight color for the run.
+func (r *Run) Highlight(color string) *Run {
+	r.getProp().Highlight = NewCTString(color)
+	return r
+}
+
+// AddBold enables bold formatting for the run.
+func (r *Run) Bold(value bool) *Run {
+	r.getProp().Bold = OnOffFromBool(value)
+	return r
+}
+
+// Italic enables or disables italic formatting for the run.
+func (r *Run) Italic(value bool) *Run {
+	r.getProp().Italic = OnOffFromBool(value)
+	return r
+}
+
+// Specifies that the contents of this run shall be displayed with a single horizontal line through the center of the line.
+func (r *Run) Strike(value bool) *Run {
+	r.getProp().Strike = OnOffFromBool(value)
+	return r
+}
+
+// Specifies that the contents of this run shall be displayed with two horizontal lines through each character displayed on the line
+func (r *Run) DoubleStrike(value bool) *Run {
+	r.getProp().DoubleStrike = OnOffFromBool(value)
+	return r
+}
+
+// Display All Characters As Capital Letters
+// Any lowercase characters in this text run shall be formatted for display only as their capital letter character equivalents
+func (r *Run) Caps(value bool) *Run {
+	r.getProp().Caps = OnOffFromBool(value)
+	return r
+}
+
+// Specifies that all small letter characters in this text run shall be formatted for display only as their capital letter character equivalents
+func (r *Run) SmallCaps(value bool) *Run {
+	r.getProp().Caps = OnOffFromBool(value)
+	return r
+}
+
+// Outline enables or disables outline formatting for the run.
+func (r *Run) Outline(value bool) *Run {
+	r.getProp().Outline = OnOffFromBool(value)
+	return r
+}
+
+// Shadow enables or disables shadow formatting for the run.
+func (r *Run) Shadow(value bool) *Run {
+	r.getProp().Shadow = OnOffFromBool(value)
+	return r
+}
+
+// Emboss enables or disables embossing formatting for the run.
+func (r *Run) Emboss(value bool) *Run {
+	r.getProp().Emboss = OnOffFromBool(value)
+	return r
+}
+
+// Imprint enables or disables imprint formatting for the run.
+func (r *Run) Imprint(value bool) *Run {
+	r.getProp().Imprint = OnOffFromBool(value)
+	return r
+}
+
+// Do Not Check Spelling or Grammar
+func (r *Run) NoGrammer(value bool) *Run {
+	r.getProp().NoGrammar = OnOffFromBool(value)
+	return r
+}
+
+// Use Document Grid Settings For Inter-Character Spacing
+func (r *Run) SnapToGrid(value bool) *Run {
+	r.getProp().SnapToGrid = OnOffFromBool(value)
+	return r
+}
+
+// Hidden Text
+func (r *Run) HideText(value bool) *Run {
+	r.getProp().Vanish = OnOffFromBool(value)
+	return r
+}
+
+// Spacing sets the spacing between characters in the run.
+func (r *Run) Spacing(value int) *Run {
+	r.getProp().Spacing = NewDecimalNum(value)
+	return r
+}
+
+// Underline sets the underline style for the run.
+func (r *Run) Underline(value stypes.Underline) *Run {
+	r.getProp().Underline = NewGenSingleStrVal(value)
+	return r
+}
+
+// Add a break element of `stypes.BreakType` to this run.
+func (r *Run) AddBreak(breakType *stypes.BreakType) {
+	// clear := stypes.BreakClearNone
+	// switch breakType{
+	// case stypes.BreakType:
+
+	// }
+	br := Break{}
+
+	if breakType != nil {
+		br.BreakType = breakType
+	}
+
+	r.Children = append(r.Children, RunChild{
+		Break: &br,
+	})
+}
+
+// Style sets the style of the run.
+func (r *Run) Style(value string) *Run {
+	r.getProp().Style = NewRunStyle(value)
+	return r
+}
+
+// VerticalAlign sets the vertical alignment for the run text.
+//
+// Parameter: A value from the stypes.VerticalAlignRun type indicating the desired vertical alignment. One of:
+//
+//	VerticalAlignRunBaseline, VerticalAlignRunSuperscript, VerticalAlignRunSubscript
+//
+// Returns: The modified Run instance with the updated vertical alignment.
+func (r *Run) VerticalAlign(value stypes.VerticalAlignRun) *Run {
+	r.getProp().VertAlign = NewGenSingleStrVal(value)
+	return r
+}
+
 func (r *Run) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
 	// Decode attributes
 	for _, attr := range start.Attr {
@@ -266,17 +475,4 @@ loop:
 	}
 
 	return nil
-}
-
-// Sym represents a symbol character in a document.
-type Sym struct {
-	Font *string `xml:"w:font,attr,omitempty"`
-	Char *string `xml:"w:char,attr,omitempty"`
-}
-
-func NewSym(font, char string) *Sym {
-	return &Sym{
-		Font: &font,
-		Char: &char,
-	}
 }

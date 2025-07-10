@@ -1,24 +1,31 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"fmt"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+func wrapLatentStyleXML(el LatentStyle) *WrapperXML {
+	return wrapXML(struct {
+		LatentStyle
+		XMLName struct{} `xml:"w:latentStyles"`
+	}{LatentStyle: el})
+}
+
 func TestLatentStyle_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		latent   LatentStyle
+		input    LatentStyle
 		expected string
 	}{
 		{
 			name: "All attributes set",
-			latent: LatentStyle{
+			input: LatentStyle{
 				DefLockedState:    internal.ToPtr(stypes.OnOffOn),
 				DefUIPriority:     internal.ToPtr(99),
 				DefSemiHidden:     internal.ToPtr(stypes.OnOffOn),
@@ -43,7 +50,7 @@ func TestLatentStyle_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Only required attributes set",
-			latent: LatentStyle{
+			input: LatentStyle{
 				LsdExceptions: []LsdException{
 					{
 						Name: "Heading1",
@@ -56,16 +63,14 @@ func TestLatentStyle_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			e := xml.NewEncoder(&result)
-			err := tt.latent.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "w:latentStyles"}})
+			output, err := xml.Marshal(wrapLatentStyleXML(tt.input))
+			// expected := wrapLatentStyleOutput(tt.expected)
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-			e.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

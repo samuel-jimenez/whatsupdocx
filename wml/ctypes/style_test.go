@@ -1,13 +1,30 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+type StyleXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element *Style   `xml:"w:style"`
+}
+
+func wrapStyleXML(el *Style) *StyleXML {
+	return &StyleXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapStyleOutput(output string) string {
+	return `<StyleXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</StyleXML>`
+}
 
 func tmpOnOffFromStr(value string) *OnOff {
 	v, _ := OnOffFromStr(value)
@@ -17,12 +34,12 @@ func tmpOnOffFromStr(value string) *OnOff {
 func TestStyle_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		style    *Style
+		input    *Style
 		expected string
 	}{
 		{
 			name: "all properties set",
-			style: &Style{
+			input: &Style{
 				Name:         &CTString{"StyleName"},
 				Alias:        &CTString{"Alias"},
 				BasedOn:      &CTString{"BaseStyle"},
@@ -85,12 +102,13 @@ func TestStyle_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(tt.style)
+			output, err := xml.Marshal(wrapStyleXML(tt.input))
+			expected := wrapStyleOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-			if got := string(output); got != tt.expected {
-				t.Errorf("expected %s, but got %s", tt.expected, got)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

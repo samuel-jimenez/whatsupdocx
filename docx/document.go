@@ -1,10 +1,11 @@
 package docx
 
 import (
-	"github.com/samuel-jimenez/xml"
+	"strconv"
 
-	"github.com/samuel-jimenez/whatsupdocx/internal"
-	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
+	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
+	"github.com/samuel-jimenez/xml"
 )
 
 // w_CT_DocumentBase = element background { w_CT_Background }?
@@ -34,7 +35,8 @@ type Document struct {
 	// w_CT_DocumentBase = element background { w_CT_Background }?
 	Background *Background `xml:"w:background,omitempty"`
 	// element body { w_CT_Body }?,
-	Body *Body `xml:"w:body,omitempty"`
+	// Body *Body `xml:"w:body,omitempty"`
+	Body *ctypes.Body `xml:"w:body,omitempty"`
 
 	DocRels      Relationships `xml:"-"` // DocRels represents relationships specific to the document.
 	RID          int           `xml:"-"`
@@ -48,18 +50,52 @@ func (doc *Document) IncRelationID() int {
 	return doc.RID
 }
 
-// AddPageBreak adds a page break to the document by inserting a paragraph containing only a page break.
+// addLinkRelation adds a hyperlink relationship to the document's relationships collection.
+//
+// Parameters:
+//   - link: A string representing the target URL or location of the hyperlink.
 //
 // Returns:
-//   - *Paragraph: A pointer to the newly created Paragraph object containing the page break.
+//   - string: The ID ("rId" + relation ID) of the added relationship.
 //
-// Example:
-//
-//	document := whatsupdocx.NewDocument()
-//	para := document.AddPageBreak()
-func (rd *RootDoc) AddPageBreak() *Paragraph {
-	p := rd.AddEmptyParagraph()
-	p.AddRun().AddBreak(internal.ToPtr(stypes.BreakTypePage))
+// This function generates a new relationship ID, creates a Relationship object with the specified link as the target,
+// and appends it to the document's relationships collection (DocRels.Relationships). It returns the generated ID of the relationship.
+func (doc *Document) addLinkRelation(link string) string {
 
-	return p
+	rID := doc.IncRelationID()
+
+	rel := &Relationship{
+		ID:         "rId" + strconv.Itoa(rID),
+		TargetMode: "External",
+		Type:       constants.SourceRelationshipHyperLink,
+		Target:     link,
+	}
+
+	doc.DocRels.Relationships = append(doc.DocRels.Relationships, rel)
+
+	return "rId" + strconv.Itoa(rID)
+}
+
+// addRelation adds a generic relationship to the document's relationships collection.
+//
+// Parameters:
+//   - relType: A string representing the type of relationship (e.g., constants.SourceRelationshipImage).
+//   - fileName: A string representing the target file name or location related to the relationship.
+//
+// Returns:
+//   - string: The ID ("rId" + relation ID) of the added relationship.
+//
+// This function generates a new relationship ID, creates a Relationship object with the specified type and target,
+// and appends it to the document's relationships collection (DocRels.Relationships). It returns the generated ID of the relationship.
+func (doc *Document) addRelation(relType string, fileName string) string {
+	rID := doc.IncRelationID()
+	rel := &Relationship{
+		ID:     "rId" + strconv.Itoa(rID),
+		Type:   relType,
+		Target: fileName,
+	}
+
+	doc.DocRels.Relationships = append(doc.DocRels.Relationships, rel)
+
+	return "rId" + strconv.Itoa(rID)
 }

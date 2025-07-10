@@ -50,7 +50,7 @@ func TestMarshalEffectExtent(t *testing.T) {
 			}
 
 			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
 			}
 		})
 	}

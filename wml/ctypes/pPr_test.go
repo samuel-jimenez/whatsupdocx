@@ -1,9 +1,10 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 
@@ -138,7 +139,7 @@ func TestParagraphProp_MarshalUnmarshal(t *testing.T) {
 	encoder := xml.NewEncoder(&result)
 	start := xml.StartElement{Name: xml.Name{Local: "w:pPr"}}
 
-	err := paraProp.MarshalXML(encoder, start)
+	err := encoder.EncodeElement(paraProp, start)
 	if err != nil {
 		t.Fatalf("Error marshaling XML: %v", err)
 	}
@@ -165,7 +166,7 @@ func TestParagraphProp_MarshalUnmarshal(t *testing.T) {
 	var rresult strings.Builder
 	rencoder := xml.NewEncoder(&rresult)
 
-	err = paraProp.MarshalXML(rencoder, start)
+	err = rencoder.EncodeElement(paraProp, start)
 	if err != nil {
 		t.Fatalf("Error marshaling XML: %v", err)
 	}
@@ -331,7 +332,7 @@ func TestPPrChange_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:pPrChange"}}
-			if err := tt.input.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.input, start); err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
@@ -340,7 +341,7 @@ func TestPPrChange_MarshalXML(t *testing.T) {
 
 			got := strings.TrimSpace(result.String())
 			if got != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, got)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, got)
 			}
 		})
 	}

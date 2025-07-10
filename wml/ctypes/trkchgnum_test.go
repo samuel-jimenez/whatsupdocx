@@ -1,11 +1,19 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
+
+func wrapTrackChangeNumXML(el TrackChangeNum) *WrapperXML {
+	return wrapXML(struct {
+		TrackChangeNum
+		XMLName struct{} `xml:"TrackChangeNum"`
+	}{TrackChangeNum: el})
+}
 
 func TestTrackChangeNum_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -50,16 +58,15 @@ func TestTrackChangeNum_MarshalXML(t *testing.T) {
 			expected: `<TrackChangeNum w:id="126" w:author="Bob" w:original="99"></TrackChangeNum>`,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(tt.input)
+			output, err := xml.Marshal(wrapTrackChangeNumXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
 				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			if string(output) != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, string(output))
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

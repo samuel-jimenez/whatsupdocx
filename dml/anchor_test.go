@@ -1,20 +1,21 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
 
 func TestMarshalAnchor(t *testing.T) {
-	simplePos := 1
-	layoutInCell := 6
-	allowOverlap := 7
-	relativeHeight := 8
-	behindDoc := 9
-	locked := 10
+	simplePos := 5
+	layoutInCell := 9
+	allowOverlap := 10
+	relativeHeight := 6
+	behindDoc := 7
+	locked := 8
 
 	tests := []struct {
 		anchor      *Anchor
@@ -24,10 +25,10 @@ func TestMarshalAnchor(t *testing.T) {
 		{
 			anchor: &Anchor{
 				SimplePosAttr:  &simplePos,
-				DistT:          2,
-				DistB:          3,
-				DistL:          4,
-				DistR:          5,
+				DistT:          1,
+				DistB:          2,
+				DistL:          3,
+				DistR:          4,
 				LayoutInCell:   layoutInCell,
 				AllowOverlap:   allowOverlap,
 				RelativeHeight: relativeHeight,
@@ -44,31 +45,35 @@ func TestMarshalAnchor(t *testing.T) {
 					BottomEdge: 4,
 				},
 				WrapNone: &WrapNone{},
-				PositionH: PoistionH{
+				PositionH: PositionH{
 					RelativeFrom: dmlst.RelFromHColumn,
 				},
-				PositionV: PoistionV{
+				PositionV: PositionV{
 					RelativeFrom: dmlst.RelFromVLine,
 				},
 				DocProp: DocProp{
 					ID:   1,
 					Name: "test",
 				},
+				Graphic: *DefaultGraphic(),
 			},
-			expectedXML: `<wp:anchor behindDoc="9" distT="2" distB="3" distL="4" distR="5" simplePos="1" locked="10" layoutInCell="6" allowOverlap="7" relativeHeight="8"><wp:simplePos x="0" y="0"></wp:simplePos><wp:positionH relativeFrom="column"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="line"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="100" cy="200"></wp:extent><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent><wp:wrapNone></wp:wrapNone><wp:docPr id="1" name="test"></wp:docPr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"></a:graphic></wp:anchor>`,
+			expectedXML: `<wp:anchor distT="1" distB="2" distL="3" distR="4" simplePos="5" relativeHeight="6" behindDoc="7" locked="8" layoutInCell="9" allowOverlap="10"><wp:simplePos x="0" y="0"></wp:simplePos><wp:positionH relativeFrom="column"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="line"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="100" cy="200"></wp:extent><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent><wp:wrapNone></wp:wrapNone><wp:docPr id="1" name="test"></wp:docPr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"></a:graphic></wp:anchor>`,
 			xmlName:     "wp:anchor",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.xmlName, func(t *testing.T) {
-			generatedXML, err := xml.Marshal(tt.anchor)
+			generatedXML, err := xml.Marshal(struct {
+				*Anchor
+				XMLName struct{} `xml:"wp:anchor"`
+			}{Anchor: tt.anchor})
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
 			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
 			}
 		})
 	}

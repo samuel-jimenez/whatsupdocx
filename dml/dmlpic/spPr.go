@@ -18,26 +18,6 @@ const (
 	BlackWhiteModeHidden     = "hidden"
 )
 
-/*
-
-   <wps:cNvCnPr/>
-   <wps:spPr>
-       <a:xfrm>
-           <a:off x="0" y="0"/>
-           <a:ext cx="7096125" cy="28575"/>
-       </a:xfrm>
-       <a:prstGeom prst="line">
-           <a:avLst/>
-       </a:prstGeom>
-       <a:ln w="57150">
-           <a:solidFill>
-               <a:schemeClr val="accent1">
-                   <a:lumMod val="50000"/>
-               </a:schemeClr>
-           </a:solidFill>
-       </a:ln>
-*/
-
 // ShapeProperties *spPr // element ([ISO/IEC29500-1:2016] section A.4.1) that specifies the visual shape properties that can be applied to a shape.<121>
 // CT_ShapeProperties
 // a_CT_ShapeProperties =

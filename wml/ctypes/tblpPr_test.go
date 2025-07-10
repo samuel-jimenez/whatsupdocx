@@ -1,14 +1,30 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"fmt"
-	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+type FloatPosXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element FloatPos `xml:"w:tblpPr"`
+}
+
+func wrapFloatPosXML(el FloatPos) *FloatPosXML {
+	return &FloatPosXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapFloatPosOutput(output string) string {
+	return `<FloatPosXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</FloatPosXML>`
+}
 
 func TestFloatPos_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -30,7 +46,7 @@ func TestFloatPos_MarshalXML(t *testing.T) {
 				AbsXDist:       internal.ToPtr(int(100)),
 				AbsYDist:       internal.ToPtr(int(200)),
 			},
-			expected: `<w:tblpPr w:leftFromText="10" w:rightFromText="20" w:topFromText="30" w:bottomFromText="40" w:horzAnchor="page" w:vertAnchor="text" w:tblpXSpec="center" w:tblpYSpec="inside" w:tblpX="100" w:tblpY="200"></w:tblpPr>`,
+			expected: `<w:tblpPr w:leftFromText="10" w:rightFromText="20" w:topFromText="30" w:bottomFromText="40" w:vertAnchor="text" w:horzAnchor="page" w:tblpXSpec="center" w:tblpX="100" w:tblpYSpec="inside" w:tblpY="200"></w:tblpPr>`,
 		},
 		{
 			name: "Without optional attributes",
@@ -46,20 +62,13 @@ func TestFloatPos_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-
-			start := xml.StartElement{Name: xml.Name{Local: "FloatPos"}}
-			err := tt.input.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapFloatPosXML(tt.input))
+			expected := wrapFloatPosOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			encoder.Flush()
-			output := strings.TrimSpace(result.String())
-
-			if output != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, output)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

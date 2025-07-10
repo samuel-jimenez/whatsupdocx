@@ -22,7 +22,7 @@ func TestTextMarshalXML(t *testing.T) {
 		encoder := xml.NewEncoder(&result)
 
 		start := xml.StartElement{Name: xml.Name{Local: "w:t"}}
-		err := tc.input.MarshalXML(encoder, start)
+		err := encoder.EncodeElement(tc.input, start)
 
 		if err != nil {
 			t.Errorf("Error during MarshalXML: %v", err)

@@ -28,13 +28,13 @@ type FloatPos struct {
 	// attribute w:tblpXSpec { s_ST_XAlign }?,
 	XAlign *stypes.XAlign `xml:"w:tblpXSpec,attr,omitempty"`
 
-	//Relative Vertical Alignment from Anchor
-	// attribute w:tblpYSpec { s_ST_YAlign }?,
-	YAlign *stypes.YAlign `xml:"w:tblpYSpec,attr,omitempty"`
-
 	//Absolute Horizontal Distance From Anchor
 	// attribute w:tblpX { w_ST_SignedTwipsMeasure }?,
 	AbsXDist *int `xml:"w:tblpX,attr,omitempty"`
+
+	//Relative Vertical Alignment from Anchor
+	// attribute w:tblpYSpec { s_ST_YAlign }?,
+	YAlign *stypes.YAlign `xml:"w:tblpYSpec,attr,omitempty"`
 
 	// Absolute Vertical Distance From Anchor
 	// attribute w:tblpY { w_ST_SignedTwipsMeasure }?

@@ -1,9 +1,10 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
@@ -29,13 +30,16 @@ func TestMarshalNonVisualGraphicFrameProp(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.expectedXML, func(t *testing.T) {
-			generatedXML, err := xml.Marshal(tt.prop)
+			generatedXML, err := xml.Marshal(struct {
+				*NonVisualGraphicFrameProp
+				XMLName struct{} `xml:"wp:cNvGraphicFramePr"`
+			}{NonVisualGraphicFrameProp: tt.prop})
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
 			if strings.TrimSpace(string(generatedXML)) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
 			}
 		})
 	}

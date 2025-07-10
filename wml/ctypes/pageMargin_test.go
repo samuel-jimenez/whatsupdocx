@@ -1,10 +1,26 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
+	"github.com/samuel-jimenez/xml"
 )
+
+type PageMarginXML struct {
+	Attr    xml.Attr   `xml:",any,attr,omitempty"`
+	Element PageMargin `xml:"w:titlePg"`
+}
+
+func wrapPageMarginXML(el PageMargin) *PageMarginXML {
+	return &PageMarginXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapPageMarginOutput(output string) string {
+	return `<PageMarginXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</PageMarginXML>`
+}
 
 func TestPageMargin_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -23,7 +39,7 @@ func TestPageMargin_MarshalXML(t *testing.T) {
 				Footer: intPtr(720),
 				Bottom: intPtr(1440),
 			},
-			expected: `<w:pgMar w:left="1440" w:right="1440" w:gutter="0" w:header="720" w:top="1440" w:footer="720" w:bottom="1440"></w:pgMar>`,
+			expected: `<w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"></w:pgMar>`,
 		},
 		{
 			name: "Some attributes",
@@ -33,7 +49,7 @@ func TestPageMargin_MarshalXML(t *testing.T) {
 				Top:    intPtr(1440),
 				Bottom: intPtr(1440),
 			},
-			expected: `<w:pgMar w:left="1440" w:right="1440" w:top="1440" w:bottom="1440"></w:pgMar>`,
+			expected: `<w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"></w:pgMar>`,
 		},
 		{
 			name:     "No attributes",
@@ -41,20 +57,15 @@ func TestPageMargin_MarshalXML(t *testing.T) {
 			expected: `<w:pgMar></w:pgMar>`,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:titlePg"}}
-
-			err := tt.input.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapPageMarginXML(tt.input))
+			expected := wrapPageMarginOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\n\nGot:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

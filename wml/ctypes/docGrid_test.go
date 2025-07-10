@@ -1,60 +1,80 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
-func TestDocGrid_MarshalXML_AllAttributes(t *testing.T) {
+func wrapDocGridXML(el DocGrid) *WrapperXML {
+	return wrapXML(struct {
+		DocGrid
+		XMLName struct{} `xml:"w:docGrid"`
+	}{DocGrid: el})
+}
+
+func TestDocGrid_MarshalXML(t *testing.T) {
 	linePitch := 240
 	charSpace := 120
+	tests := []struct {
+		name     string
+		input    DocGrid
+		expected string
+	}{{
+		name: "AllAttributes",
+		input: DocGrid{
+			Type:      stypes.DocGridLinesAndChars,
+			LinePitch: &linePitch,
+			CharSpace: &charSpace,
+		},
+		expected: `<w:docGrid w:type="linesAndChars" w:linePitch="240" w:charSpace="120"></w:docGrid>`,
+	}, {
+		name: "OmitEmptyAttributes",
+		input: DocGrid{
+			Type: stypes.DocGridLines,
+		},
+		expected: `<w:docGrid w:type="lines"></w:docGrid>`,
+	}, {
+		name:     "NoAttributes",
+		input:    DocGrid{},
+		expected: `<w:docGrid></w:docGrid>`,
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			object := wrapDocGridXML(tt.input)
+			expected := wrapXMLOutput(tt.expected)
 
-	docGrid := DocGrid{
-		Type:      stypes.DocGridLinesAndChars,
-		LinePitch: &linePitch,
-		CharSpace: &charSpace,
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+			// //TODO
+			// 	//TestDocGrid_UnmarshalXML_NoAttributes     Expected:
+			//              // &{{} [{{ xmlns:w} http://schemas.openxmlformats.org/wordprocessingml/2006/main} {{ xmlns:r} http://schemas.openxmlformats.org/officeDocument/2006/relationships}] {{ %!s(*int=<nil>) %!s(*int=<nil>)} {}}}
+			//              // Actual:
+			//              // &{{} [{{http://www.w3.org/2000/xmlns/ w} http://schemas.openxmlformats.org/wordprocessingml/2006/main} {{http://www.w3.org/2000/xmlns/ r} http://schemas.openxmlformats.org/officeDocument/2006/relationships}] <nil>}
+			// t.Run("UnMarshalXML", func(t *testing.T) {
+			// 	vt := reflect.TypeOf(object)
+			// 	dest := reflect.New(vt.Elem()).Interface()
+			// 	err := xml.Unmarshal([]byte(expected), dest)
+			// 	if err != nil {
+			// 		t.Fatalf("Error unmarshaling from XML: %v", err)
+			// 	}
+			// 	if got, want := dest, object; !reflect.DeepEqual(got, want) {
+			// 		t.Errorf("XML mismatch unmarshal(%s):\nExpected:\n%s\nActual:\n%s", tt.expected, want, got)
+			// 	}
+			//
+			// })
+		})
 	}
 
-	expectedXML := `<w:docGrid w:type="linesAndChars" w:linePitch="240" w:charSpace="120"></w:docGrid>`
-
-	checkMarshalXML(t, docGrid, expectedXML)
-}
-
-func TestDocGrid_MarshalXML_OmitEmptyAttributes(t *testing.T) {
-	docGrid := DocGrid{
-		Type: stypes.DocGridLines,
-	}
-
-	expectedXML := `<w:docGrid w:type="lines"></w:docGrid>`
-
-	checkMarshalXML(t, docGrid, expectedXML)
-}
-
-func TestDocGrid_MarshalXML_NoAttributes(t *testing.T) {
-	docGrid := DocGrid{}
-
-	expectedXML := `<w:docGrid></w:docGrid>`
-
-	checkMarshalXML(t, docGrid, expectedXML)
-}
-
-func checkMarshalXML(t *testing.T, docGrid DocGrid, expectedXML string) {
-	t.Helper()
-
-	output, err := xml.Marshal(&docGrid)
-	if err != nil {
-		t.Fatalf("Error marshaling DocGrid: %v", err)
-	}
-
-	result := strings.TrimSpace(string(output))
-	expected := strings.TrimSpace(expectedXML)
-
-	if result != expected {
-		t.Errorf("Expected XML:\n%s\nBut got:\n%s", expected, result)
-	}
 }
 
 func TestDocGrid_UnmarshalXML_AllAttributes(t *testing.T) {

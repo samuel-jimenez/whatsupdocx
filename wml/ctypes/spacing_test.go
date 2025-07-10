@@ -1,13 +1,29 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+type SpacingXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element Spacing  `xml:"w:spacing"`
+}
+
+func wrapSpacingXML(el Spacing) *SpacingXML {
+	return &SpacingXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapSpacingOutput(output string) string {
+	return `<SpacingXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</SpacingXML>`
+}
 
 func TestSpacing_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -47,20 +63,13 @@ func TestSpacing_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-
-			start := xml.StartElement{Name: xml.Name{Local: "w:spacing"}}
-			if err := tt.input.MarshalXML(encoder, start); err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+			output, err := xml.Marshal(wrapSpacingXML(tt.input))
+			expected := wrapSpacingOutput(tt.expected)
+			if err != nil {
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			got := strings.TrimSpace(result.String())
-			if got != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, got)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

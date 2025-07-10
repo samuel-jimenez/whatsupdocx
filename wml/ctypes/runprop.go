@@ -150,7 +150,7 @@ type RunProperty struct {
 
 	//25.Complex Script Font Size
 	// element szCs { w_CT_HpsMeasure }?&
-	SizeCs *FontSizeCS `xml:"w:szCs,omitempty"`
+	SizeCs *FontSize `xml:"w:szCs,omitempty"`
 
 	//26.Text Highlighting
 	// element highlight { w_CT_Highlight }?&

@@ -2,9 +2,10 @@ package ctypes
 
 import (
 	"bytes"
-	"github.com/samuel-jimenez/xml"
 	"reflect"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 func TestDocDefault_MarshalXML(t *testing.T) {
@@ -38,7 +39,7 @@ func TestDocDefault_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&buf)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:docDefaults"}}
-			if err := tt.doc.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.doc, start); err != nil {
 				t.Fatalf("Failed to marshal DocDefault: %v", err)
 			}
 
@@ -81,7 +82,7 @@ func TestRunPropDefault_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&buf)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:rPrDefault"}}
-			if err := tt.runProp.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.runProp, start); err != nil {
 				t.Fatalf("Failed to marshal RunPropDefault: %v", err)
 			}
 
@@ -123,7 +124,7 @@ func TestParaPropDefault_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&buf)
 
 			start := xml.StartElement{Name: xml.Name{Local: "w:pPrDefault"}}
-			if err := tt.paraProp.MarshalXML(encoder, start); err != nil {
+			if err := encoder.EncodeElement(tt.paraProp, start); err != nil {
 				t.Fatalf("Failed to marshal ParaPropDefault: %v", err)
 			}
 

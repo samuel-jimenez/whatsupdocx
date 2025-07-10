@@ -1,13 +1,21 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+func wrapSectionPropXML(el SectionProp) *WrapperXML {
+	return wrapXML(struct {
+		SectionProp
+		XMLName struct{} `xml:"w:sectPr"`
+	}{SectionProp: el})
+}
 
 func TestSectionProp_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -32,7 +40,7 @@ func TestSectionProp_MarshalXML(t *testing.T) {
 				TextDir:    NewGenSingleStrVal(stypes.TextDirectionLrTb),
 				DocGrid:    &DocGrid{Type: "default", LinePitch: intPtr(360)},
 			},
-			expected: `<w:sectPr><w:headerReference w:type="default" r:id="rId1"></w:headerReference><w:footerReference w:type="default" r:id="rId2"></w:footerReference><w:type w:val="nextPage"></w:type><w:pgSz w:w="12240" w:h="15840"></w:pgSz><w:pgMar w:left="1440" w:right="1440" w:top="1440" w:bottom="1440"></w:pgMar><w:pgNumType w:fmt="decimal"></w:pgNumType><w:formProt w:val="true"></w:formProt><w:titlePg w:val="true"></w:titlePg><w:textDirection w:val="lrTb"></w:textDirection><w:docGrid w:type="default" w:linePitch="360"></w:docGrid></w:sectPr>`,
+			expected: `<w:sectPr><w:headerReference r:id="rId1" w:type="default"></w:headerReference><w:footerReference r:id="rId2" w:type="default"></w:footerReference><w:type w:val="nextPage"></w:type><w:pgSz w:w="12240" w:h="15840"></w:pgSz><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"></w:pgMar><w:pgNumType w:fmt="decimal"></w:pgNumType><w:formProt w:val="true"></w:formProt><w:titlePg w:val="true"></w:titlePg><w:textDirection w:val="lrTb"></w:textDirection><w:docGrid w:type="default" w:linePitch="360"></w:docGrid></w:sectPr>`,
 		},
 		{
 			name:     "No attributes",
@@ -43,22 +51,13 @@ func TestSectionProp_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:sectPr"}}
-
-			err := tt.input.MarshalXML(encoder, start)
+			output, err := xml.Marshal(wrapSectionPropXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-
-			if err = encoder.Flush(); err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			output := result.String()
-			if output != tt.expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, output)
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}
@@ -72,7 +71,7 @@ func TestSectionProp_MarshalXML_EmptyFields(t *testing.T) {
 	encoder := xml.NewEncoder(&result)
 	start := xml.StartElement{Name: xml.Name{Local: "w:sectPr"}}
 
-	err := input.MarshalXML(encoder, start)
+	err := encoder.EncodeElement(input, start)
 	if err != nil {
 		t.Fatalf("Error marshaling XML: %v", err)
 	}

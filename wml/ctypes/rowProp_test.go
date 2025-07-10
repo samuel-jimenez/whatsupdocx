@@ -2,21 +2,36 @@ package ctypes
 
 import (
 	"errors"
-	"strings"
 	"testing"
 
 	"github.com/samuel-jimenez/xml"
 
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+type RowPropertyXML struct {
+	Attr    xml.Attr    `xml:",any,attr,omitempty"`
+	Element RowProperty `xml:"w:trPr"`
+}
+
+func wrapRowPropertyXML(el RowProperty) *RowPropertyXML {
+	return &RowPropertyXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapRowPropertyOutput(output string) string {
+	return `<RowPropertyXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</RowPropertyXML>`
+}
+
 func TestRowProperty_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name        string
-		input       RowProperty
-		expectFail  bool   // Whether marshaling is expected to fail
-		expectedXML string // Expected XML output for validation
+		name       string
+		input      RowProperty
+		expectFail bool   // Whether marshaling is expected to fail
+		expected   string // Expected XML output for validation
 	}{
 		{
 			name: "Only Cnf populated",
@@ -25,16 +40,16 @@ func TestRowProperty_MarshalXML(t *testing.T) {
 					Val: "cnfval",
 				},
 			},
-			expectFail:  false,
-			expectedXML: `<w:trPr><w:cnfStyle w:val="cnfval"></w:cnfStyle></w:trPr>`,
+			expectFail: false,
+			expected:   `<w:trPr><w:cnfStyle w:val="cnfval"></w:cnfStyle></w:trPr>`,
 		},
 		{
 			name: "Only DivId populated",
 			input: RowProperty{
 				DivId: &DecimalNum{},
 			},
-			expectFail:  false,
-			expectedXML: `<w:trPr><w:divId w:val="0"></w:divId></w:trPr>`,
+			expectFail: false,
+			expected:   `<w:trPr><w:divId w:val="0"></w:divId></w:trPr>`,
 		},
 		{
 			name: "All fields populated",
@@ -60,41 +75,20 @@ func TestRowProperty_MarshalXML(t *testing.T) {
 					Val: internal.ToPtr(stypes.OnOffFalse),
 				},
 			},
-			expectFail:  false,
-			expectedXML: `<w:trPr><w:cnfStyle w:val="cnftest"></w:cnfStyle><w:divId w:val="0"></w:divId><w:gridBefore w:val="0"></w:gridBefore><w:gridAfter w:val="0"></w:gridAfter><w:tblWBefore w:w="500" w:type="pct"></w:tblWBefore><w:tblWAfter w:w="300" w:type="dxa"></w:tblWAfter><w:cantSplit w:val="true"></w:cantSplit><w:trHeight w:val="500" w:hRule="atLeast"></w:trHeight><w:tblHeader w:val="true"></w:tblHeader><w:tblCellSpacing w:w="100" w:type="dxa"></w:tblCellSpacing><w:jc w:val="center"></w:jc><w:hidden w:val="false"></w:hidden></w:trPr>`,
+			expectFail: false,
+			expected:   `<w:trPr><w:cnfStyle w:val="cnftest"></w:cnfStyle><w:divId w:val="0"></w:divId><w:gridBefore w:val="0"></w:gridBefore><w:gridAfter w:val="0"></w:gridAfter><w:tblWBefore w:w="500" w:type="pct"></w:tblWBefore><w:tblWAfter w:w="300" w:type="dxa"></w:tblWAfter><w:cantSplit w:val="true"></w:cantSplit><w:trHeight w:val="500" w:hRule="atLeast"></w:trHeight><w:tblHeader w:val="true"></w:tblHeader><w:tblCellSpacing w:w="100" w:type="dxa"></w:tblCellSpacing><w:jc w:val="center"></w:jc><w:hidden w:val="false"></w:hidden></w:trPr>`,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-
-			start := xml.StartElement{Name: xml.Name{Local: "w:trPr"}}
-
-			err := encoder.EncodeElement(tt.input, start)
-
-			encoder.Flush()
-
-			if tt.expectFail {
-				if err == nil {
-					t.Error("Expected error but got none")
-				} else {
-					expectedErrorMsg := "incomplete table row property, missing choice elements"
-					if !strings.Contains(err.Error(), expectedErrorMsg) {
-						t.Errorf("Expected error message to contain '%s' but got '%s'", expectedErrorMsg, err.Error())
-					}
-				}
-			} else {
-				if err != nil {
-					t.Errorf("Unexpected error during marshaling: %v", err)
-				} else {
-					// Check the generated XML against expected XML
-					generatedXML := result.String()
-					if generatedXML != tt.expectedXML {
-						t.Errorf("Generated XML does not match expected XML.\nExpected:\n%s\n\nGot:\n%s", tt.expectedXML, generatedXML)
-					}
-				}
+			output, err := xml.Marshal(wrapRowPropertyXML(tt.input))
+			expected := wrapRowPropertyOutput(tt.expected)
+			if err != nil {
+				t.Fatalf("Error marshaling to XML: %v", err)
+			}
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

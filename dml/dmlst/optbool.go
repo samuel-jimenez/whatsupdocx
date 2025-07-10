@@ -1,8 +1,9 @@
 package dmlst
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 //
@@ -79,4 +80,22 @@ func (n *OptBool) UnmarshalXMLAttr(attr xml.Attr) error {
 	n.Valid = true
 	return nil
 
+}
+
+func (n *OptBool) String() string {
+	if n.Valid {
+		if n.Bool {
+			return "true"
+		}
+		return "false"
+	}
+	return ""
+}
+
+func (n *OptBool) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
+	if n.Valid {
+		value := n.String()
+		return xml.Attr{Name: name, Value: value}, nil
+	}
+	return xml.Attr{}, nil
 }

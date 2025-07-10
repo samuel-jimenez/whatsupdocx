@@ -1,16 +1,24 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+func wrapCellMarginsXML(el CellMargins) *WrapperXML {
+	return wrapXML(struct {
+		CellMargins
+		XMLName struct{} `xml:"w:tblCellMar"`
+	}{CellMargins: el})
+}
+
 func TestCellMarginsMarshalXML(t *testing.T) {
-	testCases := []struct {
+	tests := []struct {
+		name     string
 		input    CellMargins
 		expected string
 	}{
@@ -29,26 +37,20 @@ func TestCellMarginsMarshalXML(t *testing.T) {
 		},
 	}
 
-	for _, tc := range testCases {
-		var result strings.Builder
-		encoder := xml.NewEncoder(&result)
-
-		start := xml.StartElement{Name: xml.Name{Local: "w:tblCellMar"}}
-			if err := encoder.EncodeElement(tc.input, start); err != nil {
-				// if err := tc.input.MarshalXML(encoder, start); err != nil {
-
-		if err != nil {
-			t.Errorf("Error during MarshalXML: %v", err)
-		}
-
-		err = encoder.Flush()
-		if err != nil {
-			t.Errorf("Error flushing encoder: %v", err)
-		}
-
-		if result.String() != tc.expected {
-			t.Errorf("Expected XML:\n%s\n\nActual XML:\n%s", tc.expected, result.String())
-		}
+	for _, tt := range tests {
+		object := wrapCellMarginsXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
+		})
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
 )
 
-func setupRootDoc(t *testing.T) *RootDoc {
+func setupRootDoc(_ *testing.T) *RootDoc {
 	log.Println("setting root doc")
 
 	return &RootDoc{
@@ -15,7 +15,7 @@ func setupRootDoc(t *testing.T) *RootDoc {
 		RootRels:    Relationships{},
 		ContentType: ContentTypes{},
 		Document: &Document{
-			Body: &Body{},
+			Body: &ctypes.Body{},
 		},
 		DocStyles:  &ctypes.Styles{},
 		rID:        1,

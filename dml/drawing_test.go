@@ -1,31 +1,34 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
 
 func TestMarshalDrawing(t *testing.T) {
-	simplePos := 1
+	simplePos := 5
 
-	layoutInCell := 6
-	allowOverlap := 7
-	relativeHeight := 8
-	behindDoc := 9
-	locked := 10
+	layoutInCell := 9
+	allowOverlap := 10
+	relativeHeight := 6
+	behindDoc := 7
+	locked := 8
 
 	tests := []struct {
-		drawing     *Drawing
+		input       *Drawing
 		expectedXML string
 		xmlName     string
 	}{
 		{
-			drawing: &Drawing{
+			input: &Drawing{
 				Inline: []Inline{
 					{
+						Attr:  constants.DefaultNamespacesInline,
 						DistT: 2,
 						DistB: 3,
 						DistL: 4,
@@ -50,10 +53,10 @@ func TestMarshalDrawing(t *testing.T) {
 				Anchor: []*Anchor{
 					{
 						SimplePosAttr:  &simplePos,
-						DistT:          2,
-						DistB:          3,
-						DistL:          4,
-						DistR:          5,
+						DistT:          1,
+						DistB:          2,
+						DistL:          3,
+						DistR:          4,
 						LayoutInCell:   layoutInCell,
 						AllowOverlap:   allowOverlap,
 						RelativeHeight: relativeHeight,
@@ -70,35 +73,59 @@ func TestMarshalDrawing(t *testing.T) {
 							BottomEdge: 4,
 						},
 						WrapNone: &WrapNone{},
-						PositionH: PoistionH{
+						PositionH: PositionH{
 							RelativeFrom: dmlst.RelFromHColumn,
 						},
-						PositionV: PoistionV{
+						PositionV: PositionV{
 							RelativeFrom: dmlst.RelFromVLine,
 						},
 						DocProp: DocProp{
 							ID:   1,
 							Name: "test",
 						},
+						Graphic: *DefaultGraphic(),
 					},
 				},
 			},
-			expectedXML: `<w:drawing><wp:anchor behindDoc="9" distT="2" distB="3" distL="4" distR="5" simplePos="1" locked="10" layoutInCell="6" allowOverlap="7" relativeHeight="8"><wp:simplePos x="0" y="0"></wp:simplePos><wp:positionH relativeFrom="column"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="line"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="100" cy="200"></wp:extent><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent><wp:wrapNone></wp:wrapNone><wp:docPr id="1" name="test"></wp:docPr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"></a:graphic></wp:anchor><wp:inline xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" distT="2" distB="3" distL="4" distR="5"><wp:extent cx="100" cy="200"></wp:extent><wp:docPr id="1" name="Document Property" descr="This is a document property"></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"></a:graphicFrameLocks></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"></a:graphic></wp:inline></w:drawing>`,
+			expectedXML: `<w:drawing><wp:inline xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" distT="2" distB="3" distL="4" distR="5"><wp:extent cx="100" cy="200"></wp:extent><wp:docPr id="1" name="Document Property" descr="This is a document property"></wp:docPr><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"></a:graphicFrameLocks></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"></a:graphic></wp:inline><wp:anchor distT="1" distB="2" distL="3" distR="4" simplePos="5" relativeHeight="6" behindDoc="7" locked="8" layoutInCell="9" allowOverlap="10"><wp:simplePos x="0" y="0"></wp:simplePos><wp:positionH relativeFrom="column"><wp:posOffset>0</wp:posOffset></wp:positionH><wp:positionV relativeFrom="line"><wp:posOffset>0</wp:posOffset></wp:positionV><wp:extent cx="100" cy="200"></wp:extent><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent><wp:wrapNone></wp:wrapNone><wp:docPr id="1" name="test"></wp:docPr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"></a:graphic></wp:anchor></w:drawing>`,
 			xmlName:     "w:drawing",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.xmlName, func(t *testing.T) {
-			generatedXML, err := xml.Marshal(tt.drawing)
+			generatedXML, err := xml.Marshal(struct {
+				*Drawing
+				XMLName struct{} `xml:"w:drawing"`
+			}{Drawing: tt.input})
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
 
 			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
 			}
 		})
+		// 		//TODO UnmarshalXML_TOO_3
+		// /*		    expectedXML:
+		//             &dml.Drawing{Inline:[]dml.Inline{dml.Inline{Attr:[]xml.Attr{xml.Attr{Name:xml.Name{Space:"", Local:"xmlns:a"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/main"}, xml.Attr{Name:xml.Name{Space:"", Local:"xmlns:pic"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/picture"}}, DistT:0x2, DistB:0x3, DistL:0x4, DistR:0x5, Extent:dmlct.PSize2D{Width:0x64, Height:0xc8}, EffectExtent:(*dml.EffectExtent)(nil), DocProp:dml.DocProp{ID:0x1, Name:"Document Property", Description:"This is a document property"}, CNvGraphicFramePr:(*dml.NonVisualGraphicFrameProp)(0xc000100040), Graphic:dml.Graphic{DrawingMLMainNS:"http://schemas.openxmlformats.org/drawingml/2006/main", Data:(*dml.GraphicData)(nil)}}}, Anchor:[]*dml.Anchor{(*dml.Anchor)(0xc000128c60)}}
+		//             Actual:
+		//             &dml.Drawing{Inline:[]dml.Inline{dml.Inline{Attr:[]xml.Attr{xml.Attr{Name:xml.Name{Space:"http://www.w3.org/2000/xmlns/", Local:"a"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/main"}, xml.Attr{Name:xml.Name{Space:"http://www.w3.org/2000/xmlns/", Local:"pic"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/picture"}}, DistT:0x2, DistB:0x3, DistL:0x4, DistR:0x5, Extent:dmlct.PSize2D{Width:0x64, Height:0xc8}, EffectExtent:(*dml.EffectExtent)(nil), DocProp:dml.DocProp{ID:0x1, Name:"Document Property", Description:"This is a document property"}, CNvGraphicFramePr:(*dml.NonVisualGraphicFrameProp)(0xc000100070), Graphic:dml.Graphic{DrawingMLMainNS:"http://schemas.openxmlformats.org/drawingml/2006/main", Data:(*dml.GraphicData)(nil)}}}, Anchor:[]*dml.Anchor{(*dml.Anchor)(0xc0001290e0)}}
+		//          */
+		// 		t.Run("UnMarshalXML", func(t *testing.T) {
+		// 			object := tt.input
+		// 			expectedXML := tt.expectedXML
+		// 			vt := reflect.TypeOf(object)
+		// 			dest := reflect.New(vt.Elem()).Interface()
+		// 			err := xml.Unmarshal([]byte(expectedXML), dest)
+		// 			if err != nil {
+		// 				t.Fatalf("Error unmarshaling from XML: %v", err)
+		// 			}
+		// 			if got, want := dest, object; !reflect.DeepEqual(got, want) {
+		// 				t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+		// 			}
+		//
+		// 		})
 	}
 }
 

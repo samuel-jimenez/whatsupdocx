@@ -13,7 +13,7 @@ type FillProperties struct {
 	// | element solidFill { a_CT_SolidColorFillProperties }
 	// | element gradFill { a_CT_GradientFillProperties }
 	// | element pattFill { a_CT_PatternFillProperties }
-	LineFillProperties
+	LineFillProperties `xml:",group,any,omitempty"`
 
 	//TODO
 	// | element blipFill { a_CT_BlipFillProperties }
@@ -33,24 +33,6 @@ type LineFillProperties struct {
 	//TODO
 	// | element gradFill { a_CT_GradientFillProperties }
 	// | element pattFill { a_CT_PatternFillProperties }
-}
-
-func (group LineFillProperties) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-
-	if group.NoFillProperties != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "a:noFill"}}
-		if err = e.EncodeElement(group.NoFillProperties, propsElement); err != nil {
-			return err
-		}
-	}
-	if group.SolidColorFillProperties != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "a:solidFill"}}
-		if err = e.EncodeElement(group.SolidColorFillProperties, propsElement); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (group *LineFillProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
@@ -80,37 +62,7 @@ type StyleMatrixReference struct {
 	// attribute idx { a_ST_StyleMatrixColumnIndex },
 	Id string `xml:"idx,attr,omitempty"`
 	// a_EG_ColorChoice?
-	ColorChoice *ColorChoice
-}
-
-func (props *StyleMatrixReference) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-	for _, attr := range start.Attr {
-		switch attr.Name.Local {
-		case "idx":
-			props.Id = attr.Value
-		}
-	}
-
-	for {
-		currentToken, err := d.Token()
-		if err != nil {
-			return err
-		}
-		switch elem := currentToken.(type) {
-		case xml.StartElement:
-			switch elem.Name.Local {
-			case "schemeClr":
-				props.ColorChoice = &ColorChoice{}
-				props.ColorChoice.UnmarshalXML(d, elem)
-			default:
-				if err = d.Skip(); err != nil {
-					return err
-				}
-			}
-		case xml.EndElement:
-			return nil
-		}
-	}
+	ColorChoice *ColorChoice `xml:",group,any,omitempty"`
 }
 
 const (
@@ -126,72 +78,14 @@ type FontReference struct {
 	// attribute idx { a_ST_FontCollectionIndex },
 	Id string `xml:"idx,attr,omitempty"`
 	// a_EG_ColorChoice?
-	ColorChoice *ColorChoice
-}
-
-func (props *FontReference) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-	for _, attr := range start.Attr {
-		switch attr.Name.Local {
-		case "idx":
-			props.Id = attr.Value
-		}
-	}
-
-	for {
-		currentToken, err := d.Token()
-		if err != nil {
-			return err
-		}
-
-		switch elem := currentToken.(type) {
-		case xml.StartElement:
-			switch elem.Name.Local {
-			case "schemeClr":
-				props.ColorChoice = &ColorChoice{}
-				props.ColorChoice.UnmarshalXML(d, elem)
-
-			default:
-				if err = d.Skip(); err != nil {
-					return err
-				}
-			}
-		case xml.EndElement:
-			return nil
-		}
-	}
+	ColorChoice *ColorChoice `xml:",group,any,omitempty"`
 }
 
 // SolidColorFillProperties specifies the properties of solid fill.
 // a_CT_SolidColorFillProperties = a_EG_ColorChoice?
 // a_EG_ColorChoice =
 type SolidColorFillProperties struct {
-	ColorChoice *ColorChoice
-}
-
-func (props *SolidColorFillProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-
-	for {
-		currentToken, err := d.Token()
-		if err != nil {
-			return err
-		}
-
-		switch elem := currentToken.(type) {
-		case xml.StartElement:
-			switch elem.Name.Local {
-			case "schemeClr":
-				props.ColorChoice = &ColorChoice{}
-				props.ColorChoice.UnmarshalXML(d, elem)
-
-			default:
-				if err = d.Skip(); err != nil {
-					return err
-				}
-			}
-		case xml.EndElement:
-			return nil
-		}
-	}
+	ColorChoice *ColorChoice `xml:",group,any,omitempty"`
 }
 
 //TODO

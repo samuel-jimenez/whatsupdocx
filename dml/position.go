@@ -7,17 +7,17 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
 
-type PoistionH struct {
+type PositionH struct {
 	RelativeFrom dmlst.RelFromH `xml:"relativeFrom,attr"`
 	PosOffset    int            `xml:"posOffset"`
 }
 
-type PoistionV struct {
+type PositionV struct {
 	RelativeFrom dmlst.RelFromV `xml:"relativeFrom,attr"`
 	PosOffset    int            `xml:"posOffset"`
 }
 
-func (p PoistionH) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (p PositionH) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 	if p.RelativeFrom == "" {
 		return errors.New("Invalid RelativeFrom in PoistionH")
@@ -40,7 +40,7 @@ func (p PoistionH) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
 
-func (p PoistionV) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (p PositionV) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if p.RelativeFrom == "" {
 		return errors.New("Invalid RelativeFrom in PoistionV")
 	}

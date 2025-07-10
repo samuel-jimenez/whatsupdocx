@@ -1,7 +1,6 @@
 package ctypes
 
 import (
-	"bytes"
 	"testing"
 
 	"github.com/samuel-jimenez/xml"
@@ -9,6 +8,13 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+func wrapCellXML(el Cell) *WrapperXML {
+	return wrapXML(struct {
+		Cell
+		XMLName struct{} `xml:"w:tc"`
+	}{Cell: el})
+}
 
 func TestCell_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -50,23 +56,18 @@ func TestCell_MarshalXML(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		object := wrapCellXML(tt.input)
+		expected := wrapXMLOutput(tt.expected)
 		t.Run(tt.name, func(t *testing.T) {
-			var buf bytes.Buffer
-			encoder := xml.NewEncoder(&buf)
-
-			start := xml.StartElement{Name: xml.Name{Local: "w:tc"}}
-			if err := encoder.EncodeElement(tt.input, start); err != nil {
-				// if err := tt.input.MarshalXML(encoder, start); err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			// Finalize encoding
-			encoder.Flush()
-
-			got := buf.String()
-			if got != tt.expected {
-				t.Errorf("Expected %v, got %v", tt.expected, got)
-			}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expected {
+					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+				}
+			}) //TODO UnmarshalXML_TOO
 		})
 	}
 }

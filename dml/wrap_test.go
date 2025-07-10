@@ -58,7 +58,8 @@ func TestWrapSquare_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{Name: xml.Name{Local: "wrapSquare"}}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
+
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -66,7 +67,7 @@ func TestWrapSquare_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}
@@ -180,7 +181,8 @@ func TestWrapPolygon_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{Name: xml.Name{Space: "wp", Local: "wrapPolygon"}}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
+
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -188,7 +190,7 @@ func TestWrapPolygon_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}
@@ -306,7 +308,8 @@ func TestWrapTight_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
+
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -314,7 +317,7 @@ func TestWrapTight_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}
@@ -482,7 +485,8 @@ func TestWrapThrough_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
+
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -490,7 +494,7 @@ func TestWrapThrough_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}
@@ -654,7 +658,8 @@ func TestWrapTopBtm_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
+
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -662,7 +667,7 @@ func TestWrapTopBtm_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}

@@ -7,8 +7,8 @@ import (
 )
 
 type Break struct {
-	BreakType *stypes.BreakType  `xml:"type,attr,omitempty"`
-	Clear     *stypes.BreakClear `xml:"clear,attr,omitempty"`
+	BreakType *stypes.BreakType  `xml:"w:type,attr,omitempty"`
+	Clear     *stypes.BreakClear `xml:"w:clear,attr,omitempty"`
 }
 
 // NewBreak creates a new Break element with the given break type.

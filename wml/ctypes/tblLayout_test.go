@@ -1,30 +1,44 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+func wrapTableLayoutXML(el *TableLayout) *WrapperXML {
+	return wrapXML(struct {
+		*TableLayout
+		XMLName struct{} `xml:"w:tblLayout"`
+	}{TableLayout: el})
+}
+
 func TestTableLayout_MarshalXML(t *testing.T) {
-	layout := &TableLayout{LayoutType: internal.ToPtr(stypes.TableLayoutFixed)}
+	tests := []struct {
+		name     string
+		input    *TableLayout
+		expected string
+	}{{
+		input:    &TableLayout{LayoutType: internal.ToPtr(stypes.TableLayoutFixed)},
+		expected: `<w:tblLayout w:type="fixed"></w:tblLayout>`,
+	}}
 
-	expected := `<w:tblLayout w:type="fixed"></w:tblLayout>`
-
-	var builder strings.Builder
-	encoder := xml.NewEncoder(&builder)
-	err := encoder.Encode(layout)
-	if err != nil {
-		t.Fatalf("Error encoding TableLayout: %v", err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output, err := xml.Marshal(wrapTableLayoutXML(tt.input))
+			expected := wrapXMLOutput(tt.expected)
+			if err != nil {
+				t.Fatalf("Error marshaling to XML: %v", err)
+			}
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
+			}
+		})
 	}
 
-	result := builder.String()
-	if result != expected {
-		t.Errorf("Unexpected XML. Expected: %s, Got: %s", expected, result)
-	}
 }
 
 func TestLayout_UnmarshalXML(t *testing.T) {
@@ -54,7 +68,6 @@ func TestLayout_UnmarshalXML(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-
 		})
 	}
 }

@@ -46,6 +46,48 @@ var (
 	MCIgnorableDoc            = xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: "w14 wp14 w15"}
 	MCIgnorableStyle          = xml.Attr{Name: xml.Name{Local: "mc:Ignorable"}, Value: "w14"}
 
+	//TODO
+	// Actual:
+	//            <testwrapper xmlns:_xmlns="xmlns" _xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" _xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+	// 	//"xmlns:a"
+	// 	NameSpaceDrawingML                      = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "a"}, Value: DrawingMLMainNS}
+	// //"xmlns:pic"
+	// 	NameSpaceDrawingMLPic                   = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "pic"}, Value: DrawingMLPicNS}
+	// 	NameSpaceDrawingMLA14                   = xml.Attr{Name: xml.Name{Local: "a14", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2010/main"}
+	// 	NameSpaceDrawingMLChart                 = xml.Attr{Name: xml.Name{Local: "c", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/drawingml/2006/chart"}
+	// 	NameSpaceDrawingMLSlicer                = xml.Attr{Name: xml.Name{Local: "sle", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2010/slicer"}
+	// 	NameSpaceDrawingMLSlicerX15             = xml.Attr{Name: xml.Name{Local: "sle15", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2012/slicer"}
+	// 	SourceRelationship                      = xml.Attr{Name: xml.Name{Local: "r", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
+	// 	SourceRelationshipChart20070802         = xml.Attr{Name: xml.Name{Local: "c14", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2007/8/2/chart"}
+	// 	SourceRelationshipChart2014             = xml.Attr{Name: xml.Name{Local: "c16", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2014/chart"}
+	// 	SourceRelationshipChart201506           = xml.Attr{Name: xml.Name{Local: "c16r2", Space: "xmlns"}, Value: "http://schemas.microsoft.com/office/drawing/2015/06/chart"}
+	// 	SourceRelationshipCompatibility         = xml.Attr{Name: xml.Name{Local: "mc", Space: "xmlns"}, Value: "http://schemas.openxmlformats.org/markup-compatibility/2006"}
+	//
+	// //"xmlns:w"
+	// 	NameSpaceWordprocessingML = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "w"}, Value: "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+	// //"xmlns:o"
+	// 	NameSpaceO                = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "o"}, Value: "urn:schemas-microsoft-com:office:office"}
+	// //"xmlns:r"
+	// 	NameSpaceR                = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "r"}, Value: "http://schemas.openxmlformats.org/officeDocument/2006/relationships"}
+	// //"xmlns:v"
+	// 	NameSpaceV                = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "v"}, Value: "urn:schemas-microsoft-com:vml"}
+	// //"xmlns:w10"
+	// 	NameSpaceW10              = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "w10"}, Value: "urn:schemas-microsoft-com:office:word"}
+	// //"xmlns:wp"
+	// 	NameSpaceWp               = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "wp"}, Value: "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"}
+	// //"xmlns:wps"
+	// 	NameSpaceWps              = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "wps"}, Value: "http://schemas.microsoft.com/office/word/2010/wordprocessingShape"}
+	// //"xmlns:wpg"
+	// 	NameSpaceWpg              = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "wpg"}, Value: "http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"}
+	// //"xmlns:mc"
+	// 	NameSpaceMc               = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "mc"}, Value: "http://schemas.openxmlformats.org/markup-compatibility/2006"}
+	// //"xmlns:wp14"
+	// 	NameSpaceWp14             = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "wp14"}, Value: "http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"}
+	// //"xmlns:w14"
+	// 	NameSpaceW14              = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "w14"}, Value: "http://schemas.microsoft.com/office/word/2010/wordml"}
+	// //"xmlns:w15"
+	// 	NameSpaceW15              = xml.Attr{Name: xml.Name{Space: "xmlns",Local: "w15"}, Value: "http://schemas.microsoft.com/office/word/2012/wordml"}
+
 	DefaultNamespacesDoc = []xml.Attr{
 		NameSpaceWordprocessingML,
 		NameSpaceO,

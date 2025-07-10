@@ -1,24 +1,40 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"errors"
-	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+type LsdExceptionXML struct {
+	Attr    xml.Attr     `xml:",any,attr,omitempty"`
+	Element LsdException `xml:"LsdException"`
+}
+
+func wrapLsdExceptionXML(el LsdException) *LsdExceptionXML {
+	return &LsdExceptionXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapLsdExceptionOutput(output string) string {
+	return `<LsdExceptionXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</LsdExceptionXML>`
+}
+
 func TestLsdException_MarshalXML(t *testing.T) {
 	tests := []struct {
 		name     string
-		lsd      LsdException
+		input    LsdException
 		expected string
 	}{
 		{
 			name: "All attributes set",
-			lsd: LsdException{
+			input: LsdException{
 				Name:           "Heading1",
 				Locked:         internal.ToPtr(stypes.OnOffOn),
 				UIPriority:     internal.ToPtr(99),
@@ -30,25 +46,21 @@ func TestLsdException_MarshalXML(t *testing.T) {
 		},
 		{
 			name: "Only name set",
-			lsd: LsdException{
+			input: LsdException{
 				Name: "Heading2",
 			},
 			expected: `<w:lsdException w:name="Heading2"></w:lsdException>`,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			e := xml.NewEncoder(&result)
-			err := tt.lsd.MarshalXML(e, xml.StartElement{Name: xml.Name{Local: "LsdException"}})
+			output, err := xml.Marshal(wrapLsdExceptionXML(tt.input))
+			expected := wrapLsdExceptionOutput(tt.expected)
 			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-			e.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

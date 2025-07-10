@@ -1,13 +1,28 @@
 package ctypes
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/samuel-jimenez/xml"
 
+	"github.com/samuel-jimenez/whatsupdocx/common/constants"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
+
+type PageSizeXML struct {
+	Attr    xml.Attr `xml:",any,attr,omitempty"`
+	Element PageSize `xml:"w:pgSz"`
+}
+
+func wrapPageSizeXML(el PageSize) *PageSizeXML {
+	return &PageSizeXML{
+		Attr:    constants.NameSpaceWordprocessingML,
+		Element: el,
+	}
+}
+func wrapPageSizeOutput(output string) string {
+	return `<PageSizeXML xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` + output + `</PageSizeXML>`
+}
 
 func TestPageSize_MarshalXML(t *testing.T) {
 	tests := []struct {
@@ -42,18 +57,13 @@ func TestPageSize_MarshalXML(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "w:pgSz"}}
-
-			if err := encoder.EncodeElement(tt.input, start); err != nil {
-				// if err := tt.input.MarshalXML(encoder, start); err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
+			output, err := xml.Marshal(wrapPageSizeXML(tt.input))
+			expected := wrapPageSizeOutput(tt.expected)
+			if err != nil {
+				t.Fatalf("Error marshaling to XML: %v", err)
 			}
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\n\nGot:\n%s", tt.expected, result.String())
+			if got := string(output); got != expected {
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
 			}
 		})
 	}

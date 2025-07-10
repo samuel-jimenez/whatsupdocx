@@ -36,7 +36,8 @@ func TestShapeGuide_MarshalXML(t *testing.T) {
 			encoder := xml.NewEncoder(&result)
 			start := xml.StartElement{Name: xml.Name{Local: "a:gd"}}
 
-			err := tt.input.MarshalXML(encoder, start)
+			err := encoder.EncodeElement(tt.input, start)
+
 			if err != nil {
 				t.Fatalf("Error marshaling XML: %v", err)
 			}
@@ -44,7 +45,7 @@ func TestShapeGuide_MarshalXML(t *testing.T) {
 			encoder.Flush()
 
 			if result.String() != tt.expected {
-				t.Errorf("Expected XML:\n%s\nGot:\n%s", tt.expected, result.String())
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
 			}
 		})
 	}

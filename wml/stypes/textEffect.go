@@ -1,11 +1,20 @@
 package stypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"errors"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 // TextEffect represents the possible values for text animation effects.
+// w_ST_TextEffect =
+// string "blinkBackground"
+// | string "lights"
+// | string "antsBlack"
+// | string "antsRed"
+// | string "shimmer"
+// | string "sparkle"
+// | string "none"
 type TextEffect string
 
 const (

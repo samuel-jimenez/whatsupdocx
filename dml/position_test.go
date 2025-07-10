@@ -9,11 +9,11 @@ import (
 
 func TestMarshalPoistionH(t *testing.T) {
 	tests := []struct {
-		positionH   *PoistionH
+		positionH   *PositionH
 		expectedXML string
 	}{
 		{
-			positionH: &PoistionH{
+			positionH: &PositionH{
 				RelativeFrom: dmlst.RelFromHMargin,
 				PosOffset:    100,
 			},
@@ -29,7 +29,7 @@ func TestMarshalPoistionH(t *testing.T) {
 			}
 
 			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
 			}
 		})
 	}
@@ -38,11 +38,11 @@ func TestMarshalPoistionH(t *testing.T) {
 func TestUnmarshalPoistionH(t *testing.T) {
 	tests := []struct {
 		inputXML    string
-		expectedPos PoistionH
+		expectedPos PositionH
 	}{
 		{
 			inputXML: `<wp:positionH relativeFrom="margin"><wp:posOffset>100</wp:posOffset></wp:positionH>`,
-			expectedPos: PoistionH{
+			expectedPos: PositionH{
 				RelativeFrom: dmlst.RelFromHMargin,
 				PosOffset:    100,
 			},
@@ -51,7 +51,7 @@ func TestUnmarshalPoistionH(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.inputXML, func(t *testing.T) {
-			var pos PoistionH
+			var pos PositionH
 
 			err := xml.Unmarshal([]byte(tt.inputXML), &pos)
 			if err != nil {
@@ -70,11 +70,11 @@ func TestUnmarshalPoistionH(t *testing.T) {
 
 func TestMarshalPoistionV(t *testing.T) {
 	tests := []struct {
-		positionV   *PoistionV
+		positionV   *PositionV
 		expectedXML string
 	}{
 		{
-			positionV: &PoistionV{
+			positionV: &PositionV{
 				RelativeFrom: dmlst.RelFromVParagraph,
 				PosOffset:    200,
 			},
@@ -90,7 +90,7 @@ func TestMarshalPoistionV(t *testing.T) {
 			}
 
 			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("Expected XML:\n%s\nBut got:\n%s", tt.expectedXML, generatedXML)
+				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
 			}
 		})
 	}
@@ -99,11 +99,11 @@ func TestMarshalPoistionV(t *testing.T) {
 func TestUnmarshalPoistionV(t *testing.T) {
 	tests := []struct {
 		inputXML    string
-		expectedPos PoistionV
+		expectedPos PositionV
 	}{
 		{
 			inputXML: `<wp:positionV relativeFrom="paragraph"><wp:posOffset>200</wp:posOffset></wp:positionV>`,
-			expectedPos: PoistionV{
+			expectedPos: PositionV{
 				RelativeFrom: dmlst.RelFromVParagraph,
 				PosOffset:    200,
 			},
@@ -112,7 +112,7 @@ func TestUnmarshalPoistionV(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.inputXML, func(t *testing.T) {
-			var pos PoistionV
+			var pos PositionV
 
 			err := xml.Unmarshal([]byte(tt.inputXML), &pos)
 			if err != nil {

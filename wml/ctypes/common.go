@@ -1,18 +1,8 @@
 package ctypes
 
-import (
-	"github.com/samuel-jimenez/xml"
-	"strconv"
-)
-
 // Generic Element with Single Val attribute
 type GenSingleStrVal[T ~string] struct {
-	Val T `xml:"val,attr"`
-}
-
-func (g GenSingleStrVal[T]) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: string(g.Val)})
-	return e.EncodeElement("", start)
+	Val T `xml:"w:val,attr"`
 }
 
 func NewGenSingleStrVal[T ~string](val T) *GenSingleStrVal[T] {
@@ -23,14 +13,7 @@ func NewGenSingleStrVal[T ~string](val T) *GenSingleStrVal[T] {
 
 // Generic Element with Optional Single Val attribute
 type GenOptStrVal[T ~string] struct {
-	Val *T `xml:"val,attr"`
-}
-
-func (g GenOptStrVal[T]) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if g.Val != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: string(*g.Val)})
-	}
-	return e.EncodeElement("", start)
+	Val *T `xml:"w:val,attr,omitempty"`
 }
 
 func NewGenOptStrVal[T ~string](val T) *GenOptStrVal[T] {
@@ -43,7 +26,7 @@ func NewGenOptStrVal[T ~string](val T) *GenOptStrVal[T] {
 // And the String type does not have validation
 // dont use this if the element requires validation
 type CTString struct {
-	Val string `xml:"val,attr"`
+	Val string `xml:"w:val,attr"`
 }
 
 func NewCTString(value string) *CTString {
@@ -52,30 +35,14 @@ func NewCTString(value string) *CTString {
 	}
 }
 
-// MarshalXML implements the xml.Marshaler interface for the CTString type.
-// It encodes the instance into XML using the "w:ELEMENT_NAME" element with a "w:val" attribute.
-func (s CTString) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: s.Val})
-	err := e.EncodeElement("", start)
-
-	return err
-}
-
 type DecimalNum struct {
-	Val int `xml:"val,attr"`
+	Val int `xml:"w:val,attr"`
 }
 
 func NewDecimalNum(value int) *DecimalNum {
 	return &DecimalNum{
 		Val: value,
 	}
-}
-
-func (s DecimalNum) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: strconv.Itoa(s.Val)})
-	err := e.EncodeElement("", start)
-
-	return err
 }
 
 // !--- DecimalNum ends here---!
@@ -86,7 +53,7 @@ func (s DecimalNum) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // can be used where w:ST_UnsignedDecimalNumber is applicable
 // example: ST_HpsMeasure
 type Uint64Elem struct {
-	Val uint64 `xml:"val,attr"`
+	Val uint64 `xml:"w:val,attr"`
 }
 
 func NewUint64Elem(value uint64) *Uint64Elem {
@@ -95,22 +62,8 @@ func NewUint64Elem(value uint64) *Uint64Elem {
 	}
 }
 
-// MarshalXML implements the xml.Marshaler interface for the Uint64Elem type.
-// It encodes the instance into XML using the "w:ELEMENT_NAME" element with a "w:val" attribute.
-func (s Uint64Elem) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:val"}, Value: strconv.FormatUint(s.Val, 10)})
-	err := e.EncodeElement("", start)
-
-	return err
-}
-
 // !--- Uint64Elem ends here---!
 
 type Markup struct {
-	ID int `xml:"id,attr"`
-}
-
-func (m Markup) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "w:id"}, Value: strconv.Itoa(m.ID)})
-	return e.EncodeElement("", start)
+	ID int `xml:"w:id,attr"`
 }

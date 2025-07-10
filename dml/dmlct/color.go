@@ -11,17 +11,11 @@ type ColorChoice struct {
 	// | element hslClr { a_CT_HslColor }
 	// | element sysClr { a_CT_SystemColor }
 	// | element schemeClr { a_CT_SchemeColor }
-	SchemeColor *SchemeColor
+	SchemeColor *SchemeColor `xml:"a:schemeClr,omitempty"`
 	// | element prstClr { a_CT_PresetColor }
 }
 
 // group marshal
-func (group ColorChoice) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-	if group.SchemeColor != nil {
-		return e.EncodeElement(group.SchemeColor, xml.StartElement{Name: xml.Name{Local: "a:schemeClr"}})
-	}
-	return nil
-}
 
 func (group *ColorChoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
 
@@ -65,7 +59,7 @@ type SchemeColor struct {
 	// attribute val { a_ST_SchemeColorVal },
 	Val string `xml:"val,attr"`
 	// a_EG_ColorTransform*
-	ColorTransform []ColorTransform
+	ColorTransform []ColorTransform `xml:",group,any,omitempty"`
 }
 
 func (props *SchemeColor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
@@ -87,7 +81,9 @@ func (props *SchemeColor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (
 			switch elem.Name.Local {
 			case "lumOff", "lumMod":
 				colorTransform := ColorTransform{}
-				colorTransform.UnmarshalXML(d, elem)
+				if err = d.DecodeElement(&colorTransform, &elem); err != nil {
+					return err
+				}
 				props.ColorTransform = append(props.ColorTransform, colorTransform)
 
 			default:
@@ -140,7 +136,7 @@ type ColorTransform struct {
 	// | element lum { a_CT_Percentage }
 	// | element lumOff { a_CT_Percentage }
 	// | element lumMod { a_CT_Percentage }
-	LumMod *Percentage `xml:"lumMod,omitempty"`
+	LumMod *Percentage `xml:"a:lumMod,omitempty"`
 
 	// | element red { a_CT_Percentage }
 	// | element redOff { a_CT_Percentage }
@@ -154,19 +150,6 @@ type ColorTransform struct {
 	// | element gamma { a_CT_GammaTransform }
 	// | element invGamma { a_CT_InverseGammaTransform }
 
-}
-
-// // group marshal
-func (group ColorTransform) MarshalXML(e *xml.Encoder, start xml.StartElement) (err error) {
-
-	if group.LumMod != nil {
-		propsElement := xml.StartElement{Name: xml.Name{Local: "a:lumMod"}}
-		if err = e.EncodeElement(group.LumMod, propsElement); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 func (group *ColorTransform) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {

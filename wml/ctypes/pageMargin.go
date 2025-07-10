@@ -1,27 +1,28 @@
 package ctypes
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"strconv"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 // PageMargin represents the page margins of a Word document.
 // w_CT_PageMar =
 type PageMargin struct {
 	// attribute w:top { w_ST_SignedTwipsMeasure },
-	Top *int `xml:"top,attr,omitempty"`
+	Top *int `xml:"w:top,attr,omitempty"`
 	// attribute w:right { s_ST_TwipsMeasure },
-	Right *int `xml:"right,attr,omitempty"`
+	Right *int `xml:"w:right,attr,omitempty"`
 	// attribute w:bottom { w_ST_SignedTwipsMeasure },
-	Bottom *int `xml:"bottom,attr,omitempty"`
+	Bottom *int `xml:"w:bottom,attr,omitempty"`
 	// attribute w:left { s_ST_TwipsMeasure },
-	Left *int `xml:"left,attr,omitempty"`
+	Left *int `xml:"w:left,attr,omitempty"`
 	// attribute w:header { s_ST_TwipsMeasure },
-	Header *int `xml:"header,attr,omitempty"`
+	Header *int `xml:"w:header,attr,omitempty"`
 	// attribute w:footer { s_ST_TwipsMeasure },
-	Footer *int `xml:"footer,attr,omitempty"`
+	Footer *int `xml:"w:footer,attr,omitempty"`
 	// attribute w:gutter { s_ST_TwipsMeasure }
-	Gutter *int `xml:"gutter,attr,omitempty"`
+	Gutter *int `xml:"w:gutter,attr,omitempty"`
 }
 
 // MarshalXML implements the xml.Marshaler interface for the PageMargin type.
