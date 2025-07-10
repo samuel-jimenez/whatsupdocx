@@ -101,6 +101,7 @@ type Anchor struct {
 
 	// 6. Wrapping
 	// wp_EG_WrapType,
+	// WrapType WrapType `xml:",group,omitempty"`
 	//TODO
 	// 6.1 .wrapNone
 	WrapNone *WrapNone `xml:"wp:wrapNone,omitempty"`

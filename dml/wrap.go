@@ -9,7 +9,60 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 )
 
+// TODO
+// wp_EG_WrapType =
+// element wrapNone { wp_CT_WrapNone }
+// | element wrapSquare { wp_CT_WrapSquare }
+// | element wrapTight { wp_CT_WrapTight }
+// | element wrapThrough { wp_CT_WrapThrough }
+// | element wrapTopAndBottom { wp_CT_WrapTopBottom }
+
+type WrapType struct {
+	// 6.1 .wrapNone
+	WrapNone *WrapNone `xml:"wp:wrapNone,omitempty"`
+
+	// 6.2. wrapSquare
+	WrapSquare *WrapSquare `xml:"wp:wrapSquare,omitempty"`
+
+	// 6.3. wrapThrough
+	WrapThrough *WrapThrough `xml:"wp:wrapThrough,omitempty"`
+
+	// 6.4. wrapTopAndBottom
+	WrapTopBtm *WrapTopBtm `xml:"wp:wrapTopAndBottom,omitempty"`
+}
+
 // TODO fix this
+
+// wp_ST_WrapText = "bothSides" | "left" | "right" | "largest"
+// wp_CT_WrapPath =
+// attribute edited { xsd:boolean }?,
+// element start { a_CT_Point2D },
+// element lineTo { a_CT_Point2D }+
+// wp_CT_WrapNone = empty
+// wp_CT_WrapSquare =
+// ISO/IEC 29500-1:2016(E)
+// ©ISO/IEC 2016 – All rights reserved
+// attribute wrapText { wp_ST_WrapText },
+// attribute distT { wp_ST_WrapDistance }?,
+// attribute distB { wp_ST_WrapDistance }?,
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element effectExtent { wp_CT_EffectExtent }?
+// wp_CT_WrapTight =
+// attribute wrapText { wp_ST_WrapText },
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element wrapPolygon { wp_CT_WrapPath }
+// wp_CT_WrapThrough =
+// attribute wrapText { wp_ST_WrapText },
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element wrapPolygon { wp_CT_WrapPath }
+// wp_CT_WrapTopBottom =
+// attribute distT { wp_ST_WrapDistance }?,
+// attribute distB { wp_ST_WrapDistance }?,
+// element effectExtent { wp_CT_EffectExtent }?
+
 type WrapNone struct {
 	XMLName xml.Name `xml:"wrapNone"`
 }
