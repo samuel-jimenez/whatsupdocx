@@ -25,6 +25,7 @@ type WrapType struct {
 	WrapSquare *WrapSquare `xml:"wp:wrapSquare,omitempty"`
 
 	// | element wrapTight { wp_CT_WrapTight }
+	WrapTight *WrapTight `xml:"wp:wrapTight,omitempty"`
 
 	// | element wrapThrough { wp_CT_WrapThrough }
 	WrapThrough *WrapThrough `xml:"wp:wrapThrough,omitempty"`

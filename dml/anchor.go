@@ -101,19 +101,7 @@ type Anchor struct {
 
 	// 6. Wrapping
 	// wp_EG_WrapType,
-	// WrapType WrapType `xml:",group,omitempty"`
-	//TODO
-	// 6.1 .wrapNone
-	WrapNone *WrapNone `xml:"wp:wrapNone,omitempty"`
-
-	// 6.2. wrapSquare
-	WrapSquare *WrapSquare `xml:"wp:wrapSquare,omitempty"`
-
-	// 6.3. wrapThrough
-	WrapThrough *WrapThrough `xml:"wp:wrapThrough,omitempty"`
-
-	// 6.4. wrapTopAndBottom
-	WrapTopBtm *WrapTopBtm `xml:"wp:wrapTopAndBottom,omitempty"`
+	WrapType WrapType `xml:",group"`
 
 	// 7. Drawing Object Non-Visual Properties
 	// element docPr { a_CT_NonVisualDrawingProps },

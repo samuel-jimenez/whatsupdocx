@@ -72,7 +72,7 @@ func TestMarshalDrawing(t *testing.T) {
 							RightEdge:  3,
 							BottomEdge: 4,
 						},
-						WrapNone: &WrapNone{},
+						WrapType: WrapType{WrapNone: &WrapNone{}},
 						PositionH: PositionH{
 							RelativeFrom: dmlst.RelFromHColumn,
 						},
@@ -189,7 +189,7 @@ func TestUnmarshalDrawing(t *testing.T) {
 							RightEdge:  3,
 							BottomEdge: 4,
 						},
-						WrapNone: &WrapNone{},
+						WrapType: WrapType{WrapNone: &WrapNone{}},
 					},
 				},
 			},
