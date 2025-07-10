@@ -1,9 +1,10 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 func TestNewEffectExtent(t *testing.T) {
@@ -30,28 +31,58 @@ func TestNewEffectExtent(t *testing.T) {
 	}
 }
 
-func TestMarshalEffectExtent(t *testing.T) {
+func wrapEffectExtentXML(el *EffectExtent) *WrapperXML {
+	return wrapXML(struct {
+		*EffectExtent
+		XMLName struct{} `xml:"wp:effectExtent"`
+	}{EffectExtent: el})
+}
+
+func TestEffectExtent_MarshalXML(t *testing.T) {
 	tests := []struct {
-		extent      *EffectExtent
+		name        string
+		input       *EffectExtent
 		expectedXML string
-		xmlName     string
 	}{
 		{
-			extent:      NewEffectExtent(-27273042329600, -1, -2, 27273042316900),
+			name:        "NewEffectExtent",
+			input:       NewEffectExtent(-27273042329600, -1, -2, 27273042316900),
 			expectedXML: `<wp:effectExtent l="-27273042329600" t="-1" r="-2" b="27273042316900"></wp:effectExtent>`,
+		},
+		{
+			name:        "Default",
+			input:       &EffectExtent{},
+			expectedXML: `<wp:effectExtent l="0" t="0" r="0" b="0"></wp:effectExtent>`,
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.xmlName, func(t *testing.T) {
-			generatedXML, err := xml.Marshal(tt.extent)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
+		object := wrapEffectExtentXML(tt.input)
+		expectedXML := wrapXMLOutput(tt.expectedXML)
+		t.Run(tt.name, func(t *testing.T) {
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expectedXML {
+					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML = tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
 
-			if string(generatedXML) != tt.expectedXML {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, generatedXML)
-			}
+			})
 		})
 	}
 }

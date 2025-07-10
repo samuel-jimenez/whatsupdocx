@@ -1,8 +1,6 @@
 package dml
 
 import (
-	"strconv"
-
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
@@ -17,52 +15,40 @@ import (
 // | element wrapThrough { wp_CT_WrapThrough }
 // | element wrapTopAndBottom { wp_CT_WrapTopBottom }
 
+// wp_EG_WrapType =
 type WrapType struct {
-	// 6.1 .wrapNone
+
+	// element wrapNone { wp_CT_WrapNone }
 	WrapNone *WrapNone `xml:"wp:wrapNone,omitempty"`
 
-	// 6.2. wrapSquare
+	// | element wrapSquare { wp_CT_WrapSquare }
 	WrapSquare *WrapSquare `xml:"wp:wrapSquare,omitempty"`
 
-	// 6.3. wrapThrough
+	// | element wrapTight { wp_CT_WrapTight }
+
+	// | element wrapThrough { wp_CT_WrapThrough }
 	WrapThrough *WrapThrough `xml:"wp:wrapThrough,omitempty"`
 
-	// 6.4. wrapTopAndBottom
+	// | element wrapTopAndBottom { wp_CT_WrapTopBottom }
 	WrapTopBtm *WrapTopBtm `xml:"wp:wrapTopAndBottom,omitempty"`
 }
 
-// TODO fix this
-
-// wp_ST_WrapText = "bothSides" | "left" | "right" | "largest"
 // wp_CT_WrapPath =
 // attribute edited { xsd:boolean }?,
 // element start { a_CT_Point2D },
 // element lineTo { a_CT_Point2D }+
-// wp_CT_WrapNone = empty
-// wp_CT_WrapSquare =
-// ISO/IEC 29500-1:2016(E)
-// ©ISO/IEC 2016 – All rights reserved
-// attribute wrapText { wp_ST_WrapText },
-// attribute distT { wp_ST_WrapDistance }?,
-// attribute distB { wp_ST_WrapDistance }?,
-// attribute distL { wp_ST_WrapDistance }?,
-// attribute distR { wp_ST_WrapDistance }?,
-// element effectExtent { wp_CT_EffectExtent }?
-// wp_CT_WrapTight =
-// attribute wrapText { wp_ST_WrapText },
-// attribute distL { wp_ST_WrapDistance }?,
-// attribute distR { wp_ST_WrapDistance }?,
-// element wrapPolygon { wp_CT_WrapPath }
-// wp_CT_WrapThrough =
-// attribute wrapText { wp_ST_WrapText },
-// attribute distL { wp_ST_WrapDistance }?,
-// attribute distR { wp_ST_WrapDistance }?,
-// element wrapPolygon { wp_CT_WrapPath }
-// wp_CT_WrapTopBottom =
-// attribute distT { wp_ST_WrapDistance }?,
-// attribute distB { wp_ST_WrapDistance }?,
-// element effectExtent { wp_CT_EffectExtent }?
 
+// wp_CT_WrapPath =
+type WrapPolygon struct {
+	// attribute edited { xsd:boolean }?,
+	Edited *bool `xml:"edited,attr,omitempty"`
+	// element start { a_CT_Point2D },
+	Start dmlct.Point2D `xml:"wp:start"`
+	// element lineTo { a_CT_Point2D }+
+	LineTo []dmlct.Point2D `xml:"wp:lineTo"`
+}
+
+// wp_CT_WrapNone = empty
 type WrapNone struct {
 	XMLName xml.Name `xml:"wrapNone"`
 }
@@ -78,224 +64,113 @@ func (w WrapNone) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // func (w WrapThrough) getWrapName() {}
 // func (w WrapTopBtm) getWrapName()  {}
 
+// wp_CT_WrapSquare =
+// attribute wrapText { wp_ST_WrapText },
+// attribute distT { wp_ST_WrapDistance }?,
+// attribute distB { wp_ST_WrapDistance }?,
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element effectExtent { wp_CT_EffectExtent }?
+
+// wp_CT_WrapSquare =
 type WrapSquare struct {
-	XMLName xml.Name `xml:"wrapSquare"`
 
 	//Text Wrapping Location
+	// attribute wrapText { wp_ST_WrapText },
 	WrapText dmlst.WrapText `xml:"wrapText,attr"`
 
 	//Distance From Text (Top)
+	// attribute distT { wp_ST_WrapDistance }?,
 	DistT *uint `xml:"distT,attr,omitempty"`
 
 	//Distance From Text on Bottom Edge
+	// attribute distB { wp_ST_WrapDistance }?,
 	DistB *uint `xml:"distB,attr,omitempty"`
 
 	//Distance From Text on Left Edge
+	// attribute distL { wp_ST_WrapDistance }?,
 	DistL *uint `xml:"distL,attr,omitempty"`
 
 	//Distance From Text on Right Edge
+	// attribute distR { wp_ST_WrapDistance }?,
 	DistR *uint `xml:"distR,attr,omitempty"`
 
-	EffectExtent *EffectExtent `xml:"effectExtent,omitempty"`
+	// element effectExtent { wp_CT_EffectExtent }?
+	EffectExtent *EffectExtent `xml:"wp:effectExtent,omitempty"`
 }
 
-func (ws WrapSquare) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "wp:wrapSquare"
-
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "wrapText"}, Value: string(ws.WrapText)},
-	}
-
-	if ws.DistT != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distT"}, Value: strconv.FormatUint(uint64(*ws.DistT), 10)})
-	}
-	if ws.DistB != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distB"}, Value: strconv.FormatUint(uint64(*ws.DistB), 10)})
-	}
-	if ws.DistL != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distL"}, Value: strconv.FormatUint(uint64(*ws.DistL), 10)})
-	}
-	if ws.DistR != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distR"}, Value: strconv.FormatUint(uint64(*ws.DistR), 10)})
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if ws.EffectExtent != nil {
-		if err := ws.EffectExtent.MarshalXML(e, xml.StartElement{}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
-
-type WrapPolygon struct {
-	Start  dmlct.Point2D   `xml:"start"`
-	LineTo []dmlct.Point2D `xml:"lineTo"`
-	Edited *bool           `xml:"edited,attr,omitempty"`
-}
-
-func (wp WrapPolygon) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "wp:wrapPolygon"
-
-	start.Attr = []xml.Attr{}
-
-	if wp.Edited != nil {
-		if *wp.Edited {
-			start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "edited"}, Value: "true"})
-		} else {
-			start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "edited"}, Value: "false"})
-		}
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if err := wp.Start.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "wp:start"},
-	}); err != nil {
-		return err
-	}
-
-	for _, lineTo := range wp.LineTo {
-		if err := lineTo.MarshalXML(e, xml.StartElement{
-			Name: xml.Name{Local: "wp:lineTo"},
-		}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
+// wp_CT_WrapTight =
+// attribute wrapText { wp_ST_WrapText },
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element wrapPolygon { wp_CT_WrapPath }
 
 // Tight Wrapping
+// wp_CT_WrapTight =
 type WrapTight struct {
-	XMLName xml.Name `xml:"wrapTight"`
-
-	//Tight Wrapping Extents Polygon
-	WrapPolygon WrapPolygon `xml:"wrapPolygon"`
 
 	// Text Wrapping Location
+	// attribute wrapText { wp_ST_WrapText },
 	WrapText dmlst.WrapText `xml:"wrapText,attr"`
 
 	// Distance From Text on Left Edge
+	// attribute distL { wp_ST_WrapDistance }?,
 	DistL *uint `xml:"distL,attr,omitempty"`
 
 	// Distance From Text on Right Edge
+	// attribute distR { wp_ST_WrapDistance }?,
 	DistR *uint `xml:"distR,attr,omitempty"`
+
+	//Tight Wrapping Extents Polygon
+	// element wrapPolygon { wp_CT_WrapPath }
+	WrapPolygon WrapPolygon `xml:"wp:wrapPolygon"`
 }
 
-func (w WrapTight) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "wp:wrapTight"
-
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "wrapText"}, Value: string(w.WrapText)},
-	}
-
-	if w.DistL != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distL"}, Value: strconv.FormatUint(uint64(*w.DistL), 10)})
-	}
-	if w.DistR != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distR"}, Value: strconv.FormatUint(uint64(*w.DistR), 10)})
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if err := w.WrapPolygon.MarshalXML(e, xml.StartElement{}); err != nil {
-		return err
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
+// wp_CT_WrapThrough =
+// attribute wrapText { wp_ST_WrapText },
+// attribute distL { wp_ST_WrapDistance }?,
+// attribute distR { wp_ST_WrapDistance }?,
+// element wrapPolygon { wp_CT_WrapPath }
 
 // Through Wrapping
+// wp_CT_WrapThrough =
 type WrapThrough struct {
-	XMLName xml.Name `xml:"wrapThrough"`
-
-	//Tight Wrapping Extents Polygon
-	WrapPolygon WrapPolygon `xml:"wrapPolygon"`
 
 	// Text Wrapping Location
+	// attribute wrapText { wp_ST_WrapText },
 	WrapText dmlst.WrapText `xml:"wrapText,attr"`
 
 	// Distance From Text on Left Edge
+	// attribute distL { wp_ST_WrapDistance }?,
 	DistL *uint `xml:"distL,attr,omitempty"`
 
 	// Distance From Text on Right Edge
+	// attribute distR { wp_ST_WrapDistance }?,
 	DistR *uint `xml:"distR,attr,omitempty"`
+
+	//Tight Wrapping Extents Polygon
+	// element wrapPolygon { wp_CT_WrapPath }
+	WrapPolygon WrapPolygon `xml:"wp:wrapPolygon"`
 }
 
-func (w WrapThrough) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "wp:wrapThrough"
-
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "wrapText"}, Value: string(w.WrapText)},
-	}
-
-	if w.DistL != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distL"}, Value: strconv.FormatUint(uint64(*w.DistL), 10)})
-	}
-	if w.DistR != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distR"}, Value: strconv.FormatUint(uint64(*w.DistR), 10)})
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if err := w.WrapPolygon.MarshalXML(e, xml.StartElement{}); err != nil {
-		return err
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
+// wp_CT_WrapTopBottom =
+// attribute distT { wp_ST_WrapDistance }?,
+// attribute distB { wp_ST_WrapDistance }?,
+// element effectExtent { wp_CT_EffectExtent }?
 
 // Top and Bottom Wrapping
+// wp_CT_WrapTopBottom =
 type WrapTopBtm struct {
-	XMLName xml.Name `xml:"wrapTopAndBottom"`
 
 	//Distance From Text (Top)
+	// attribute distT { wp_ST_WrapDistance }?,
 	DistT *uint `xml:"distT,attr,omitempty"`
 
 	//Distance From Text on Bottom Edge
+	// attribute distB { wp_ST_WrapDistance }?,
 	DistB *uint `xml:"distB,attr,omitempty"`
 
 	//Wrapping Boundaries
-	EffectExtent *EffectExtent `xml:"effectExtent,omitempty"`
-}
-
-func (w WrapTopBtm) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "wp:wrapTopAndBottom"
-
-	start.Attr = []xml.Attr{}
-
-	if w.DistT != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distT"}, Value: strconv.FormatUint(uint64(*w.DistT), 10)})
-	}
-	if w.DistB != nil {
-		start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "distB"}, Value: strconv.FormatUint(uint64(*w.DistB), 10)})
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	if w.EffectExtent != nil {
-		if err := w.EffectExtent.MarshalXML(e, xml.StartElement{}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
+	// element effectExtent { wp_CT_EffectExtent }?
+	EffectExtent *EffectExtent `xml:"wp:effectExtent,omitempty"`
 }

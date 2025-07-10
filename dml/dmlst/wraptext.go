@@ -1,11 +1,13 @@
 package dmlst
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"errors"
+
+	"github.com/samuel-jimenez/xml"
 )
 
 // WrapText type
+// wp_ST_WrapText = "bothSides" | "left" | "right" | "largest"
 type WrapText string
 
 // Constants for valid values

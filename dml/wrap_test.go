@@ -1,25 +1,32 @@
 package dml
 
 import (
-	"github.com/samuel-jimenez/xml"
 	"reflect"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlst"
 	"github.com/samuel-jimenez/whatsupdocx/internal"
 )
 
+func wrapWrapSquareXML(el *WrapSquare) *WrapperXML {
+	return wrapXML(struct {
+		*WrapSquare
+		XMLName struct{} `xml:"wp:wrapSquare"`
+	}{WrapSquare: el})
+}
+
 func TestWrapSquare_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    WrapSquare
-		expected string
+		name        string
+		input       *WrapSquare
+		expectedXML string
 	}{
 		{
 			name: "With all attributes and EffectExtent",
-			input: WrapSquare{
+			input: &WrapSquare{
 				WrapText: dmlst.WrapTextLeft,
 				DistT:    internal.ToPtr(uint(10)),
 				DistB:    internal.ToPtr(uint(15)),
@@ -32,43 +39,53 @@ func TestWrapSquare_MarshalXML(t *testing.T) {
 					BottomEdge: 4,
 				},
 			},
-			expected: `<wp:wrapSquare wrapText="left" distT="10" distB="15" distL="5" distR="8"><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent></wp:wrapSquare>`,
+			expectedXML: `<wp:wrapSquare wrapText="left" distT="10" distB="15" distL="5" distR="8"><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent></wp:wrapSquare>`,
 		},
 		{
 			name: "Only WrapText attribute",
-			input: WrapSquare{
+			input: &WrapSquare{
 				WrapText: dmlst.WrapTextLeft,
 			},
-			expected: `<wp:wrapSquare wrapText="left"></wp:wrapSquare>`,
+			expectedXML: `<wp:wrapSquare wrapText="left"></wp:wrapSquare>`,
 		},
 		{
 			name: "With DistT and DistR attributes",
-			input: WrapSquare{
+			input: &WrapSquare{
 				WrapText: dmlst.WrapTextLeft,
 				DistT:    internal.ToPtr(uint(10)),
 				DistR:    internal.ToPtr(uint(8)),
 			},
-			expected: `<wp:wrapSquare wrapText="left" distT="10" distR="8"></wp:wrapSquare>`,
+			expectedXML: `<wp:wrapSquare wrapText="left" distT="10" distR="8"></wp:wrapSquare>`,
 		},
 	}
 
 	for _, tt := range tests {
+		object := wrapWrapSquareXML(tt.input)
+		expectedXML := wrapXMLOutput(tt.expectedXML)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Local: "wrapSquare"}}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expectedXML {
+					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML = tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
 
-			err := encoder.EncodeElement(tt.input, start)
-
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
-			}
+			})
 		})
 	}
 }
@@ -149,49 +166,66 @@ func TestWrapSquare_UnmarshalXML(t *testing.T) {
 // Tests for WrapSquare ends
 
 // Tests for WrapPolygon starts
+
+func wrapWrapPolygonXML(el *WrapPolygon) *WrapperXML {
+	return wrapXML(struct {
+		*WrapPolygon
+		XMLName struct{} `xml:"wp:wrapPolygon"`
+	}{WrapPolygon: el})
+}
+
 func TestWrapPolygon_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    WrapPolygon
-		expected string
-	}{
-		{
-			name: "With all attributes and edited true",
-			input: WrapPolygon{
-				Start:  dmlct.NewPoint2D(1, 2),
-				LineTo: []dmlct.Point2D{dmlct.NewPoint2D(3, 4), dmlct.NewPoint2D(5, 6)},
-				Edited: internal.ToPtr(true),
-			},
-			expected: `<wp:wrapPolygon xmlns="wp" edited="true"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon>`,
+		name        string
+		input       *WrapPolygon
+		expectedXML string
+	}{{
+		name: "With all attributes and edited true",
+		input: &WrapPolygon{
+			Start:  dmlct.NewPoint2D(1, 2),
+			LineTo: []dmlct.Point2D{dmlct.NewPoint2D(3, 4), dmlct.NewPoint2D(5, 6)},
+			Edited: internal.ToPtr(true),
 		},
+		expectedXML: `<wp:wrapPolygon edited="true"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon>`,
+	},
 		{
 			name: "With no edited attribute",
-			input: WrapPolygon{
+			input: &WrapPolygon{
 				Start:  dmlct.NewPoint2D(1, 2),
 				LineTo: []dmlct.Point2D{dmlct.NewPoint2D(3, 4), dmlct.NewPoint2D(5, 6), dmlct.NewPoint2D(7, 8)},
 				Edited: nil,
 			},
-			expected: `<wp:wrapPolygon xmlns="wp"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo><wp:lineTo x="7" y="8"></wp:lineTo></wp:wrapPolygon>`,
+			expectedXML: `<wp:wrapPolygon><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo><wp:lineTo x="7" y="8"></wp:lineTo></wp:wrapPolygon>`,
 		},
 	}
 
 	for _, tt := range tests {
+		object := wrapWrapPolygonXML(tt.input)
+		expectedXML := wrapXMLOutput(tt.expectedXML)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{Name: xml.Name{Space: "wp", Local: "wrapPolygon"}}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expectedXML {
+					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML = tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
 
-			err := encoder.EncodeElement(tt.input, start)
-
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
-			}
+			})
 		})
 	}
 }
@@ -252,15 +286,22 @@ func TestWrapPolygon_UnmarshalXML(t *testing.T) {
 	}
 }
 
+func wrapWrapTightXML(el *WrapTight) *WrapperXML {
+	return wrapXML(struct {
+		*WrapTight
+		XMLName struct{} `xml:"wp:wrapTight"`
+	}{WrapTight: el})
+}
+
 func TestWrapTight_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    WrapTight
-		expected string
+		name        string
+		input       *WrapTight
+		expectedXML string
 	}{
 		{
 			name: "With all attributes and DistL, DistR",
-			input: WrapTight{
+			input: &WrapTight{
 				WrapPolygon: WrapPolygon{
 					Start:  dmlct.Point2D{XAxis: 1, YAxis: 2},
 					LineTo: []dmlct.Point2D{{XAxis: 3, YAxis: 4}, {XAxis: 5, YAxis: 6}},
@@ -270,11 +311,11 @@ func TestWrapTight_MarshalXML(t *testing.T) {
 				DistL:    internal.ToPtr(uint(10)),
 				DistR:    internal.ToPtr(uint(5)),
 			},
-			expected: `<wp:wrapTight wrapText="right" distL="10" distR="5"><wp:wrapPolygon edited="true"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapTight>`,
+			expectedXML: `<wp:wrapTight wrapText="right" distL="10" distR="5"><wp:wrapPolygon edited="true"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapTight>`,
 		},
 		{
 			name: "With no DistL and DistR",
-			input: WrapTight{
+			input: &WrapTight{
 				WrapPolygon: WrapPolygon{
 					Start:  dmlct.Point2D{XAxis: 1, YAxis: 2},
 					LineTo: []dmlct.Point2D{{XAxis: 3, YAxis: 4}, {XAxis: 5, YAxis: 6}},
@@ -284,11 +325,11 @@ func TestWrapTight_MarshalXML(t *testing.T) {
 				DistL:    nil,
 				DistR:    nil,
 			},
-			expected: `<wp:wrapTight wrapText="right"><wp:wrapPolygon edited="false"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapTight>`,
+			expectedXML: `<wp:wrapTight wrapText="right"><wp:wrapPolygon edited="false"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapTight>`,
 		},
 		{
 			name: "With minimal attributes",
-			input: WrapTight{
+			input: &WrapTight{
 				WrapPolygon: WrapPolygon{
 					Start:  dmlct.Point2D{XAxis: 1, YAxis: 2},
 					LineTo: []dmlct.Point2D{{XAxis: 3, YAxis: 4}},
@@ -298,27 +339,37 @@ func TestWrapTight_MarshalXML(t *testing.T) {
 				DistL:    nil,
 				DistR:    nil,
 			},
-			expected: `<wp:wrapTight wrapText="right"><wp:wrapPolygon><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo></wp:wrapPolygon></wp:wrapTight>`,
+			expectedXML: `<wp:wrapTight wrapText="right"><wp:wrapPolygon><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo></wp:wrapPolygon></wp:wrapTight>`,
 		},
 	}
 
 	for _, tt := range tests {
+		object := wrapWrapTightXML(tt.input)
+		expectedXML := wrapXMLOutput(tt.expectedXML)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expectedXML {
+					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML = tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
 
-			err := encoder.EncodeElement(tt.input, start)
-
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
-			}
+			})
 		})
 	}
 }
@@ -429,15 +480,22 @@ func TestWrapTight_UnmarshalXML(t *testing.T) {
 	}
 }
 
+func wrapWrapThroughXML(el *WrapThrough) *WrapperXML {
+	return wrapXML(struct {
+		*WrapThrough
+		XMLName struct{} `xml:"wp:wrapThrough"`
+	}{WrapThrough: el})
+}
+
 func TestWrapThrough_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    WrapThrough
-		expected string
+		name        string
+		input       *WrapThrough
+		expectedXML string
 	}{
 		{
 			name: "With all attributes and DistL, DistR",
-			input: WrapThrough{
+			input: &WrapThrough{
 				WrapPolygon: WrapPolygon{
 					Start:  dmlct.Point2D{XAxis: 1, YAxis: 2},
 					LineTo: []dmlct.Point2D{{XAxis: 3, YAxis: 4}, {XAxis: 5, YAxis: 6}},
@@ -447,11 +505,11 @@ func TestWrapThrough_MarshalXML(t *testing.T) {
 				DistL:    internal.ToPtr(uint(10)),
 				DistR:    internal.ToPtr(uint(5)),
 			},
-			expected: `<wp:wrapThrough wrapText="right" distL="10" distR="5"><wp:wrapPolygon edited="true"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapThrough>`,
+			expectedXML: `<wp:wrapThrough wrapText="right" distL="10" distR="5"><wp:wrapPolygon edited="true"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapThrough>`,
 		},
 		{
 			name: "With no DistL and DistR",
-			input: WrapThrough{
+			input: &WrapThrough{
 				WrapPolygon: WrapPolygon{
 					Start:  dmlct.Point2D{XAxis: 1, YAxis: 2},
 					LineTo: []dmlct.Point2D{{XAxis: 3, YAxis: 4}, {XAxis: 5, YAxis: 6}},
@@ -461,11 +519,11 @@ func TestWrapThrough_MarshalXML(t *testing.T) {
 				DistL:    nil,
 				DistR:    nil,
 			},
-			expected: `<wp:wrapThrough wrapText="right"><wp:wrapPolygon edited="false"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapThrough>`,
+			expectedXML: `<wp:wrapThrough wrapText="right"><wp:wrapPolygon edited="false"><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo><wp:lineTo x="5" y="6"></wp:lineTo></wp:wrapPolygon></wp:wrapThrough>`,
 		},
 		{
 			name: "With minimal attributes",
-			input: WrapThrough{
+			input: &WrapThrough{
 				WrapPolygon: WrapPolygon{
 					Start:  dmlct.Point2D{XAxis: 1, YAxis: 2},
 					LineTo: []dmlct.Point2D{{XAxis: 3, YAxis: 4}},
@@ -475,30 +533,41 @@ func TestWrapThrough_MarshalXML(t *testing.T) {
 				DistL:    nil,
 				DistR:    nil,
 			},
-			expected: `<wp:wrapThrough wrapText="right"><wp:wrapPolygon><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo></wp:wrapPolygon></wp:wrapThrough>`,
+			expectedXML: `<wp:wrapThrough wrapText="right"><wp:wrapPolygon><wp:start x="1" y="2"></wp:start><wp:lineTo x="3" y="4"></wp:lineTo></wp:wrapPolygon></wp:wrapThrough>`,
 		},
 	}
 
 	for _, tt := range tests {
+		object := wrapWrapThroughXML(tt.input)
+		expectedXML := wrapXMLOutput(tt.expectedXML)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expectedXML {
+					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML = tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
 
-			err := encoder.EncodeElement(tt.input, start)
-
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
-			}
+			})
 		})
 	}
 }
+
 func compareWrapThrough(a, b WrapThrough) bool {
 	if a.WrapText != b.WrapText {
 		return false
@@ -605,15 +674,22 @@ func TestWrapThrough_UnmarshalXML(t *testing.T) {
 	}
 }
 
+func wrapWrapTopBtmXML(el *WrapTopBtm) *WrapperXML {
+	return wrapXML(struct {
+		*WrapTopBtm
+		XMLName struct{} `xml:"wp:wrapTopAndBottom"`
+	}{WrapTopBtm: el})
+}
+
 func TestWrapTopBtm_MarshalXML(t *testing.T) {
 	tests := []struct {
-		name     string
-		input    WrapTopBtm
-		expected string
+		name        string
+		input       *WrapTopBtm
+		expectedXML string
 	}{
 		{
 			name: "With all attributes and EffectExtent",
-			input: WrapTopBtm{
+			input: &WrapTopBtm{
 				DistT: internal.ToPtr(uint(10)),
 				DistB: internal.ToPtr(uint(15)),
 				EffectExtent: &EffectExtent{
@@ -623,11 +699,11 @@ func TestWrapTopBtm_MarshalXML(t *testing.T) {
 					BottomEdge: 4,
 				},
 			},
-			expected: `<wp:wrapTopAndBottom distT="10" distB="15"><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent></wp:wrapTopAndBottom>`,
+			expectedXML: `<wp:wrapTopAndBottom distT="10" distB="15"><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent></wp:wrapTopAndBottom>`,
 		},
 		{
 			name: "With DistT and EffectExtent",
-			input: WrapTopBtm{
+			input: &WrapTopBtm{
 				DistT: internal.ToPtr(uint(10)),
 				EffectExtent: &EffectExtent{
 					LeftEdge:   1,
@@ -636,39 +712,49 @@ func TestWrapTopBtm_MarshalXML(t *testing.T) {
 					BottomEdge: 4,
 				},
 			},
-			expected: `<wp:wrapTopAndBottom distT="10"><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent></wp:wrapTopAndBottom>`,
+			expectedXML: `<wp:wrapTopAndBottom distT="10"><wp:effectExtent l="1" t="2" r="3" b="4"></wp:effectExtent></wp:wrapTopAndBottom>`,
 		},
 		{
 			name: "With DistB only",
-			input: WrapTopBtm{
+			input: &WrapTopBtm{
 				DistB: internal.ToPtr(uint(15)),
 			},
-			expected: `<wp:wrapTopAndBottom distB="15"></wp:wrapTopAndBottom>`,
+			expectedXML: `<wp:wrapTopAndBottom distB="15"></wp:wrapTopAndBottom>`,
 		},
 		{
-			name:     "With no attributes",
-			input:    WrapTopBtm{},
-			expected: `<wp:wrapTopAndBottom></wp:wrapTopAndBottom>`,
+			name:        "With no attributes",
+			input:       &WrapTopBtm{},
+			expectedXML: `<wp:wrapTopAndBottom></wp:wrapTopAndBottom>`,
 		},
 	}
 
 	for _, tt := range tests {
+		object := wrapWrapTopBtmXML(tt.input)
+		expectedXML := wrapXMLOutput(tt.expectedXML)
 		t.Run(tt.name, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-			start := xml.StartElement{}
+			t.Run("MarshalXML", func(t *testing.T) {
+				output, err := xml.Marshal(object)
+				if err != nil {
+					t.Fatalf("Error marshaling to XML: %v", err)
+				}
+				if got := string(output); got != expectedXML {
+					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
+				}
+			})
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML = tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
 
-			err := encoder.EncodeElement(tt.input, start)
-
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			encoder.Flush()
-
-			if result.String() != tt.expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expected, result.String())
-			}
+			})
 		})
 	}
 }
