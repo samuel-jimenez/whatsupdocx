@@ -1,6 +1,7 @@
 package dml
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/samuel-jimenez/xml"
@@ -58,10 +59,10 @@ func TestInline_MarshalXML(t *testing.T) {
 	}}
 
 	for _, tt := range tests {
-		object := wrapInlineXML(tt.input)
-		expectedXML := wrapXMLOutput(tt.expectedXML)
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run("MarshalXML", func(t *testing.T) {
+				object := wrapInlineXML(tt.input)
+				expectedXML := wrapXMLOutput(tt.expectedXML)
 				output, err := xml.Marshal(object)
 				if err != nil {
 					t.Fatalf("Error marshaling to XML: %v", err)
@@ -70,25 +71,20 @@ func TestInline_MarshalXML(t *testing.T) {
 					t.Errorf("XML mismatch\nexpectedXML:\n%s\nActual:\n%s", expectedXML, got)
 				}
 			})
-			//TODO UnmarshalXML_TOO_3
-			//              // expectedXML:
-			//              // &dml.Inline{Attr:[]xml.Attr{xml.Attr{Name:xml.Name{Space:"", Local:"xmlns:a"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/main"}, xml.Attr{Name:xml.Name{Space:"", Local:"xmlns:pic"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/picture"}}, DistT:0x2, DistB:0x3, DistL:0x4, DistR:0x5, Extent:dmlct.PSize2D{Width:0x64, Height:0xc8}, EffectExtent:(*dml.EffectExtent)(nil), DocProp:dml.DocProp{ID:0x1, Name:"Document Property", Description:"This is a document property"}, CNvGraphicFramePr:(*dml.NonVisualGraphicFrameProp)(0xc000048448), Graphic:dml.Graphic{DrawingMLMainNS:"http://schemas.openxmlformats.org/drawingml/2006/main", Data:(*dml.GraphicData)(nil)}}
-			//              // Actual:
-			//              // &dml.Inline{Attr:[]xml.Attr{xml.Attr{Name:xml.Name{Space:"http://www.w3.org/2000/xmlns/", Local:"a"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/main"}, xml.Attr{Name:xml.Name{Space:"http://www.w3.org/2000/xmlns/", Local:"pic"}, Value:"http://schemas.openxmlformats.org/drawingml/2006/picture"}}, DistT:0x2, DistB:0x3, DistL:0x4, DistR:0x5, Extent:dmlct.PSize2D{Width:0x64, Height:0xc8}, EffectExtent:(*dml.EffectExtent)(nil), DocProp:dml.DocProp{ID:0x1, Name:"Document Property", Description:"This is a document property"}, CNvGraphicFramePr:(*dml.NonVisualGraphicFrameProp)(0xc000048450), Graphic:dml.Graphic{DrawingMLMainNS:"http://schemas.openxmlformats.org/drawingml/2006/main", Data:(*dml.GraphicData)(nil)}}
-			// t.Run("UnMarshalXML", func(t *testing.T) {
-			// 	object := tt.input
-			// 	expectedXML = tt.expectedXML
-			// 	vt := reflect.TypeOf(object)
-			// 	dest := reflect.New(vt.Elem()).Interface()
-			// 	err := xml.Unmarshal([]byte(expectedXML), dest)
-			// 	if err != nil {
-			// 		t.Fatalf("Error unmarshaling from XML: %v", err)
-			// 	}
-			// 	if got, want := dest, object; !reflect.DeepEqual(got, want) {
-			// 		t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
-			// 	}
-			//
-			// })
+			t.Run("UnMarshalXML", func(t *testing.T) {
+				object := tt.input
+				expectedXML := tt.expectedXML
+				vt := reflect.TypeOf(object)
+				dest := reflect.New(vt.Elem()).Interface()
+				err := xml.Unmarshal([]byte(expectedXML), dest)
+				if err != nil {
+					t.Fatalf("Error unmarshaling from XML: %v", err)
+				}
+				if got, want := dest, object; !reflect.DeepEqual(got, want) {
+					t.Errorf("XML mismatch unmarshal(%s):\nexpectedXML:\n%#v\nActual:\n%#v", tt.expectedXML, want, got)
+				}
+
+			})
 		})
 	}
 }
