@@ -1,114 +1,55 @@
 package ctypes
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/internal"
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
+	"github.com/stretchr/testify/suite"
 )
 
-func wrapGridXML(el Grid) *WrapperXML {
+func wrapGridXML(el any) *testsuite.WrapperXML {
 	return wrapXML(struct {
-		Grid
+		*Grid
 		XMLName struct{} `xml:"w:tblGrid"`
-	}{Grid: el})
+	}{Grid: el.(*Grid)})
 }
 
-func TestGrid_MarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    Grid
-		expected string
-	}{
+func TestGrid(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapGridXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
+	xmlTester.Tests = []testsuite.XMLTestData{
 		{
-			name: "With Columns and GridChange",
-			input: Grid{
+			Name: "With Columns and GridChange",
+			Input: &Grid{
 				Col: []Column{
 					{Width: internal.ToPtr(uint64(500))},
 					{Width: internal.ToPtr(uint64(750))},
 				},
 				GridChange: &GridChange{ID: 1},
 			},
-			expected: `<w:tblGrid><w:gridCol w:w="500"></w:gridCol><w:gridCol w:w="750"></w:gridCol><w:tblGridChange w:id="1"></w:tblGridChange></w:tblGrid>`,
+			ExpectedXML: `<w:tblGrid><w:gridCol w:w="500"></w:gridCol><w:gridCol w:w="750"></w:gridCol><w:tblGridChange w:id="1"></w:tblGridChange></w:tblGrid>`,
 		},
 		{
-			name: "With Columns, without GridChange",
-			input: Grid{
+			Name: "With Columns, without GridChange",
+			Input: &Grid{
 				Col: []Column{
 					{Width: internal.ToPtr(uint64(300))},
 					{Width: internal.ToPtr(uint64(600))},
 				},
 			},
-			expected: `<w:tblGrid><w:gridCol w:w="300"></w:gridCol><w:gridCol w:w="600"></w:gridCol></w:tblGrid>`,
+			ExpectedXML: `<w:tblGrid><w:gridCol w:w="300"></w:gridCol><w:gridCol w:w="600"></w:gridCol></w:tblGrid>`,
 		},
 		{
-			name:     "Empty Grid",
-			input:    Grid{},
-			expected: `<w:tblGrid></w:tblGrid>`,
+			Name:        "Empty Grid",
+			Input:       &Grid{},
+			ExpectedXML: `<w:tblGrid></w:tblGrid>`,
 		},
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(wrapGridXML(tt.input))
-			expected := wrapXMLOutput(tt.expected)
-			if err != nil {
-				t.Fatalf("Error marshaling to XML: %v", err)
-			}
-			if got := string(output); got != expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
-			}
-		})
-	}
-}
-
-func TestGrid_UnmarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		inputXML string
-		expected Grid
-	}{
-		{
-			name:     "With Columns and GridChange",
-			inputXML: `<w:tblGrid><w:gridCol w:w="500"></w:gridCol><w:gridCol w:w="750"></w:gridCol><w:tblGridChange w:id="1"></w:tblGridChange></w:tblGrid>`,
-			expected: Grid{
-				Col: []Column{
-					{Width: internal.ToPtr(uint64(500))},
-					{Width: internal.ToPtr(uint64(750))},
-				},
-				GridChange: &GridChange{ID: 1},
-			},
-		},
-		{
-			name:     "With Columns, without GridChange",
-			inputXML: `<w:tblGrid><w:gridCol w:w="300"></w:gridCol><w:gridCol w:w="600"></w:gridCol></w:tblGrid>`,
-			expected: Grid{
-				Col: []Column{
-					{Width: internal.ToPtr(uint64(300))},
-					{Width: internal.ToPtr(uint64(600))},
-				},
-			},
-		},
-		{
-			name:     "Empty Grid",
-			inputXML: `<w:tblGrid></w:tblGrid>`,
-			expected: Grid{},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var result Grid
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &result)
-			if err != nil {
-				t.Fatalf("Error unmarshaling XML: %v", err)
-			}
-
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("Unmarshaled Grid struct does not match expected:\nExpected: %+v\nActual:   %+v", tt.expected, result)
-			}
-		})
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
 }

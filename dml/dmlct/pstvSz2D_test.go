@@ -1,12 +1,55 @@
 package dmlct
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
 
+	"github.com/samuel-jimenez/xml"
+	"github.com/stretchr/testify/suite"
+
 	"github.com/samuel-jimenez/whatsupdocx/common/units"
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
 )
+
+func wrapPSize2DXML(el any, tag string) *testsuite.WrapperXML {
+	return wrapXML(struct {
+		*PSize2D
+		XMLName xml.Name
+	}{PSize2D: el.(*PSize2D), XMLName: xml.Name{Local: tag}})
+}
+
+func TestPSize2D(t *testing.T) {
+	xmlTester := new(testsuite.XMLNamedTester)
+	xmlTester.WrapXMLInput = wrapPSize2DXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
+	xmlTester.Tests = []testsuite.XMLTestData{
+		{
+			Name:        "w:extent",
+			Input:       NewPostvSz2D(units.Emu(100), units.Emu(200)),
+			ExpectedXML: `<w:extent cx="100" cy="200"></w:extent>`,
+			XMLName:     "w:extent",
+		},
+		{
+			Name:        "a:ext",
+			Input:       NewPostvSz2D(units.Emu(150), units.Emu(250)),
+			ExpectedXML: `<a:ext cx="150" cy="250"></a:ext>`,
+			XMLName:     "a:ext",
+		},
+		{
+			Name: "a:extent",
+			Input: &PSize2D{
+				Width:  150,
+				Height: 250,
+			},
+			ExpectedXML: `<a:extent cx="150" cy="250"></a:extent>`,
+			XMLName:     "a:extent",
+		},
+	}
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
+	}
+}
 
 func TestNewPSize2D(t *testing.T) {
 	width := units.Emu(100)
@@ -19,86 +62,5 @@ func TestNewPSize2D(t *testing.T) {
 
 	if extent.Height != uint64(height) {
 		t.Errorf("Height does not match. Expected %d, got %d", height, extent.Height)
-	}
-}
-
-func TestMarshalPSize2D(t *testing.T) {
-	tests := []struct {
-		extent      *PSize2D
-		expectedXML string
-		xmlName     string
-	}{
-		{
-			extent:      NewPostvSz2D(units.Emu(100), units.Emu(200)),
-			expectedXML: `<w:extent cx="100" cy="200"></w:extent>`,
-			xmlName:     "w:extent",
-		},
-		{
-			extent:      NewPostvSz2D(units.Emu(150), units.Emu(250)),
-			expectedXML: `<a:ext cx="150" cy="250"></a:ext>`,
-			xmlName:     "a:ext",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.xmlName, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-
-			start := xml.StartElement{Name: xml.Name{Local: tt.xmlName}}
-			err := encoder.EncodeElement(tt.extent, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			err = encoder.Flush()
-			if err != nil {
-				t.Errorf("Error flushing encoder: %v", err)
-			}
-
-			if result.String() != tt.expectedXML {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, result.String())
-			}
-		})
-	}
-}
-
-func TestUnmarshalPSize2D(t *testing.T) {
-	tests := []struct {
-		inputXML    string
-		expectedExt PSize2D
-	}{
-		{
-			inputXML: `<w:extent cx="100" cy="200"></w:extent>`,
-			expectedExt: PSize2D{
-				Width:  100,
-				Height: 200,
-			},
-		},
-		{
-			inputXML: `<a:extent cx="150" cy="250"></a:extent>`,
-			expectedExt: PSize2D{
-				Width:  150,
-				Height: 250,
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.inputXML, func(t *testing.T) {
-			var extent PSize2D
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &extent)
-			if err != nil {
-				t.Fatalf("Error unmarshaling XML: %v", err)
-			}
-
-			if extent.Width != tt.expectedExt.Width {
-				t.Errorf("Expected width %d, but got %d", tt.expectedExt.Width, extent.Width)
-			}
-			if extent.Height != tt.expectedExt.Height {
-				t.Errorf("Expected height %d, but got %d", tt.expectedExt.Height, extent.Height)
-			}
-		})
 	}
 }

@@ -1,96 +1,45 @@
 package dmlct
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"strings"
 	"testing"
+
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestMarshalCNvPr(t *testing.T) {
-	tests := []struct {
-		cnvpr       *CNvPr
-		expectedXML string
-	}{
-		{
-			cnvpr: &CNvPr{
-				ID:          1,
-				Name:        "Drawing1",
-				Description: "Description of Drawing1",
-			},
-			expectedXML: `<pic:cNvPr id="1" name="Drawing1" descr="Description of Drawing1"></pic:cNvPr>`,
-		},
-		{
-			cnvpr: &CNvPr{
-				ID:   2,
-				Name: "Drawing2",
-			},
-			expectedXML: `<pic:cNvPr id="2" name="Drawing2" descr=""></pic:cNvPr>`,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.expectedXML, func(t *testing.T) {
-			var result strings.Builder
-			encoder := xml.NewEncoder(&result)
-
-			start := xml.StartElement{Name: xml.Name{Local: "pic:cNvPr"}}
-			err := encoder.EncodeElement(tt.cnvpr, start)
-			if err != nil {
-				t.Fatalf("Error marshaling XML: %v", err)
-			}
-
-			err = encoder.Flush()
-			if err != nil {
-				t.Errorf("Error flushing encoder: %v", err)
-			}
-
-			if result.String() != tt.expectedXML {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", tt.expectedXML, result.String())
-			}
-		})
-	}
+func wrapCNvPrXML(el any) *testsuite.WrapperXML {
+	return wrapXML(struct {
+		*CNvPr
+		XMLName struct{} `xml:"pic:cNvPr"`
+	}{CNvPr: el.(*CNvPr)})
 }
 
-func TestUnmarshalCNvPr(t *testing.T) {
-	tests := []struct {
-		inputXML      string
-		expectedCNvPr CNvPr
-	}{
+func TestCNvPr(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapCNvPrXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
+	xmlTester.Tests = []testsuite.XMLTestData{
 		{
-			inputXML: `<pic:cNvPr id="1" name="Drawing1" descr="Description of Drawing1"></pic:cNvPr>`,
-			expectedCNvPr: CNvPr{
+			Name: "With Description",
+			Input: &CNvPr{
 				ID:          1,
 				Name:        "Drawing1",
 				Description: "Description of Drawing1",
 			},
+			ExpectedXML: `<pic:cNvPr id="1" name="Drawing1" descr="Description of Drawing1"></pic:cNvPr>`,
 		},
 		{
-			inputXML: `<pic:cNvPr id="2" name="Drawing2"></pic:cNvPr>`,
-			expectedCNvPr: CNvPr{
+			Name: "No Description",
+			Input: &CNvPr{
 				ID:   2,
 				Name: "Drawing2",
 			},
+			ExpectedXML: `<pic:cNvPr id="2" name="Drawing2"></pic:cNvPr>`,
 		},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.inputXML, func(t *testing.T) {
-			var cnvpr CNvPr
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &cnvpr)
-			if err != nil {
-				t.Fatalf("Error unmarshaling XML: %v", err)
-			}
-
-			if cnvpr.ID != tt.expectedCNvPr.ID {
-				t.Errorf("Expected ID %d, but got %d", tt.expectedCNvPr.ID, cnvpr.ID)
-			}
-			if cnvpr.Name != tt.expectedCNvPr.Name {
-				t.Errorf("Expected Name %s, but got %s", tt.expectedCNvPr.Name, cnvpr.Name)
-			}
-			if cnvpr.Description != tt.expectedCNvPr.Description {
-				t.Errorf("Expected Description %s, but got %s", tt.expectedCNvPr.Description, cnvpr.Description)
-			}
-		})
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
 }

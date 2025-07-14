@@ -1,82 +1,39 @@
 package ctypes
 
 import (
-	"reflect"
 	"testing"
 
-	"github.com/samuel-jimenez/xml"
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
+	"github.com/stretchr/testify/suite"
 )
 
-func wrapFitTextXML(el FitText) *WrapperXML {
+func wrapFitTextXML(el any) *testsuite.WrapperXML {
 	return wrapXML(struct {
-		FitText
+		*FitText
 		XMLName struct{} `xml:"w:fitText"`
-	}{FitText: el})
+	}{FitText: el.(*FitText)})
 }
 
-func TestFitText_MarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    FitText
-		expected string
-	}{
-		{
-			name:     "With ID",
-			input:    FitText{Val: 123, ID: IntPtr(456)},
-			expected: `<w:fitText w:val="123" w:id="456"></w:fitText>`,
-		},
-		{
-			name:     "Without ID",
-			input:    FitText{Val: 789},
-			expected: `<w:fitText w:val="789"></w:fitText>`,
-		},
-	}
+func TestFitText(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapFitTextXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(wrapFitTextXML(tt.input))
-			expected := wrapXMLOutput(tt.expected)
-			if err != nil {
-				t.Fatalf("Error marshaling to XML: %v", err)
-			}
-			if got := string(output); got != expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
-			}
-		})
-	}
-}
-
-func TestFitText_UnmarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		inputXML string
-		expected FitText
-	}{
+	xmlTester.Tests = []testsuite.XMLTestData{
 		{
-			name:     "With ID",
-			inputXML: `<w:fitText w:val="123" w:id="456"></w:fitText>`,
-			expected: FitText{Val: 123, ID: IntPtr(456)},
+			Name:        "With ID",
+			Input:       &FitText{Val: 123, ID: IntPtr(456)},
+			ExpectedXML: `<w:fitText w:val="123" w:id="456"></w:fitText>`,
 		},
 		{
-			name:     "Without ID",
-			inputXML: `<w:fitText w:val="789"></w:fitText>`,
-			expected: FitText{Val: 789},
+			Name:        "Without ID",
+			Input:       &FitText{Val: 789},
+			ExpectedXML: `<w:fitText w:val="789"></w:fitText>`,
 		},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var result FitText
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &result)
-			if err != nil {
-				t.Fatalf("Error unmarshaling XML: %v", err)
-			}
-
-			if !reflect.DeepEqual(result, tt.expected) {
-				t.Errorf("Expected %+v but got %+v", tt.expected, result)
-			}
-		})
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
 }
 

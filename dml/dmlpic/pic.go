@@ -16,7 +16,7 @@ type Pic struct {
 	Attr []xml.Attr `xml:",any,attr,omitempty"`
 
 	// 1. Non-Visual Picture Properties
-	NonVisualPicProp NonVisualPicProp `xml:"nvPicPr,omitempty"`
+	NonVisualPicProp NonVisualPicProp `xml:"pic:nvPicPr,omitempty"`
 
 	// 2.Picture Fill
 	BlipFill BlipFill `xml:"pic:blipFill,omitempty"`
@@ -37,7 +37,7 @@ func NewPic(rID string, imgCount uint, width units.Emu, height units.Emu) *Pic {
 
 	blipFill := NewBlipFill(rID)
 
-	blipFill.FillModeProps = FillModeProps{
+	blipFill.FillModeProps = &FillModeProps{
 		Stretch: &shapes.Stretch{
 			FillRect: &dmlct.RelativeRect{},
 		},

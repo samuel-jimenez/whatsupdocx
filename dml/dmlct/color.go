@@ -1,7 +1,5 @@
 package dmlct
 
-import "github.com/samuel-jimenez/xml"
-
 // ColorChoice selects a color
 // a_EG_ColorChoice =
 type ColorChoice struct {
@@ -13,23 +11,6 @@ type ColorChoice struct {
 	// | element schemeClr { a_CT_SchemeColor }
 	SchemeColor *SchemeColor `xml:"a:schemeClr,omitempty"`
 	// | element prstClr { a_CT_PresetColor }
-}
-
-// group marshal
-
-func (group *ColorChoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-
-	switch start.Name.Local {
-	case "schemeClr":
-		group.SchemeColor = &SchemeColor{}
-		if err = d.DecodeElement(group.SchemeColor, &start); err != nil {
-			return err
-		}
-	default:
-		err = d.Skip()
-		return err
-	}
-	return nil
 }
 
 // SchemeColorVal
@@ -60,41 +41,6 @@ type SchemeColor struct {
 	Val string `xml:"val,attr"`
 	// a_EG_ColorTransform*
 	ColorTransform []ColorTransform `xml:",group,any,omitempty"`
-}
-
-func (props *SchemeColor) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-	for _, attr := range start.Attr {
-		switch attr.Name.Local {
-		case "val":
-			props.Val = attr.Value
-		}
-	}
-
-	for {
-		currentToken, err := d.Token()
-		if err != nil {
-			return err
-		}
-
-		switch elem := currentToken.(type) {
-		case xml.StartElement:
-			switch elem.Name.Local {
-			case "lumOff", "lumMod":
-				colorTransform := ColorTransform{}
-				if err = d.DecodeElement(&colorTransform, &elem); err != nil {
-					return err
-				}
-				props.ColorTransform = append(props.ColorTransform, colorTransform)
-
-			default:
-				if err = d.Skip(); err != nil {
-					return err
-				}
-			}
-		case xml.EndElement:
-			return nil
-		}
-	}
 }
 
 // a_ST_Percentage = s_ST_Percentage
@@ -150,21 +96,6 @@ type ColorTransform struct {
 	// | element gamma { a_CT_GammaTransform }
 	// | element invGamma { a_CT_InverseGammaTransform }
 
-}
-
-func (group *ColorTransform) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-
-	switch start.Name.Local {
-	case "lumMod":
-		group.LumMod = &Percentage{}
-		if err = d.DecodeElement(group.LumMod, &start); err != nil {
-			return err
-		}
-	default:
-		err = d.Skip()
-		return err
-	}
-	return nil
 }
 
 //TODO

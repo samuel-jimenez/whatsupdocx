@@ -71,7 +71,7 @@ func TestMarshalGraphic(t *testing.T) {
 					Blip: &dmlpic.Blip{
 						EmbedID: "rId1",
 					},
-					FillModeProps: dmlpic.FillModeProps{
+					FillModeProps: &dmlpic.FillModeProps{
 						Stretch: &shapes.Stretch{
 							FillRect: &dmlct.RelativeRect{},
 						},

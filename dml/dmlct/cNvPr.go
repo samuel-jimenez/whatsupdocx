@@ -1,19 +1,14 @@
 package dmlct
 
-import (
-	"strconv"
-
-	"github.com/samuel-jimenez/xml"
-)
-
 // Non-Visual Drawing Properties
+// 19.3.1.12 cNvPr (Non-Visual Drawing Properties)
 // CT_NonVisualDrawingProps
 // a_CT_NonVisualDrawingProps =
 type CNvPr struct {
 	// attribute id { a_ST_DrawingElementId },
-	ID uint `xml:"id,attr,omitempty"`
+	ID uint `xml:"id,attr"`
 	// attribute name { xsd:string },
-	Name string `xml:"name,attr,omitempty"`
+	Name string `xml:"name,attr"`
 
 	//Alternative Text for Object - Default value is "".
 	// attribute descr { xsd:string }?,
@@ -40,34 +35,4 @@ func NewNonVisProp(id uint, name string) *CNvPr {
 		ID:   id,
 		Name: name,
 	}
-}
-
-func (c CNvPr) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	// ! NOTE: Disabling the empty name check for the Picture
-	//  since popular docx tools allow them
-	// if c.Name == "" {
-	// 	return fmt.Errorf("invalid Name for Non-Visual Drawing Properties when marshaling")
-	// }
-
-	start.Attr = []xml.Attr{
-		{Name: xml.Name{Local: "id"}, Value: strconv.FormatUint(uint64(c.ID), 10)},
-		{Name: xml.Name{Local: "name"}, Value: c.Name},
-	}
-
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "descr"}, Value: c.Description})
-
-	if c.Hidden != nil {
-		if *c.Hidden {
-			start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "hidden"}, Value: "true"})
-		} else {
-			start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "hidden"}, Value: "false"})
-		}
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }

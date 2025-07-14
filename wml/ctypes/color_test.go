@@ -3,59 +3,31 @@ package ctypes
 import (
 	"testing"
 
-	"github.com/samuel-jimenez/xml"
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
+	"github.com/stretchr/testify/suite"
 )
 
-func wrapColorXML(el *Color) *WrapperXML {
+func wrapColorXML(el any) *testsuite.WrapperXML {
 	return wrapXML(struct {
 		*Color
 		XMLName struct{} `xml:"w:color"`
-	}{Color: el})
+	}{Color: el.(*Color)})
 }
 
 func TestColor(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapColorXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
 	testColor := NewColor("FF0000")
-	tests := []struct {
-		name     string
-		input    *Color
-		expected string
-	}{{
-		name:     "",
-		input:    testColor,
-		expected: `<w:color w:val="FF0000"></w:color>`,
-	}}
-
-	for _, tt := range tests {
-		object := wrapColorXML(tt.input)
-		expected := wrapXMLOutput(tt.expected)
-		t.Run(tt.name, func(t *testing.T) {
-			t.Run("MarshalXML", func(t *testing.T) {
-				output, err := xml.Marshal(object)
-				if err != nil {
-					t.Fatalf("Error marshaling to XML: %v", err)
-				}
-				if got := string(output); got != expected {
-					t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
-				}
-			}) //TODO UnmarshalXML_TOO
-		})
-
+	xmlTester.Tests = []testsuite.XMLTestData{
+		{
+			Input:       testColor,
+			ExpectedXML: `<w:color w:val="FF0000"></w:color>`,
+		},
 	}
-
-	//TODO
-	xmlData, err := xml.Marshal(testColor)
-	if err != nil {
-		t.Fatalf("Error marshaling Color to XML: %v", err)
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
-
-	var unmarshaledColor Color
-	err = xml.Unmarshal(xmlData, &unmarshaledColor)
-	if err != nil {
-		t.Fatalf("Error unmarshaling XML to Color: %v", err)
-	}
-
-	if testColor.Val != unmarshaledColor.Val {
-		t.Errorf("Expected color value \n%s\n, got \n%s\n", testColor.Val, unmarshaledColor.Val)
-	}
-
 }

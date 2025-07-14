@@ -1,10 +1,6 @@
 package dmlct
 
 import (
-	"strconv"
-
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/common/units"
 )
 
@@ -19,12 +15,4 @@ func NewPostvSz2D(width units.Emu, height units.Emu) *PSize2D {
 		Height: uint64(height),
 		Width:  uint64(width),
 	}
-}
-
-func (p PSize2D) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "cx"}, Value: strconv.FormatUint(p.Width, 10)})
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "cy"}, Value: strconv.FormatUint(p.Height, 10)})
-
-	return e.EncodeElement("", start)
 }

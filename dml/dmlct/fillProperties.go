@@ -1,8 +1,6 @@
 package dmlct
 
 import (
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/common"
 )
 
@@ -35,26 +33,6 @@ type LineFillProperties struct {
 	// | element pattFill { a_CT_PatternFillProperties }
 }
 
-func (group *LineFillProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) (err error) {
-
-	switch start.Name.Local {
-	case "noFill":
-		group.NoFillProperties = &common.Empty{}
-		if err = d.DecodeElement(group.NoFillProperties, &start); err != nil {
-			return err
-		}
-	case "solidFill":
-		group.SolidColorFillProperties = &SolidColorFillProperties{}
-		if err = d.DecodeElement(group.SolidColorFillProperties, &start); err != nil {
-			return err
-		}
-	default:
-		err = d.Skip()
-		return err
-	}
-	return nil
-}
-
 // StyleMatrixReference
 // a_CT_StyleMatrixReference =
 type StyleMatrixReference struct {
@@ -65,6 +43,7 @@ type StyleMatrixReference struct {
 	ColorChoice *ColorChoice `xml:",group,any,omitempty"`
 }
 
+// TODO make this a type
 const (
 	FontCollectionIndexMajor = "major"
 	FontCollectionIndexMinor = "minor"
@@ -76,7 +55,7 @@ const (
 type FontReference struct {
 	// a_ST_FontCollectionIndex = "major" | "minor" | "none"
 	// attribute idx { a_ST_FontCollectionIndex },
-	Id string `xml:"idx,attr,omitempty"`
+	Id string `xml:"idx,attr"`
 	// a_EG_ColorChoice?
 	ColorChoice *ColorChoice `xml:",group,any,omitempty"`
 }

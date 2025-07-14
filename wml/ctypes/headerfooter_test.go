@@ -3,222 +3,101 @@ package ctypes
 import (
 	"testing"
 
-	"github.com/samuel-jimenez/xml"
-
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
+	"github.com/stretchr/testify/suite"
 )
 
-func wrapHeaderReferenceXML(el HeaderFooterReference) *WrapperXML {
+func wrapHeaderReferenceXML(el any) *testsuite.WrapperXML {
 	return wrapXML(struct {
-		HeaderFooterReference
+		*HeaderFooterReference
 		XMLName struct{} `xml:"w:headerReference"`
-	}{HeaderFooterReference: el})
+	}{HeaderFooterReference: el.(*HeaderFooterReference)})
 }
 
-func wrapFooterReferenceXML(el HeaderFooterReference) *WrapperXML {
+func wrapFooterReferenceXML(el any) *testsuite.WrapperXML {
 	return wrapXML(struct {
-		HeaderFooterReference
+		*HeaderFooterReference
 		XMLName struct{} `xml:"w:footerReference"`
-	}{HeaderFooterReference: el})
+	}{HeaderFooterReference: el.(*HeaderFooterReference)})
 }
 
-func TestHeaderReference_MarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    HeaderFooterReference
-		expected string
-	}{
+func TestHeaderReference(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapHeaderReferenceXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
+	xmlTester.Tests = []testsuite.XMLTestData{
 		{
-			name: "Marshal with ID and Type",
-			input: HeaderFooterReference{
+			Name: "With ID and Type",
+			Input: &HeaderFooterReference{
 				ID:   "rId1",
 				Type: stypes.HdrFtrFirst,
 			},
-			expected: `<w:headerReference r:id="rId1" w:type="first"></w:headerReference>`,
+			ExpectedXML: `<w:headerReference r:id="rId1" w:type="first"></w:headerReference>`,
 		},
 		{
-			name: "Marshal with Type only",
-			input: HeaderFooterReference{
+			Name: "With Type only",
+			Input: &HeaderFooterReference{
 				Type: stypes.HdrFtrEven,
 			},
-			expected: `<w:headerReference w:type="even"></w:headerReference>`,
+			ExpectedXML: `<w:headerReference w:type="even"></w:headerReference>`,
 		},
 		{
-			name: "Marshal with ID only",
-			input: HeaderFooterReference{
+			Name: "With ID only",
+			Input: &HeaderFooterReference{
 				ID: "rId2",
 			},
-			expected: `<w:headerReference r:id="rId2"></w:headerReference>`,
+			ExpectedXML: `<w:headerReference r:id="rId2"></w:headerReference>`,
 		},
 		{
-			name:     "Marshal with neither ID nor Type",
-			input:    HeaderFooterReference{},
-			expected: `<w:headerReference></w:headerReference>`,
+			Name:        "With neither ID nor Type",
+			Input:       &HeaderFooterReference{},
+			ExpectedXML: `<w:headerReference></w:headerReference>`,
 		},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(wrapHeaderReferenceXML(tt.input))
-			expected := wrapXMLOutput(tt.expected)
-			if err != nil {
-				t.Fatalf("Error marshaling to XML: %v", err)
-			}
-			if got := string(output); got != expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
-			}
-		})
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
 }
 
-func TestHeaderReference_UnmarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		inputXML string
-		expected HeaderFooterReference
-	}{
+func TestFooterReference(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapFooterReferenceXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
+	xmlTester.Tests = []testsuite.XMLTestData{
 		{
-			name:     "Unmarshal with ID and Type",
-			inputXML: `<w:headerReference w:type="first" r:id="rId1"></w:headerReference>`,
-			expected: HeaderFooterReference{
+			Name: "With ID and Type",
+			Input: &HeaderFooterReference{
 				ID:   "rId1",
 				Type: stypes.HdrFtrFirst,
 			},
+			ExpectedXML: `<w:footerReference r:id="rId1" w:type="first"></w:footerReference>`,
 		},
 		{
-			name:     "Unmarshal with Type only",
-			inputXML: `<w:headerReference w:type="even"></w:headerReference>`,
-			expected: HeaderFooterReference{
+			Name: "With Type only",
+			Input: &HeaderFooterReference{
 				Type: stypes.HdrFtrEven,
 			},
+			ExpectedXML: `<w:footerReference w:type="even"></w:footerReference>`,
 		},
 		{
-			name:     "Unmarshal with ID only",
-			inputXML: `<w:headerReference r:id="rId2"></w:headerReference>`,
-			expected: HeaderFooterReference{
+			Name: "With ID only",
+			Input: &HeaderFooterReference{
 				ID: "rId2",
 			},
+			ExpectedXML: `<w:footerReference r:id="rId2"></w:footerReference>`,
 		},
 		{
-			name:     "Unmarshal with neither ID nor Type",
-			inputXML: `<w:headerReference></w:headerReference>`,
-			expected: HeaderFooterReference{},
+			Name:        "With neither ID nor Type",
+			Input:       &HeaderFooterReference{},
+			ExpectedXML: `<w:footerReference></w:footerReference>`,
 		},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var result HeaderFooterReference
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &result)
-			if err != nil {
-				t.Fatalf("Error during unmarshaling: %v", err)
-			}
-
-			if result.ID != tt.expected.ID || result.Type != tt.expected.Type {
-				t.Errorf("Expected %+v but got %+v", tt.expected, result)
-			}
-		})
-	}
-}
-
-func TestFooterReference_MarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    HeaderFooterReference
-		expected string
-	}{
-		{
-			name: "Marshal with ID and Type",
-			input: HeaderFooterReference{
-				ID:   "rId1",
-				Type: stypes.HdrFtrFirst,
-			},
-			expected: `<w:footerReference r:id="rId1" w:type="first"></w:footerReference>`,
-		},
-		{
-			name: "Marshal with Type only",
-			input: HeaderFooterReference{
-				Type: stypes.HdrFtrEven,
-			},
-			expected: `<w:footerReference w:type="even"></w:footerReference>`,
-		},
-		{
-			name: "Marshal with ID only",
-			input: HeaderFooterReference{
-				ID: "rId2",
-			},
-			expected: `<w:footerReference r:id="rId2"></w:footerReference>`,
-		},
-		{
-			name:     "Marshal with neither ID nor Type",
-			input:    HeaderFooterReference{},
-			expected: `<w:footerReference></w:footerReference>`,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(wrapFooterReferenceXML(tt.input))
-			expected := wrapXMLOutput(tt.expected)
-			if err != nil {
-				t.Fatalf("Error marshaling to XML: %v", err)
-			}
-			if got := string(output); got != expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
-			}
-		})
-	}
-
-}
-
-func TestFooterReference_UnmarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		inputXML string
-		expected HeaderFooterReference
-	}{
-		{
-			name:     "Unmarshal with ID and Type",
-			inputXML: `<w:footerReference w:type="first" r:id="rId1"></w:footerReference>`,
-			expected: HeaderFooterReference{
-				ID:   "rId1",
-				Type: stypes.HdrFtrFirst,
-			},
-		},
-		{
-			name:     "Unmarshal with Type only",
-			inputXML: `<w:footerReference w:type="even"></w:footerReference>`,
-			expected: HeaderFooterReference{
-				Type: stypes.HdrFtrEven,
-			},
-		},
-		{
-			name:     "Unmarshal with ID only",
-			inputXML: `<w:footerReference r:id="rId2"></w:footerReference>`,
-			expected: HeaderFooterReference{
-				ID: "rId2",
-			},
-		},
-		{
-			name:     "Unmarshal with neither ID nor Type",
-			inputXML: `<w:footerReference></w:footerReference>`,
-			expected: HeaderFooterReference{},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var result HeaderFooterReference
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &result)
-			if err != nil {
-				t.Fatalf("Error during unmarshaling: %v", err)
-			}
-
-			if result.ID != tt.expected.ID || result.Type != tt.expected.Type {
-				t.Errorf("Expected %+v but got %+v", tt.expected, result)
-			}
-		})
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
 }

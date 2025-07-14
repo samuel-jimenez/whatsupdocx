@@ -3,28 +3,28 @@ package ctypes
 import (
 	"testing"
 
-	"github.com/samuel-jimenez/xml"
-
 	"github.com/samuel-jimenez/whatsupdocx/internal"
+	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
+	"github.com/stretchr/testify/suite"
 )
 
-func wrapFramePropXML(el FrameProp) *WrapperXML {
+func wrapFramePropXML(el any) *testsuite.WrapperXML {
 	return wrapXML(struct {
-		FrameProp
+		*FrameProp
 		XMLName struct{} `xml:"w:framePr"`
-	}{FrameProp: el})
+	}{FrameProp: el.(*FrameProp)})
 }
 
-func TestFrameProp_MarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    FrameProp
-		expected string
-	}{
+func TestFrameProp(t *testing.T) {
+	xmlTester := new(testsuite.XMLTester)
+	xmlTester.WrapXMLInput = wrapFramePropXML
+	xmlTester.WrapXMLOutput = wrapXMLOutput
+
+	xmlTester.Tests = []testsuite.XMLTestData{
 		{
-			name: "With all attributes",
-			input: FrameProp{
+			Name: "With all attributes",
+			Input: &FrameProp{
 				Width:      internal.ToPtr(int64(500)),
 				Height:     internal.ToPtr(int64((300))),
 				DropCap:    internal.ToPtr(stypes.DropCapMargin),
@@ -41,133 +41,21 @@ func TestFrameProp_MarshalXML(t *testing.T) {
 				HRule:      internal.ToPtr(stypes.HeightRuleExact),
 				AnchorLock: internal.ToPtr(stypes.OnOffTrue),
 			},
-			expected: `<w:framePr w:w="500" w:h="300" w:dropCap="margin" w:lines="3" w:hSpace="20" w:vSpace="50" w:wrap="around" w:hAnchor="margin" w:vAnchor="page" w:x="100" w:y="200" w:xAlign="left" w:yAlign="center" w:hRule="exact" w:anchorLock="true"></w:framePr>`,
-		},
-		{
-			name: "Without optional attributes",
-			input: FrameProp{
-				Width:  internal.ToPtr(int64(500)),
-				Height: internal.ToPtr(int64(300)),
-			},
-			expected: `<w:framePr w:w="500" w:h="300"></w:framePr>`,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			output, err := xml.Marshal(wrapFramePropXML(tt.input))
-			expected := wrapXMLOutput(tt.expected)
-			if err != nil {
-				t.Fatalf("Error marshaling to XML: %v", err)
-			}
-			if got := string(output); got != expected {
-				t.Errorf("XML mismatch\nExpected:\n%s\nActual:\n%s", expected, got)
-			}
-		})
-	}
-}
-
-func TestFrameProp_UnmarshalXML(t *testing.T) {
-	tests := []struct {
-		name     string
-		inputXML string
-		expected FrameProp
-	}{
-		{
-			name: "With all attributes",
-			inputXML: `<w:framePr w:w="500" w:h="300" w:dropCap="margin" w:lines="3" w:vSpace="50" w:hSpace="20" ` +
+			ExpectedXML: `<w:framePr w:w="500" w:h="300" w:dropCap="margin" w:lines="3" w:hSpace="20" w:vSpace="50" ` +
 				`w:wrap="around" w:hAnchor="margin" w:vAnchor="page" w:x="100" w:y="200" w:xAlign="left" w:yAlign="center" ` +
 				`w:hRule="exact" w:anchorLock="true"></w:framePr>`,
-			expected: FrameProp{
-				Width:      internal.ToPtr(int64(500)),
-				Height:     internal.ToPtr(int64(300)),
-				DropCap:    internal.ToPtr(stypes.DropCapMargin),
-				Lines:      internal.ToPtr(3),
-				VSpace:     internal.ToPtr(int64(50)),
-				HSpace:     internal.ToPtr(int64(20)),
-				Wrap:       internal.ToPtr(stypes.WrapAround),
-				HAnchor:    internal.ToPtr(stypes.AnchorMargin),
-				VAnchor:    internal.ToPtr(stypes.AnchorPage),
-				AbsHPos:    internal.ToPtr(100),
-				AbsVPos:    internal.ToPtr(200),
-				XAlign:     internal.ToPtr(stypes.XAlignLeft),
-				YAlign:     internal.ToPtr(stypes.YAlignCenter),
-				HRule:      internal.ToPtr(stypes.HeightRuleExact),
-				AnchorLock: internal.ToPtr(stypes.OnOffTrue),
-			},
 		},
 		{
-			name:     "Without optional attributes",
-			inputXML: `<w:framePr w:w="500" w:h="300"></w:framePr>`,
-			expected: FrameProp{
+			Name: "Without optional attributes",
+			Input: &FrameProp{
 				Width:  internal.ToPtr(int64(500)),
 				Height: internal.ToPtr(int64(300)),
 			},
+			ExpectedXML: `<w:framePr w:w="500" w:h="300"></w:framePr>`,
 		},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var result FrameProp
-
-			err := xml.Unmarshal([]byte(tt.inputXML), &result)
-			if err != nil {
-				t.Fatalf("Error unmarshaling XML: %v", err)
-			}
-
-			// Compare each field individually due to pointer comparisons
-			if err := compareFrameProps(result, tt.expected); err != nil {
-				t.Error(err)
-			}
-		})
+	suite.Run(t, xmlTester)
+	if !xmlTester.Stats.Passed() {
+		xmlTester.FailNow("XML Failure")
 	}
-}
-
-// Helper function to compare FrameProp structs
-func compareFrameProps(a, b FrameProp) error {
-	if err := internal.ComparePtr("Width", a.Width, b.Width); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("Height", a.Height, b.Height); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("DropCap", a.DropCap, b.DropCap); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("Lines", a.Lines, b.Lines); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("VSpace", a.VSpace, b.VSpace); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("HSpace", a.HSpace, b.HSpace); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("Wrap", a.Wrap, b.Wrap); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("HAnchor", a.HAnchor, b.HAnchor); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("VAnchor", a.VAnchor, b.VAnchor); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("AbsHPos", a.AbsHPos, b.AbsHPos); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("AbsVPos", a.AbsVPos, b.AbsVPos); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("XAlign", a.XAlign, b.XAlign); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("YAlign", a.YAlign, b.YAlign); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("HRule", a.HRule, b.HRule); err != nil {
-		return err
-	}
-	if err := internal.ComparePtr("AnchorLock", a.AnchorLock, b.AnchorLock); err != nil {
-		return err
-	}
-	return nil
 }

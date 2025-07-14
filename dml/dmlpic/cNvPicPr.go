@@ -1,9 +1,6 @@
 package dmlpic
 
 import (
-	"github.com/samuel-jimenez/xml"
-	"fmt"
-
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlct"
 	"github.com/samuel-jimenez/whatsupdocx/dml/dmlprops"
 )
@@ -19,7 +16,7 @@ type CNvPicPr struct {
 
 	//1. Picture Locks
 	// element picLocks { a_CT_PictureLocking }?,
-	PicLocks *dmlprops.PicLocks `xml:"picLocks,omitempty"`
+	PicLocks *dmlprops.PicLocks `xml:"a:picLocks,omitempty"`
 
 	//TODO:
 	// 2. Extension List
@@ -30,39 +27,13 @@ func NewCNvPicPr() CNvPicPr {
 	return CNvPicPr{}
 }
 
-func (c CNvPicPr) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "pic:cNvPicPr"
-
-	if c.PreferRelativeResize != nil {
-		if *c.PreferRelativeResize {
-			start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "preferRelativeResize"}, Value: "true"})
-		} else {
-			start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "preferRelativeResize"}, Value: "false"})
-		}
-	}
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// 1. PicLocks
-	if c.PicLocks != nil {
-		if err := e.EncodeElement(c.PicLocks, xml.StartElement{Name: xml.Name{Local: "a:picLocks"}}); err != nil {
-			return err
-		}
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
-}
-
 // Non-Visual Picture Properties
 type NonVisualPicProp struct {
 	// 1. Non-Visual Drawing Properties
-	CNvPr dmlct.CNvPr `xml:"cNvPr,omitempty"`
+	CNvPr dmlct.CNvPr `xml:"pic:cNvPr,omitempty"`
 
 	// 2.Non-Visual Picture Drawing Properties
-	CNvPicPr CNvPicPr `xml:"cNvPicPr,omitempty"`
+	CNvPicPr CNvPicPr `xml:"pic:cNvPicPr,omitempty"`
 }
 
 func NewNVPicProp(cNvPr dmlct.CNvPr, cNvPicPr CNvPicPr) NonVisualPicProp {
@@ -79,29 +50,4 @@ func DefaultNVPicProp(id uint, name string) NonVisualPicProp {
 		CNvPr:    *dmlct.NewNonVisProp(id, name),
 		CNvPicPr: cnvPicPr,
 	}
-}
-
-func (n NonVisualPicProp) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	start.Name.Local = "pic:nvPicPr"
-
-	err := e.EncodeToken(start)
-	if err != nil {
-		return err
-	}
-
-	// 1. cNvPr
-	if err = n.CNvPr.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "pic:cNvPr"},
-	}); err != nil {
-		return fmt.Errorf("marshalling cNvPr: %w", err)
-	}
-
-	// 2. cNvPicPr
-	if err = n.CNvPicPr.MarshalXML(e, xml.StartElement{
-		Name: xml.Name{Local: "pic:cNvPicPr"},
-	}); err != nil {
-		return fmt.Errorf("marshalling cNvPicPr: %w", err)
-	}
-
-	return e.EncodeToken(xml.EndElement{Name: start.Name})
 }
