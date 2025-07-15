@@ -1,28 +1,29 @@
 package dmlct
 
-import (
-	"strconv"
-
-	"github.com/samuel-jimenez/xml"
-)
+// a_ST_Coordinate = a_ST_CoordinateUnqualified | s_ST_UniversalMeasure
+//
+// a_ST_CoordinateUnqualified =
+// xsd:long {
+// minInclusive = "-27273042329600"
+// maxInclusive = "27273042316900"
+// }
+//
+// s_ST_UniversalMeasure =
+// xsd:string { pattern = "-?[0-9]+(\.[0-9]+)?(mm|cm|in|pt|pc|pi)" }
+// http://www.datypic.com/sc/ooxml/t-a_ST_Coordinate.html
 
 // Wrapping Polygon Point2D
+// a_CT_Point2D =
+// attribute x { a_ST_Coordinate },
+// attribute y { a_ST_Coordinate }
 type Point2D struct {
-	XAxis uint64 `xml:"x,attr"`
-	YAxis uint64 `xml:"y,attr"`
+	XAxis int64 `xml:"x,attr"`
+	YAxis int64 `xml:"y,attr"`
 }
 
-func NewPoint2D(x, y uint64) Point2D {
+func NewPoint2D(x, y int64) Point2D {
 	return Point2D{
-		XAxis: uint64(x),
-		YAxis: uint64(y),
+		XAxis: int64(x),
+		YAxis: int64(y),
 	}
-}
-
-func (p Point2D) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "x"}, Value: strconv.FormatUint(p.XAxis, 10)})
-	start.Attr = append(start.Attr, xml.Attr{Name: xml.Name{Local: "y"}, Value: strconv.FormatUint(p.YAxis, 10)})
-
-	return e.EncodeElement("", start)
 }
