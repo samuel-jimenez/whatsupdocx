@@ -9,3 +9,20 @@
 // which provides methods for creating a new document from a default template or
 // opening an existing document.
 package docx
+
+import "github.com/samuel-jimenez/whatsupdocx/wml/ctypes"
+
+// w_CT_P
+type Paragraph = ctypes.Paragraph
+
+// w_CT_R
+type Run = ctypes.Run
+
+// w_CT_Tbl
+type Table = ctypes.Table
+
+// w_CT_Row
+type Row = ctypes.Row
+
+// w_CT_Tc
+type Cell = ctypes.Cell
