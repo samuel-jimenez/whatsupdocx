@@ -28,6 +28,9 @@ import (
 // element cNvGraphicFramePr { a_CT_NonVisualGraphicFrameProperties }?,
 // a_graphic
 
+// NOTE!: As per http://www.datypic.com/sc/ooxml/e-wp_anchor.html, Dist* attributes is optional
+// But we include them to lower diffs with MS Word
+
 // wp_CT_Anchor =
 type Anchor struct {
 
@@ -35,16 +38,16 @@ type Anchor struct {
 	/// The distance shall be measured in EMUs (English Mektric Units).,
 	//Distance From Text on Top Edge
 	// attribute distT { wp_ST_WrapDistance }?,
-	DistT uint `xml:"distT,attr,omitempty"`
+	DistT uint `xml:"distT,attr"`
 	//Distance From Text on Bottom Edge
 	// attribute distB { wp_ST_WrapDistance }?,
-	DistB uint `xml:"distB,attr,omitempty"`
+	DistB uint `xml:"distB,attr"`
 	//Distance From Text on Left Edge
 	// attribute distL { wp_ST_WrapDistance }?,
-	DistL uint `xml:"distL,attr,omitempty"`
+	DistL uint `xml:"distL,attr"`
 	//Distance From Text on Right Edge
 	// attribute distR { wp_ST_WrapDistance }?,
-	DistR uint `xml:"distR,attr,omitempty"`
+	DistR uint `xml:"distR,attr"`
 
 	/// Specifies that this object shall be positioned using the positioning information in the
 	/// simplePos child element (§20.4.2.13). This positioning, when specified, positions the

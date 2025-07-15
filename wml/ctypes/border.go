@@ -4,11 +4,33 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 )
 
+// w_CT_Border =
+// attribute w:val { w_ST_Border },
+// attribute w:color { w_ST_HexColor }?,
+// ## default value: auto
+// attribute w:themeColor { w_ST_ThemeColor }?,
+// attribute w:themeTint { w_ST_UcharHexNumber }?,
+// attribute w:themeShade { w_ST_UcharHexNumber }?,
+// attribute w:sz { w_ST_EighthPointMeasure }?,
+// attribute w:space { w_ST_PointMeasure }?,
+// ## default value: 0
+// attribute w:shadow { s_ST_OnOff }?,
+// attribute w:frame { s_ST_OnOff }?
+
 // Border Properties (CT_Border)
+// http://www.datypic.com/sc/wordprocessingml2003/t-ns4_borderProperty.html
 // w_CT_Border =
 type Border struct {
 	// attribute w:val { w_ST_Border },
 	Val stypes.BorderStyle `xml:"w:val,attr"`
+
+	// NOTE!: These are out of order to lower diffs with MS Word
+	// attribute w:sz { w_ST_EighthPointMeasure }?,
+	Size *int `xml:"w:sz,attr,omitempty"`
+	// attribute w:space { w_ST_PointMeasure }?,
+	// ## default value: 0
+	Space *string `xml:"w:space,attr,omitempty"`
+
 	// attribute w:color { w_ST_HexColor }?,
 	// ## default value: auto
 	Color *string `xml:"w:color,attr,omitempty"`
@@ -18,11 +40,7 @@ type Border struct {
 	ThemeTint *string `xml:"w:themeTint,attr,omitempty"`
 	// attribute w:themeShade { w_ST_UcharHexNumber }?,
 	ThemeShade *string `xml:"w:themeShade,attr,omitempty"`
-	// attribute w:sz { w_ST_EighthPointMeasure }?,
-	Size *int `xml:"w:sz,attr,omitempty"`
-	// attribute w:space { w_ST_PointMeasure }?,
-	// ## default value: 0
-	Space *string `xml:"w:space,attr,omitempty"`
+
 	// attribute w:shadow { s_ST_OnOff }?,
 	Shadow *stypes.OnOff `xml:"w:shadow,attr,omitempty"`
 	// attribute w:frame { s_ST_OnOff }?

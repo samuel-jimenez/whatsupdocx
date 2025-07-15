@@ -8,6 +8,7 @@ import (
 	"github.com/samuel-jimenez/whatsupdocx/wps"
 )
 
+// http://www.datypic.com/sc/ooxml/e-a_graphic.html
 // a_CT_GraphicalObject = element graphicData { a_CT_GraphicalObjectData }
 // a_graphic = element graphic { a_CT_GraphicalObject }
 type Graphic struct {

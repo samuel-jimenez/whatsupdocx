@@ -25,13 +25,15 @@ func TestCellBorders(t *testing.T) {
 	themeTint := "80"
 	themeShade := "20"
 	space := "4"
+	size := 150
+
 	shadow := stypes.OnOff("true")
 	frame := stypes.OnOff("false")
 	xmlTester.Tests = []testsuite.XMLTestData{
 		{
 			Name: "With all attributes",
 			Input: &CellBorders{
-				Top:     &Border{Val: stypes.BorderStyleSingle, Color: &colorRed, ThemeColor: &themeColorAccent1, ThemeTint: &themeTint, ThemeShade: &themeShade, Space: &space, Shadow: &shadow, Frame: &frame},
+				Top:     &Border{Val: stypes.BorderStyleSingle, Color: &colorRed, ThemeColor: &themeColorAccent1, ThemeTint: &themeTint, ThemeShade: &themeShade, Size: &size, Space: &space, Shadow: &shadow, Frame: &frame},
 				Left:    &Border{Val: stypes.BorderStyleDouble},
 				Bottom:  &Border{Val: stypes.BorderStyleDashed},
 				Right:   &Border{Val: stypes.BorderStyleDotted},
@@ -41,7 +43,7 @@ func TestCellBorders(t *testing.T) {
 				TR2BL:   &Border{Val: stypes.BorderStyleThick},
 			},
 			ExpectedXML: `<w:tcBorders>` +
-				`<w:top w:val="single" w:color="red" w:themeColor="accent1" w:themeTint="80" w:themeShade="20" w:space="4" w:shadow="true" w:frame="false"></w:top>` +
+				`<w:top w:val="single" w:sz="150" w:space="4" w:color="red" w:themeColor="accent1" w:themeTint="80" w:themeShade="20" w:shadow="true" w:frame="false"></w:top>` +
 				`<w:left w:val="double"></w:left>` +
 				`<w:bottom w:val="dashed"></w:bottom>` +
 				`<w:right w:val="dotted"></w:right>` +

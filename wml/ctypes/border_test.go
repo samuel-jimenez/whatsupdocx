@@ -3,6 +3,7 @@ package ctypes
 import (
 	"testing"
 
+	"github.com/samuel-jimenez/whatsupdocx/internal"
 	"github.com/samuel-jimenez/whatsupdocx/internal/testsuite"
 	"github.com/samuel-jimenez/whatsupdocx/wml/stypes"
 	"github.com/stretchr/testify/suite"
@@ -31,9 +32,10 @@ func TestBorder(t *testing.T) {
 				ThemeShade: StringPtr("200"),
 				Space:      StringPtr("0"),
 				Shadow:     OnOffPtr(stypes.OnOffTrue),
+				Size:       internal.ToPtr(19),
 				Frame:      OnOffPtr(stypes.OnOffTrue),
 			},
-			ExpectedXML: `<w:bdr w:val="single" w:color="FF0000" w:themeColor="accent1" w:themeTint="500" w:themeShade="200" w:space="0" w:shadow="true" w:frame="true"></w:bdr>`,
+			ExpectedXML: `<w:bdr w:val="single" w:sz="19" w:space="0" w:color="FF0000" w:themeColor="accent1" w:themeTint="500" w:themeShade="200" w:shadow="true" w:frame="true"></w:bdr>`,
 		},
 		{
 			Name: "Without optional attributes",
