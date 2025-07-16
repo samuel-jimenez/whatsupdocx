@@ -1,6 +1,8 @@
 package ctypes
 
 import (
+	"strings"
+
 	"github.com/samuel-jimenez/xml"
 
 	"github.com/samuel-jimenez/whatsupdocx/common"
@@ -174,6 +176,19 @@ func NewSym(font, char string) *Sym {
 		Font: &font,
 		Char: &char,
 	}
+}
+
+// String representation
+func (el Run) String() string {
+	var builder strings.Builder
+	for _, child := range el.Children {
+		switch {
+		case child.Text != nil:
+			t := child.Text
+			builder.WriteString(t.Text)
+		}
+	}
+	return builder.String()
 }
 
 // Appends a new text to the run.

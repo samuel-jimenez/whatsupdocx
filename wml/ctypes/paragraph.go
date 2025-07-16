@@ -46,14 +46,8 @@ type ParagraphChild struct {
 func (p Paragraph) String() string {
 	var builder strings.Builder
 	for _, cElem := range p.Children {
-		if cElem.Run != nil {
-			for _, child := range cElem.Run.Children {
-				switch {
-				case child.Text != nil:
-					t := child.Text
-					builder.WriteString(t.Text)
-				}
-			}
+		if run := cElem.Run; run != nil {
+			builder.WriteString(run.String())
 		}
 	}
 	return builder.String()
